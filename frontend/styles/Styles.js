@@ -128,7 +128,7 @@ export const drawerStyle = StyleSheet.create({
   },
   profileContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginVertical: 20,
   },
   profilePic: {
     width: 80,

@@ -22,7 +22,6 @@ import RecipientRecords from "./screens/Superadmin/RecipientRecords";
 const CustomDrawerContent = (props) => {
   return (
     <DrawerContentScrollView {...props}>
-
       <View style={drawerStyle.profileContainer}>
         <Image
           source={{ uri: defaultImg }} // Replace with your profile picture URL
