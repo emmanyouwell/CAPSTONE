@@ -5,13 +5,13 @@ import Header from '../../components/Superadmin/Header'
 import MenuGrid from '../../components/Superadmin/MenuGrid'
 const Dashboard = ({navigation}) => {
     const onMenuPress = () => {
-
+        navigation.openDrawer();
     }
     const onLogoutPress = () => {
 
     }
     return (
-        <View style={defaultStyle.container}>
+        <View style={SuperAdmin.container}>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress}/>
             <Text style={SuperAdmin.headerText}>Admin Dashboard</Text>
             <MenuGrid/>

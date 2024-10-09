@@ -1,11 +1,12 @@
 import { StyleSheet, Platform, StatusBar, Dimensions } from "react-native";
 const screenWidth = Dimensions.get('window').width;
+const screenHeight = StatusBar.currentHeight;
 export const colors = {
-  color1: "#2ecc71",
+  color1: "#E53777",
   color1_light: "#5bc0de",
   color1_dark: "#014780",
   color1_light2: "#89c4f4",
-  color2: "white",
+  color2: "#ff2d55",
   color3: "#69d697",
   color4: "transparent",
   color5: "white",
@@ -24,8 +25,7 @@ export const SuperAdminHeader = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
-    backgroundColor: '#E53777', // Background color for the header
-    
+    backgroundColor: colors.color1, // Background color for the header
     elevation: 2, // Add shadow for Android
   },
   centerContainer: {
@@ -36,7 +36,6 @@ export const SuperAdminHeader = StyleSheet.create({
     width: 40,
     height: 40,
     marginRight: 10,
-    
   },
   systemName: {
     fontSize: 20,
@@ -48,7 +47,7 @@ export const SuperAdminMenuItem = StyleSheet.create({
   button: {
     width: 152,
     height: 146,
-    backgroundColor: '#E53777', // Button background color
+    backgroundColor: colors.color1, // Button background color
     padding: 10,
     borderRadius: 20,
     margin: 5, // Space between buttons
@@ -83,6 +82,9 @@ export const SuperAdminMenuGrid = StyleSheet.create({
   }
 });
 export const SuperAdmin = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -96,12 +98,32 @@ export const SuperAdmin = StyleSheet.create({
   menuItems: {
     width: 152,
     height: 146,
-    backgroundColor: '#E53777',
+    backgroundColor: colors.color1,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center'
   },
-})
+});
+
+export const drawerStyle = StyleSheet.create({
+  container: {
+    flex:1,
+  },
+  profileContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  profilePic: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
+  },
+  profileName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});
 export const buttonStyle = StyleSheet.create({
   defaultBtn: {
     backgroundColor: colors.color1,
@@ -198,6 +220,7 @@ export const divider = StyleSheet.create({
     flex: 1,
     height: 1,
     backgroundColor: '#ccc',
+    marginVertical: 5,
   },
   dividerText: {
     marginHorizontal: 10,
