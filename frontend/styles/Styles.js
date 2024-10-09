@@ -89,7 +89,8 @@ export const SuperAdmin = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginVertical: 20,
-    textAlign: 'center'
+    textAlign: 'center',
+    color: 'black',
   },
   menuContainer: {
     flex: 1,
