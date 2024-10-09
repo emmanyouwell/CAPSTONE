@@ -88,7 +88,7 @@ export const SuperAdmin = StyleSheet.create({
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginTop: 20,
+    marginVertical: 20,
     textAlign: 'center'
   },
   menuContainer: {
@@ -104,6 +104,23 @@ export const SuperAdmin = StyleSheet.create({
     alignItems: 'center'
   },
 });
+
+export const dataTableStyle = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  tableContainer: {
+    flex: 1,
+  },
+  cell: {
+    minWidth: 100,
+    maxWidth: 200,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  }
+})
+
 
 export const drawerStyle = StyleSheet.create({
   container: {

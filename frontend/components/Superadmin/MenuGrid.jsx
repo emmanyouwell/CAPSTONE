@@ -3,10 +3,10 @@ import React from 'react';
 import { View, FlatList, StyleSheet, Image } from 'react-native';
 import MenuItem from './MenuItem'; // Import your MenuItem component
 import { SuperAdminMenuGrid } from '../../styles/Styles';
-
+import { useNavigation } from '@react-navigation/native';
 const menuItems = [
-  { id: '1', title: 'Donor Records', image: require('../../assets/image/donor-records.png') },
-  { id: '2', title: 'Recipient Records',image: require('../../assets/image/recipient-records.png') },
+  { id: '1', title: 'Donor Records', route: 'superadmin_donor_record',image: require('../../assets/image/donor-records.png') },
+  { id: '2', title: 'Recipient Records', route: 'superadmin_recipient_record', image: require('../../assets/image/recipient-records.png') },
   { id: '3', title: 'Schedules',image: require('../../assets/image/schedules.png') },
   { id: '4', title: 'Inventory & Metrics',image: require('../../assets/image/inventory-and-metrics.png') },
   { id: '5', title: 'Account Management',image: require('../../assets/image/account-management.png') },
@@ -18,8 +18,9 @@ const menuItems = [
 
 
 const MenuGrid = () => {
+    const navigation = useNavigation();
   const renderItem = ({ item }) => (
-    <MenuItem title={item.title} icon={<Image source={item.image} style={styles.icon} />} onPress={() => console.log(item.title)} />
+    <MenuItem title={item.title} icon={<Image source={item.image} style={styles.icon} />} onPress={() => navigation.navigate(item.route)} />
   );
 
   return (
