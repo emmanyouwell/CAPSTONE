@@ -1,23 +1,25 @@
 // MenuGrid.js
 import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, Image } from 'react-native';
 import MenuItem from './MenuItem'; // Import your MenuItem component
 import { SuperAdminMenuGrid } from '../../styles/Styles';
 
 const menuItems = [
-  { id: '1', title: 'Donor Records' },
-  { id: '2', title: 'Recipient Records' },
-  { id: '3', title: 'Schedules' },
-  { id: '4', title: 'Inventory & Metrics' },
-  { id: '5', title: 'Account Management' },
-  { id: '6', title: 'Announcement Creation' },
-  { id: '7', title: 'Resources Management' },
-  { id: '8', title: 'Revenue' },
+  { id: '1', title: 'Donor Records', image: require('../../assets/image/donor-records.png') },
+  { id: '2', title: 'Recipient Records',image: require('../../assets/image/recipient-records.png') },
+  { id: '3', title: 'Schedules',image: require('../../assets/image/schedules.png') },
+  { id: '4', title: 'Inventory & Metrics',image: require('../../assets/image/inventory-and-metrics.png') },
+  { id: '5', title: 'Account Management',image: require('../../assets/image/account-management.png') },
+  { id: '6', title: 'Announcement Creation',image: require('../../assets/image/announcement-creation.png') },
+  { id: '7', title: 'Resources Management',image: require('../../assets/image/resources-management.png') },
+  { id: '8', title: 'Revenue',image: require('../../assets/image/revenue.png') },
+  
 ];
+
 
 const MenuGrid = () => {
   const renderItem = ({ item }) => (
-    <MenuItem title={item.title} onPress={() => console.log(item.title)} />
+    <MenuItem title={item.title} icon={<Image source={item.image} style={styles.icon} />} onPress={() => console.log(item.title)} />
   );
 
   return (

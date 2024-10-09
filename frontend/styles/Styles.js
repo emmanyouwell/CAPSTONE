@@ -61,6 +61,9 @@ export const SuperAdminMenuItem = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+  iconContainer: {
+    marginBottom: 5,  
+  },
 });
 
 export const SuperAdminMenuGrid = StyleSheet.create({
@@ -72,6 +75,12 @@ export const SuperAdminMenuGrid = StyleSheet.create({
   row: {
     justifyContent: 'space-between', // Distribute buttons evenly in the row
   },
+  
+  icon: {
+    height: 50,
+    resizeMode: 'contain',
+    marginBottom: 5
+  }
 });
 export const SuperAdmin = StyleSheet.create({
   headerText: {
