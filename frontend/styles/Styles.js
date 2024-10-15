@@ -6,7 +6,7 @@ export const colors = {
   color1: "#E53777",
   color1_light: "#DE5F86",
   color1_dark: "#8A1531",
-  color1_light2: "#89c4f4",
+  color1_light2: "#F0CDDA",
   color2: "#ff2d55",
   color3: "#2E040D",
   color4: "transparent",
@@ -221,6 +221,54 @@ export const drawerStyle = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export const cardStyle = StyleSheet.create({
+  card: {
+    padding: 2,
+    flex:1,
+    backgroundColor: colors.color1_light2
+  },
+  cardContent: {
+    flexDirection:'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardTitle: {
+    fontSize: 18,
+    
+  },
+  textWrap: {
+    flex: 1,
+    height: '100%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  cardSubtitle: {
+    
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: colors.color2
+  }
+});
+export const metricsStyle = StyleSheet.create({
+  container: {
+    padding: 10,
+  },
+  flatListContent: {
+    // paddingHorizontal: 10,
+    
+  },
+  cardContainer: {
+    flex: 1,
+    margin:5,
+  },
+  columnWrapper: {
+    justifyContent: 'space-between',
+  },
+  separator: {
+    height: 10,
+  }
+})
 export const buttonStyle = StyleSheet.create({
   defaultBtn: {
     backgroundColor: colors.color1,
