@@ -71,7 +71,7 @@ const RecipientRecordsTable = () => {
           onPageChange={(page) => console.log(page)}
           label="1-2 of 6"
         />
-        <TouchableOpacity onPress={addRow} style={buttonStyle.smallBtn}><Text>Add new row</Text></TouchableOpacity>
+        <TouchableOpacity onPress={addRow} style={buttonStyle.smallBtn}><Text style={buttonStyle.btnText}>Add new row</Text></TouchableOpacity>
       </View>
       {isScrollable ? (
         <View style={dataTableStyle.tableContainer}>
