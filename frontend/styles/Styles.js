@@ -20,6 +20,12 @@ export const colors = {
   color11_lpcyan: "#125c58",
   color12_dpurple: "#b932fc"
 };
+export const sticky = StyleSheet.create({
+  sticky: {
+    paddingTop: 60,
+    
+  }
+});
 export const SuperAdminHeader = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
@@ -28,6 +34,16 @@ export const SuperAdminHeader = StyleSheet.create({
     padding: 10,
     backgroundColor: colors.color1, // Background color for the header
     elevation: 2, // Add shadow for Android
+    
+  },
+  stickyHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    backgroundColor: 'white',
+    elevation: 2,
   },
   centerContainer: {
     flexDirection: 'row',
@@ -85,11 +101,18 @@ export const SuperAdminMenuGrid = StyleSheet.create({
 export const SuperAdmin = StyleSheet.create({
   container: {
     flex: 1,
+    
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     marginVertical: 20,
+    textAlign: 'center',
+  },
+  subHeaderText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 5,
     textAlign: 'center',
   },
   menuContainer: {
@@ -221,7 +244,14 @@ export const drawerStyle = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-
+export const barChartStyle = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 0,
+  },
+});
 export const cardStyle = StyleSheet.create({
   card: {
     padding: 2,
@@ -238,7 +268,7 @@ export const cardStyle = StyleSheet.create({
     
   },
   textWrap: {
-    flex: 1,
+    width: 100,
     height: '100%',
     flexDirection: 'column',
     justifyContent: 'space-between',
@@ -254,13 +284,22 @@ export const metricsStyle = StyleSheet.create({
   container: {
     padding: 10,
   },
-  flatListContent: {
-    // paddingHorizontal: 10,
-    
+  chartContainer: {
+    padding: 10,
+    borderColor: colors.color3,
+    borderWidth: 3,
+    marginVertical: 5,
+    borderRadius: 20,
   },
   cardContainer: {
-    flex: 1,
-    margin:5,
+    width: '48%',
+    marginBottom:10,
+    
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   columnWrapper: {
     justifyContent: 'space-between',

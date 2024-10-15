@@ -3,7 +3,7 @@ import { View, Text, Image, ImageBackground, TextInput } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Superadmin/Header'
 import DonorRecordsTable from '../../components/Superadmin/DonorRecordTable'
-import { SuperAdmin, donorRecordsStyle, colors } from '../../styles/Styles'
+import { SuperAdmin, donorRecordsStyle, colors, sticky } from '../../styles/Styles'
 import donors from '../../assets/image/donors.jpg'
 const DonorRecords = ({ navigation }) => {
   const handleMenuClick = () => {
@@ -15,7 +15,7 @@ const DonorRecords = ({ navigation }) => {
   return (
     <View>
       <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
-      <View style={donorRecordsStyle.imageContainer}>
+      <View style={[donorRecordsStyle.imageContainer, sticky.sticky]}>
         <ImageBackground source={donors} style={donorRecordsStyle.image}>
           <View style={donorRecordsStyle.overlay} />
           <Text style={donorRecordsStyle.headerText}>Donor Records</Text>
