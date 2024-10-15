@@ -6,7 +6,7 @@ import DonorRecordsTable from '../../components/Superadmin/DonorRecordTable'
 import { SuperAdmin, metricsStyle, colors } from '../../styles/Styles'
 import donors from '../../assets/image/donors.jpg'
 import Cards from '../../components/Superadmin/Metrics/Cards';
-const Metrics = () => {
+const Metrics = ({navigation}) => {
     const cardData = [
         { id: '1', title: 'Revenue', subtitle: '100k', icon: 'cash-multiple' },
         { id: '2', title: 'Donors', subtitle: '10.9k', icon: 'account-group' },
