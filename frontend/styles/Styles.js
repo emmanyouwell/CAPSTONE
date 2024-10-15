@@ -1,17 +1,18 @@
 import { StyleSheet, Platform, StatusBar, Dimensions } from "react-native";
 const screenWidth = Dimensions.get('window').width;
-const screenHeight = StatusBar.currentHeight;
+// const screenHeight = StatusBar.currentHeight;
+const screenHeight = Dimensions.get('window').height;
 export const colors = {
   color1: "#E53777",
-  color1_light: "#5bc0de",
-  color1_dark: "#014780",
+  color1_light: "#DE5F86",
+  color1_dark: "#8A1531",
   color1_light2: "#89c4f4",
   color2: "#ff2d55",
-  color3: "#69d697",
+  color3: "#2E040D",
   color4: "transparent",
   color5: "white",
   color6: "#f7f7f7",
-  color7_black: "#000000",
+  color7_black: "#050003",
   color8_dgreen: "#2a783f",
   color81_dgreen2: "#197832",
   color9_lpgreen: "#e0ffe9",
@@ -61,7 +62,7 @@ export const SuperAdminMenuItem = StyleSheet.create({
     textAlign: 'center',
   },
   iconContainer: {
-    marginBottom: 5,  
+    marginBottom: 5,
   },
 });
 
@@ -74,7 +75,7 @@ export const SuperAdminMenuGrid = StyleSheet.create({
   row: {
     justifyContent: 'space-between', // Distribute buttons evenly in the row
   },
-  
+
   icon: {
     height: 50,
     resizeMode: 'contain',
@@ -105,26 +106,100 @@ export const SuperAdmin = StyleSheet.create({
   },
 });
 
+export const donorRecordsStyle = StyleSheet.create({
+  image: {
+    width: screenWidth,
+    height: 200,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Adjust the opacity as needed
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'white', // Background color of the search bar
+    borderRadius: 20, // Rounded corners
+    paddingHorizontal: 15, // Padding inside the search bar
+    width: '80%', // Adjust the width as needed
+    height: 40, // Adjust the height as needed
+  },
+  searchInput: {
+    flex: 1,
+    color: 'black'
+  },
+  searchIcon: {
+    marginLeft: 10,
+  },
+  imageContainer: {
+    position: 'relative',
+    marginBottom: 10,
+  },
+  headerText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: 'white',
+    zIndex: 99,
+  }
+});
 export const dataTableStyle = StyleSheet.create({
   container: {
-    flex: 1,
+    padding: 10,
+  },
+  btnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  tableHeaderStyle: {
+    color: colors.color2,
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  tableBodyTextStyle: {
+    color: colors.color7_black,
+    fontSize: 16,
   },
   tableContainer: {
-    flex: 1,
+    height: (screenHeight/2) + 50,
+    borderColor: 'rgba(5,0,3,0.5)',
+    borderWidth: 2,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    padding: 5,
+  },
+  verticalContainer: {
+    flexGrow:1,
   },
   cell: {
-    minWidth: 100,
-    maxWidth: 200,
+    minWidth: 100, // Adjust the minimum width as needed
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
-  }
+  },
+  nameColumn: {
+    width: 150,
+  },
+  emailColumn: {
+   width: 200,
+  },
+  roleColumn: {
+    width: 100,
+  },
+  ageColumn: {
+   width: 80,
+  },
+  locationColumn: {
+    width: 150,
+  },
 })
 
 
 export const drawerStyle = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
   },
   profileContainer: {
     alignItems: 'center',
@@ -156,7 +231,17 @@ export const buttonStyle = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold'
-  }
+  },
+  smallBtn: {
+    backgroundColor: colors.color1,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'flex-start'
+  },
 });
 export const defaultStyle = StyleSheet.create({
   container: {
