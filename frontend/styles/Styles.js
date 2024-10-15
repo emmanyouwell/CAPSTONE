@@ -162,6 +162,11 @@ export const dataTableStyle = StyleSheet.create({
     color: colors.color7_black,
     fontSize: 16,
   },
+  checkboxColumn:{
+    width: 80,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
   tableContainer: {
     height: (screenHeight/2) + 50,
     borderColor: 'rgba(5,0,3,0.5)',
