@@ -1,44 +1,32 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
 const {ObjectId} = mongoose.Schema.Types;
 
-const userSchema = new mongoose.Schema({
+const patientSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, 'Please enter your name'],
-        maxLength: [30, 'Your name cannot exceed 30 characters']
+        required: [true, 'Please enter name of the patient']
     },
-    email: {
+    address: {
         type: String,
-        required: [true, 'Please enter your email'],
-        unique: true,
-        validate: [validator.isEmail, 'Please enter valid email address']
-    },
-    password: {
-        type: String,
-        required: [true, 'Please enter your password'],
-        minlength: [6, 'Your password must be longer than 6 characters'],
-        select: false
+        required: [true, 'Please enter address of the patient']
     },
     phone: {
         type: String,
-        required: [true, 'Please enter your phone'],
-        minlength: [11, 'Phone number is invalid'],
+        required: [true, 'Please enter contact number of the patient']
     },
-    avatar: {
-        public_id: {
-            type: String,
-            // required: true
-        },
-        url: {
-            type: String,
-            // required: true
-        }
-    },
-    role: {
+    milkRequested: {
         type: String,
-        enum: ['Staff', 'Admin', 'SuperAdmin'],
-        default: 'Staff'
+        required: [true, 'Please enter amount of requested milk']
+    },
+    patientType: {
+        type: String,
+        enum: ['Inpatient', 'Outpatient'],
+        default: 'Inpatient',
+        required: true
+    },
+    hospital: {
+        type: String,
+        required: [true, 'Please enter the hospital name of the patient is admitted']
     },
     createdAt: {
         type: Date,
@@ -47,4 +35,4 @@ const userSchema = new mongoose.Schema({
 });
 
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('Patient', patientSchema);

@@ -21,11 +21,13 @@ app.use(fileUpload()); // For handling file uploads
 
 // Route Imports
 const user = require('./routes/user');
-const event = require('./routes/event')
+const event = require('./routes/event');
+const patient = require('./routes/patient');
 
 // API routes
 app.use('/api/v1', user);
 app.use('/api/v1', event);
+app.use('/api/v1', patient);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
