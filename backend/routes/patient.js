@@ -13,12 +13,12 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 // Super Admin Routes
 router.route('/patients')
-    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), allPatients)
-    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin'), createPatient);
+    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allPatients)
+    .post(isAuthenticatedUser, authorizeRoles('Staff','SuperAdmin', 'Admin'), createPatient);
 router.route('/patient/:id')
-    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), getPatientDetails)
-    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin'), updatePatient)
-    .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin'), deletePatient);
+    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getPatientDetails)
+    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updatePatient)
+    .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), deletePatient);
 
 
 module.exports = router;
