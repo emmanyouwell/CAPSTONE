@@ -24,12 +24,14 @@ const user = require('./routes/user');
 const event = require('./routes/event');
 const patient = require('./routes/patient');
 const donor = require('./routes/donor');
+const fridge = require('./routes/fridge');
 
 // API routes
 app.use('/api/v1', user);
 app.use('/api/v1', event);
 app.use('/api/v1', patient);
 app.use('/api/v1', donor);
+app.use('/api/v1', fridge);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
