@@ -8,8 +8,8 @@ const fridgeSchema = new mongoose.Schema({
     },
     fridgeType: {
         type: String,
-        enum: ['Medical', 'Freezer'],
-        default: 'Medical'
+        enum: ['Unpasteurized', 'Pasteurized'],
+        default: 'Unpasteurized'
     },
     capacity: {
         type: String,
