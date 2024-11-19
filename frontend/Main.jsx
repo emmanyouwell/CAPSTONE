@@ -20,6 +20,7 @@ import { drawerStyle, defaultImg, divider, colors } from "./styles/Styles";
 import DonorRecords from "./screens/Superadmin/DonorRecords";
 import RecipientRecords from "./screens/Superadmin/RecipientRecords";
 import Schedule from "./screens/Superadmin/Schedule";
+import Metrics from "./screens/Superadmin/Metrics";
 const CustomDrawerContent = (props) => {
   return (
     <DrawerContentScrollView {...props}>
@@ -117,6 +118,7 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_donor_record" component={DonorRecords}/>
         <Stack.Screen name="superadmin_recipient_record" component={RecipientRecords}/>
         <Stack.Screen name="superadmin_schedules" component={Schedule}/>
+        <Stack.Screen name="superadmin_metrics" component={Metrics}/>
       </Stack.Group>
     </Stack.Navigator>
   )
