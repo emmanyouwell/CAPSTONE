@@ -6,6 +6,8 @@ export const donorSlice = createSlice({
     donors: [],
     loading: false, // Useful for async actions like login/signup
     error: null, // To handle errors
+    count: 0,
+    pageSize: 0,
   },
   reducers: {
   },
@@ -18,6 +20,8 @@ export const donorSlice = createSlice({
       .addCase(getDonors.fulfilled, (state, action) => {
         state.loading = false;
         state.donors = action.payload.donors;
+        state.count = action.payload.count;
+        state.pageSize = action.payload.pageSize;
       })
       .addCase(getDonors.rejected, (state, action) => {
         state.loading = false;

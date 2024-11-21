@@ -11,12 +11,20 @@ import { getDonors } from '../../redux/actions/donorActions';
 import { getToken, viewAsyncStorage } from '../../utils/helper';
 const DonorRecords = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { donors, loading, error } = useSelector((state) => state.donors);
+  const { donors, count, pageSize, loading, error } = useSelector((state) => state.donors);
+  const [query, setQuery] = useState('');
   const handleMenuClick = () => {
     navigation.openDrawer();
   }
   const handleLogoutClick = () => {
     dispatch(logoutUser()).then(() => { navigation.navigate('login') }).catch((err) => console.log(err))
+  }
+  // Using onChangeText to update the state when text changes
+  const handleTextChange = (newText) => {
+    setQuery(newText);
+  };
+  const handleSubmit = () => {
+    dispatch(getDonors(query));
   }
   useEffect(() => {
     console.log('Dispatching getDonors...');
@@ -26,12 +34,17 @@ const DonorRecords = ({ navigation }) => {
       .then((data) => console.log('Donors fetched:', data))
       .catch((err) => console.error('Error fetching donors:', err));
   }, [dispatch])
-  useEffect(() => {
-    if (donors) {
-      console.log("Donors: ", donors);
-    }
+  // useEffect(() => {
+  //   if (donors) {
+  //     console.log("Donors: ", donors);
+  //   }
 
-  }, [donors])
+  // }, [donors])
+  useEffect(() => {
+    if (query) {
+      console.log('Query:', query);
+    }
+  }, [query])
   return (
     <View>
       <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
@@ -40,13 +53,15 @@ const DonorRecords = ({ navigation }) => {
           <View style={donorRecordsStyle.overlay} />
           <Text style={donorRecordsStyle.headerText}>Donor Records</Text>
           <View style={donorRecordsStyle.searchContainer}>
-            <TextInput style={donorRecordsStyle.searchInput} placeholder="Search Donor Records" placeholderTextColor="#ccc" />
+            <TextInput style={donorRecordsStyle.searchInput} placeholder="Search Donor Records" placeholderTextColor="#ccc" onChangeText={handleTextChange} onSubmitEditing={handleSubmit}  // This will trigger when the user presses 'Enter'
+              returnKeyType="Search"  // Change the return key to 'Search' for a better UX
+            />
             <Icon name="search" size={20} color={colors.color1} style={donorRecordsStyle.searchIcon} />
           </View>
         </ImageBackground>
       </View>
-      {loading && <Text>Loading...</Text>}
-      {donors && <DonorRecordsTable donors={donors} />}
+      {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} count={count} pageSize={pageSize}/>}
+      
     </View>
   )
 }

@@ -5,7 +5,8 @@ import { REACT_APP_API_URL } from '@env';
 
 export const getDonors = createAsyncThunk(
     'donor/getDonors',
-    async (_, thunkAPI) => {
+    async (query, thunkAPI) => {
+        
         const token = await getToken();
         console.log('Token Retrieved:', token);
 
@@ -21,8 +22,14 @@ export const getDonors = createAsyncThunk(
             withCredentials: true
         }
         try {
-
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/donors`, config);
+            let urlString = ''
+            if (query){
+                urlString = `${REACT_APP_API_URL}/api/v1/donors?search=${query}`
+            }
+            else {
+                urlString = `${REACT_APP_API_URL}/api/v1/donors`
+            }
+            const response = await axios.get(urlString, config);
 
             return response.data;
 
