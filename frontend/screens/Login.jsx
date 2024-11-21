@@ -7,7 +7,8 @@ import { loginStyle } from '../styles/Styles';
 import { divider } from '../styles/Styles';
 const screenWidth = Dimensions.get('window').width;
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, logout } from '../redux/slices/userSlice';
+import { loginUser, logout } from '../redux/actions/userActions';
+import { viewAsyncStorage } from '../utils/helper';
 const Login = ({ navigation }) => {
     const dispatch = useDispatch();
     const [email, setEmail] = useState('');
@@ -18,6 +19,9 @@ const Login = ({ navigation }) => {
         console.log('Form submitted:', { email, password });
         dispatch(loginUser({ email, password }));
     };
+    useEffect(()=>{
+        console.log(viewAsyncStorage());
+    }, []);
 
     useEffect(()=>{
         if (isLoggedIn) {

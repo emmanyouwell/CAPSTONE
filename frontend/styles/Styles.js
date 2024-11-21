@@ -184,21 +184,9 @@ export const dataTableStyle = StyleSheet.create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  nameColumn: {
-    width: 150,
-  },
-  emailColumn: {
-   width: 200,
-  },
-  roleColumn: {
-    width: 100,
-  },
-  ageColumn: {
-   width: 80,
-  },
-  locationColumn: {
-    width: 150,
-  },
+  columnWidth: {
+    width: 200
+  }
 })
 
 
