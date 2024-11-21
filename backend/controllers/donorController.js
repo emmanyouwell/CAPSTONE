@@ -3,20 +3,49 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
 // Get All Donors => /api/v1/donors
-exports.allDonors = catchAsyncErrors( async (req, res, next) => {
-    const donors = await Donor.find();
+exports.allDonors = catchAsyncErrors(async (req, res, next) => {
+    // Destructure search query parameters from the request
+    const { search } = req.query;
 
-    const count = await Donor.countDocuments();
+    // Create a query object to hold the search criteria
+    const query = {};
 
-    res.status(200).json({
-        success: true,
-        count,
-        donors
-    })
+    if (search) {
+        query.$or = [
+            { 'name.first': { $regex: search, $options: 'i' } },  // Search in first name
+            { 'name.middle': { $regex: search, $options: 'i' } }, // Search in middle name
+            { 'name.last': { $regex: search, $options: 'i' } }    // Search in last name
+        ];
+    }
+
+    // Optional: Add pagination (e.g., limit results and skip for page number)
+    const page = Number(req.query.page) || 1;
+    const pageSize = 10; // Adjust page size as needed
+    const skip = (page - 1) * pageSize;
+
+    try {
+        // Find donors based on the query object
+        const donors = await Donor.find(query)
+            .skip(skip)
+            .limit(pageSize);
+
+        // Count total donors after filtering (for pagination)
+        const count = await Donor.countDocuments(query);
+
+        res.status(200).json({
+            success: true,
+            count,
+            pageSize,
+            donors
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+
 })
 
 // Create donor => /api/v1/donors
-exports.createDonor= catchAsyncErrors( async (req, res, next) => {
+exports.createDonor = catchAsyncErrors(async (req, res, next) => {
     const data = req.body;
 
     const donor = await Donor.create({
@@ -38,7 +67,7 @@ exports.createDonor= catchAsyncErrors( async (req, res, next) => {
 })
 
 // Get specific donor details => /api/v1/donor/:id
-exports.getDonorDetails = catchAsyncErrors( async (req, res, next) => {
+exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
     const donor = await Donor.findById(req.params.id);
 
     if (!donor) {
@@ -52,9 +81,9 @@ exports.getDonorDetails = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Update donor => /api/v1/donor/:id
-exports.updateDonor = catchAsyncErrors( async (req, res, next) => {
+exports.updateDonor = catchAsyncErrors(async (req, res, next) => {
     const data = req.body;
-    
+
     const newdonorData = {
         name: data.name,
         address: data.address,
@@ -72,7 +101,7 @@ exports.updateDonor = catchAsyncErrors( async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false,
     })
-    
+
     res.status(200).json({
         success: true,
         donor
@@ -81,7 +110,7 @@ exports.updateDonor = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Delete donor => /api/v1/donor/:id
-exports.deleteDonor = catchAsyncErrors( async (req, res, next) => {
+exports.deleteDonor = catchAsyncErrors(async (req, res, next) => {
     const donor = await Donor.findById(req.params.id);
 
     if (!donor) {
