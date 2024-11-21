@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {useState, useEffect } from "react";
 import { View, Image, Text, StatusBar } from "react-native";
 import {
   DrawerContentScrollView,
@@ -21,19 +21,31 @@ import DonorRecords from "./screens/Superadmin/DonorRecords";
 import RecipientRecords from "./screens/Superadmin/RecipientRecords";
 import Schedule from "./screens/Superadmin/Schedule";
 import Metrics from "./screens/Superadmin/Metrics";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "./utils/helper";
 const CustomDrawerContent = (props) => {
+  
+  const [userDetails, setUserDetails] = useState(null);
+  useEffect(()=>{
+    setUserDetails(getUser());
+  },[])
+  useEffect(()=>{
+    if (userDetails){
+      console.log("details: ", userDetails);
+    }
+  },[userDetails])
   return (
     <DrawerContentScrollView {...props}>
       <View style={drawerStyle.profileContainer}>
-        <Image
+        {/* <Image
           source={{ uri: defaultImg }} // Replace with your profile picture URL
           style={drawerStyle.profilePic}
-        />
-        <Text style={drawerStyle.profileName}>John Doe</Text>
+        /> */}
+        <Text style={drawerStyle.profileName}>Logged in as, Superadmin</Text>
       </View>
 
       <View style={divider.divider} />
-      <DrawerItem
+      {/* <DrawerItem
         label="Home"
         icon={({ focused, color, size }) => (
           <Icon name="home" color={focused ? 'white' : colors.color2} size={26} />
@@ -42,10 +54,10 @@ const CustomDrawerContent = (props) => {
         activeTintColor="white"
         inactiveTintColor="black"
         activeBackgroundColor={colors.color1}
-        onPress={() => props.navigation.navigate('home')} />
+        onPress={() => props.navigation.navigate('home')} /> */}
 
       <DrawerItem
-        label="My Profile"
+        label="Dashboard"
         icon={({ focused, color, size }) => (
           <Icon name="account-circle" color={focused ? 'white' : colors.color2} size={26} />
         )}
@@ -53,7 +65,7 @@ const CustomDrawerContent = (props) => {
         activeTintColor="white"
         inactiveTintColor="black"
         activeBackgroundColor={colors.color1}
-        onPress={() => props.navigation.navigate('My Profile')} />
+        onPress={() => props.navigation.navigate('Dashboard')} />
 
       <DrawerItem
         label="Settings"
@@ -112,7 +124,7 @@ const MainStack = () => {
       }}
     >
       <Stack.Group>
-        <Stack.Screen name="home" component={Home} />
+        
         <Stack.Screen name="login" component={Login} />
         <Stack.Screen name="superadmin_dashboard" component={Dashboard} />
         <Stack.Screen name="superadmin_donor_record" component={DonorRecords}/>
@@ -135,7 +147,7 @@ const Main = () => {
           }}
         >
           <Drawer.Screen name="Home" component={MainStack} options={{ swipeEnabled: false }} />
-          <Drawer.Screen name="My Profile" component={Dashboard} />
+          <Drawer.Screen name="Dashboard" component={Dashboard} />
 
         </Drawer.Navigator>
       </SafeAreaView>
