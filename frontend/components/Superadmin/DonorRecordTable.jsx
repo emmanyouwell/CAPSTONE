@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import { ScrollView, View, TouchableOpacity, Text, Animated } from 'react-native'
 import { Checkbox, DataTable } from 'react-native-paper'
 import { dataTableStyle, buttonStyle } from '../../styles/Styles'
-const DonorRecordsTable = () => {
+import { formatDate } from '../../utils/helper'
+const DonorRecordsTable = ({donors}) => {
   const [isScrollable, setIsScrollable] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
   // Initial data
@@ -86,15 +87,19 @@ const DonorRecordsTable = () => {
                     <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.checkboxColumn}>Select</DataTable.Title>
                   </Animated.View>
 
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.nameColumn}>Name</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.emailColumn}>Email</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.roleColumn}>Role</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.ageColumn}>Age</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.locationColumn}>Location</DataTable.Title>
-
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>First Name</DataTable.Title>
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Last Name</DataTable.Title>
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Middle Name</DataTable.Title>
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Address</DataTable.Title>
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Phone</DataTable.Title>
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Age</DataTable.Title>
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Birthday</DataTable.Title>
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Civil Status</DataTable.Title>
+                  {/* <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.locationColumn}>Children</DataTable.Title> */}
+                  
                 </DataTable.Header>
 
-                {data.map((row, index) => (
+                {donors && donors.map((row, index) => (
                   <DataTable.Row key={index} onLongPress={() => { handleLongPress(index) }}>
                     <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
                       <DataTable.Cell style={dataTableStyle.checkboxColumn}>
@@ -104,11 +109,14 @@ const DonorRecordsTable = () => {
                       </DataTable.Cell>
 
                     </Animated.View>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.nameColumn}>{row.name}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.emailColumn}>{row.email}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.roleColumn}>{row.role}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.ageColumn}>{row.age}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.locationColumn}>{row.location}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.first}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.last}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.middle}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.address}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.phone}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.age}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{formatDate(row.birthday)}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.civilStatus}</DataTable.Cell>
                   </DataTable.Row>
                 ))}
 
