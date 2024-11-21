@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect } from 'react'
 import { ScrollView, View, TouchableOpacity, Text, Animated } from 'react-native'
 import { DataTable, Checkbox } from 'react-native-paper'
 import { dataTableStyle, buttonStyle } from '../../styles/Styles'
-const RecipientRecordsTable = () => {
+const RecipientRecordsTable = ({recipients, count, pageSize}) => {
   const [isScrollable, setIsScrollable] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
   // Initial data
   const [data, setData] = useState([
     { name: 'John Doe', email: 'johndoe@gmail.com', role: 'user', age: 25, location: 'New York' },
@@ -66,12 +67,15 @@ const RecipientRecordsTable = () => {
       <View style={dataTableStyle.btnContainer}>
         {/* <TouchableOpacity onPress={toggleScroll} style={buttonStyle.smallBtn}><Text>{isScrollable ? "Fixed View" : "Scroll View"}</Text></TouchableOpacity> */}
         <DataTable.Pagination
-          page={0}
-          numberOfPages={3}
-          onPageChange={(page) => console.log(page)}
-          label="1-2 of 6"
+          page={currentPage}
+          numberOfPages={Math.ceil(count / pageSize)}
+          onPageChange={(page) => setCurrentPage(page)}
+          label={`${currentPage * pageSize + 1}-${Math.min(
+            (currentPage + 1) * pageSize,
+            recipients.length
+          )} of ${recipients.length}`}
         />
-        <TouchableOpacity onPress={addRow} style={buttonStyle.smallBtn}><Text style={buttonStyle.btnText}>Add new row</Text></TouchableOpacity>
+        {/* <TouchableOpacity onPress={addRow} style={buttonStyle.smallBtn}><Text style={buttonStyle.btnText}>Add new row</Text></TouchableOpacity> */}
       </View>
       {isScrollable ? (
         <View style={dataTableStyle.tableContainer}>
@@ -82,15 +86,16 @@ const RecipientRecordsTable = () => {
               <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
                     <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.checkboxColumn}>Select</DataTable.Title>
                   </Animated.View>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.nameColumn}>Name</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.emailColumn}>Email</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.roleColumn}>Role</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.ageColumn}>Age</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.locationColumn}>Location</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Name</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Address</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Phone</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Patient Type</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Hospital</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Milk Requested</DataTable.Title>
 
               </DataTable.Header>
 
-              {data.map((row, index) => (
+              {recipients && recipients.map((row, index) => (
                   <DataTable.Row key={index} onLongPress={() => { handleLongPress(index) }}>
                     <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
                       <DataTable.Cell style={dataTableStyle.checkboxColumn}>
@@ -100,11 +105,12 @@ const RecipientRecordsTable = () => {
                       </DataTable.Cell>
 
                     </Animated.View>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.nameColumn}>{row.name}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.emailColumn}>{row.email}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.roleColumn}>{row.role}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.ageColumn}>{row.age}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.locationColumn}>{row.location}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.address}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.phone}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.patientType}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.hospital}</DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.milkRequested}</DataTable.Cell>
                   </DataTable.Row>
                 ))}
             </DataTable>
