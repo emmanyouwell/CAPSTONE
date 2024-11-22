@@ -44,6 +44,7 @@ export const userSlice = createSlice({
       })
       .addCase(getUserDetails.fulfilled, (state, action) => {
         state.userDetails = action.payload.user;
+        state.loading = false;
       })
       .addCase(getUserDetails.rejected, (state, action) => {
         state.error = action.payload;

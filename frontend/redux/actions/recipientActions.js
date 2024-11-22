@@ -29,6 +29,7 @@ export const getRecipients = createAsyncThunk(
             else {
                 urlString = `${REACT_APP_API_URL}/api/v1/patients`
             }
+            console.log('URL:', urlString);
             const response = await axios.get(urlString, config);
 
             return response.data;
@@ -39,49 +40,3 @@ export const getRecipients = createAsyncThunk(
         }
     }
 )
-
-export const logoutUser = createAsyncThunk(
-    'user/logoutUser',
-    async (_, thunkAPI) => {
-        try {
-            const response = await axios.get(
-                `${REACT_APP_API_URL}/api/v1/logout`,
-                {},
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    withCredentials: true, // Assuming the API uses cookies or session for auth
-                }
-            );
-            logout(() => { });
-            return response.data; // Optionally return the response if necessary for further actions
-
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
-        }
-    }
-);
-
-export const getUserDetails = createAsyncThunk(
-    'user/getUserDetails',
-    async (_, thunkAPI) => {
-        try {
-            const response = await axios.get(
-                `${REACT_APP_API_URL}/api/v1/me`,
-                {},
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    withCredentials: true, // Assuming the API uses cookies or session for auth
-                }
-            );
-
-            return response.data; // Optionally return the response if necessary for further actions
-
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
-        }
-    }
-);

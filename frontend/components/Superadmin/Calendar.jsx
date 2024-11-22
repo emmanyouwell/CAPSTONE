@@ -1,13 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { View, Text, TouchableOpacity, SafeAreaView, StyleSheet, Alert, TextInput, Button } from 'react-native'
 import { Agenda } from 'react-native-calendars'
-
+import DateTimePicker from '@react-native-community/datetimepicker';
+import {useDispatch, useSelector} from 'react-redux';
+import { getUser } from '../../utils/helper';
+import { getUserDetails } from '../../redux/actions/userActions';
 const Calendar = () => {
+    const dispatch = useDispatch();
+    const {userDetails, loading, error} = useSelector((state)=>state.users);
     const [items, setItems] = useState({});
     const [eventName, setEventName] = useState('');
-    const [eventDate, setEventDate] = useState('');
-    const [eventTime, setEventTime] = useState('');
-
+    const [eventDate, setEventDate] = useState(new Date());
+    const [eventTime, setEventTime] = useState(new Date());
+    const [showTimePicker, setShowTimePicker] = useState(false);
+    
     // Function to load items into the calendar
     const loadItems = (day) => {
         setTimeout(() => {
@@ -29,36 +35,59 @@ const Calendar = () => {
             Alert.alert('Error', 'Please fill in all fields');
             return;
         }
+        const eventDateString = eventDate.toISOString().split('T')[0]; // Get the date part (e.g., "2024-11-22")
+        const eventTimeString = eventTime.toTimeString().split(' ')[0]; 
+        const eventDetails = `${eventDateString}T${eventTimeString}`;
 
-        const eventDateTime = `${eventDate}T${eventTime}:00`;
-
-        if (!items[eventDate]) {
-            items[eventDate] = [];
+        if (!items[eventDetails]) {
+            items[eventDetails] = [];
         }
-
+        
         const newEvent = {
-            name: eventName,
+            title: eventName,
+            description: "Enter description",
+            eventDetails,
             height: 100, // Adjust this as needed
-            time: eventTime,
+            user: userDetails._id
         };
 
         setItems({
             ...items,
-            [eventDate]: [...items[eventDate], newEvent],
+            [eventDetails]: [...items[eventDetails], newEvent],
         });
 
         setEventName(''); // Reset input fields
-        setEventDate('');
-        setEventTime('');
+        setEventDate(new Date());
+        setEventTime(new Date());
     };
 
+    // Function to handle time selection
+    const onTimeChange = (event, selectedTime) => {
+        if (selectedTime !== undefined) {
+            setEventTime(selectedTime);
+            setShowTimePicker(false);
+        }
+    };
+    const onDayPress = (day) => {
+        setEventDate(new Date(day.timestamp));
+    }
+
+    useEffect(()=>{
+        dispatch(getUserDetails());
+    },[dispatch])
+
+    useEffect(()=>{
+        if (userDetails){
+            console.log("userDetails: ", userDetails);
+        }
+    },[userDetails])
     // Function to render each item in the Agenda
-    const renderItem = (item) => (
+    const renderItem = useCallback((item) => (
         <View style={[styles.item, { height: item.height }]}>
             <Text>{item.name}</Text>
             <Text>{item.time}</Text>
         </View>
-    );
+    ));
     return (
         <SafeAreaView style={styles.container}>
             <Agenda
@@ -68,6 +97,7 @@ const Calendar = () => {
                 renderItem={renderItem}
                 renderEmptyDate={() => <View style={styles.emptyDate}><Text>No Events</Text></View>}
                 rowHasChanged={(r1, r2) => r1.name !== r2.name}
+                onDayPress={onDayPress}
             />
 
             {/* Event Input Form */}
@@ -78,19 +108,31 @@ const Calendar = () => {
                     value={eventName}
                     onChangeText={setEventName}
                 />
-                <TextInput
-                    placeholder="Event Date (YYYY-MM-DD)"
-                    style={styles.input}
-                    value={eventDate}
-                    onChangeText={setEventDate}
-                />
-                <TextInput
+
+                {/* <TextInput
                     placeholder="Event Time (HH:MM)"
                     style={styles.input}
                     value={eventTime}
                     onChangeText={setEventTime}
-                />
+                /> */}
+                <Text style={styles.label}>Selected Time:</Text>
+                <Text style={styles.dateText}>{eventTime.toLocaleTimeString()}</Text>
+                <Text style={styles.label}>Selected Date:</Text>
+                <Text style={styles.dateText}>{eventDate.toLocaleDateString()}</Text>
+                <View>
+                    <Button onPress={() => setShowTimePicker(true)} title="Select Event Time" />
+                    {showTimePicker && (
+                        <DateTimePicker
+                            testID="timePicker"
+                            value={eventTime}
+                            mode="time"
+                            display="default"
+                            onChange={onTimeChange}
+                        />
+                    )}
+                </View>
                 <Button title="Add Event" onPress={addEvent} />
+
             </View>
         </SafeAreaView>
     )
@@ -117,6 +159,11 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 30,
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginVertical: 10,
+    }
 })
 
 export default Calendar
