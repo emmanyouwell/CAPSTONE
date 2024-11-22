@@ -16,7 +16,7 @@ exports.allInventories = catchAsyncErrors(async (req, res, next) => {
 
 // Create inventory => /api/v1/inventories
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
-    const { fridgeId, pasteurizedDetails, unpasteurizedDetails, inventoryDate } = req.body;
+    const { fridgeId, userId, pasteurizedDetails, unpasteurizedDetails, inventoryDate } = req.body;
 
     // Validate fridge
     const fridge = await Fridge.findById(fridgeId);
@@ -24,7 +24,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler('Refrigerator not found', 404));
     }
 
-    const inventoryData = { fridge: fridgeId, inventoryDate };
+    const inventoryData = { fridge: fridgeId, inventoryDate, user: userId };
 
     if (fridge.fridgeType === 'Pasteurized') {
         if (!pasteurizedDetails || pasteurizedDetails.length === 0) {
