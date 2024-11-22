@@ -11,6 +11,11 @@ const inventorySchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    user: {
+        type: ObjectId,
+        ref: 'User',
+        required: [true, 'User is needed to complete inventory'],
+    },
     pasteurizedDetails: [
         {
             pasteurizationDate: {
