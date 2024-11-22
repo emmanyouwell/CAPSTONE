@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
+// import {server as REACT_APP_API_URL} from '../store';
 // import {server} from '../store';
 export const loginUser = createAsyncThunk(
   'user/loginUser',
@@ -16,7 +17,7 @@ export const loginUser = createAsyncThunk(
     try {
       console.log(`${REACT_APP_API_URL}/api/v1/login`);
       const response = await axios.post(`${REACT_APP_API_URL}/api/v1/login`, { email, password }, config);
-      await authenticate(response.data, ()=>{});
+      await authenticate(response.data, () => { });
       return response;
 
     } catch (error) {
@@ -52,18 +53,28 @@ export const logoutUser = createAsyncThunk(
 export const getUserDetails = createAsyncThunk(
   'user/getUserDetails',
   async (_, thunkAPI) => {
+
+    const token = await getToken();
+    console.log('Token Retrieved:', token);
+
+    if (!token) {
+      throw new Error('No token available');
+    }
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      withCredentials: true
+    }
     try {
+      console.log("Getting user details");
       const response = await axios.get(
         `${REACT_APP_API_URL}/api/v1/me`,
-        {},
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true, // Assuming the API uses cookies or session for auth
-        }
+        config
       );
-
+      
       return response.data; // Optionally return the response if necessary for further actions
 
     } catch (error) {

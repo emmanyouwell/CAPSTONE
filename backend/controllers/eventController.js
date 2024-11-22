@@ -17,11 +17,11 @@ exports.allEvents = catchAsyncErrors( async (req, res, next) => {
 
 // Create Event => /api/v1/events
 exports.createEvent= catchAsyncErrors( async (req, res, next) => {
-    const eventDate = req.body.eventDetails.date;
-    const eventTime = req.body.eventDetails.time;
+    // const eventDate = req.body.eventDetails.date;
+    // const eventTime = req.body.eventDetails.time;
 
-    const eventDetails = new Date(`${eventDate}T${eventTime}:00Z`)
-
+    // const eventDetails = new Date(`${eventDate}T${eventTime}:00Z`)
+    const eventDetails = req.body.eventDetails;
     const eventStatus = req.body.eventStatus.trim();
 
     const event = await Event.create({

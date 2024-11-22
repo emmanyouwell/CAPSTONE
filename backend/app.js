@@ -12,7 +12,7 @@ const errorMiddleware = require('./middlewares/errors');
 dotenv.config({ path: 'config/.env' });
 
 const corsOptions = {
-    origin:['http://192.168.5.234:8081', 'https://yourfrontenddomain.com'], // Add your frontend's URL here
+    origin:['*','http://192.168.5.234:8081', 'https://yourfrontenddomain.com'], // Add your frontend's URL here
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
