@@ -14,10 +14,6 @@ const patientSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter contact number of the patient']
     },
-    milkRequested: {
-        type: String,
-        required: [true, 'Please enter amount of requested milk']
-    },
     patientType: {
         type: String,
         enum: ['Inpatient', 'Outpatient'],
@@ -28,6 +24,23 @@ const patientSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter the hospital name of the patient is admitted']
     },
+    requested: [
+        {
+            date: {
+                type: Date,
+                required: [true, 'Please enter date of donation']
+            },
+            milkRequested: {
+                type: Number,
+                required: [true, 'Please enter amount of milk donated']
+            },
+            approvedBy: {
+                type: ObjectId,
+                required: true,
+                ref: 'User'
+            },
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now
