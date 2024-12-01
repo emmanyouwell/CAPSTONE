@@ -2,15 +2,17 @@ module.exports = function (api) {
   api.cache(true);
   return {
     presets: ['babel-preset-expo'],
-    plugins: ['react-native-reanimated/plugin',
+    plugins: [
       [
         'module:react-native-dotenv',
         {
-          moduleName: '@env', // Imports will come from '@env'
-          path: '.env',       // Path to your .env file
-          allowUndefined: true, // Optional: Allow undefined variables
+          moduleName: '@env',
+          path: '.env',
+          allowUndefined: true,
         },
       ],
+      'react-native-reanimated/plugin', // Reanimated plugin must be last
     ],
+
   };
 };
