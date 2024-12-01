@@ -12,7 +12,7 @@ const fridgeSchema = new mongoose.Schema({
         default: 'Unpasteurized'
     },
     capacity: {
-        type: String,
+        type: Number,
         required: [true, 'Please enter capacity of the fridge']
     },
     createdAt: {
