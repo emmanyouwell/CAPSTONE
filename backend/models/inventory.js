@@ -16,8 +16,7 @@ const inventorySchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'User is needed to complete inventory'],
     },
-    pasteurizedDetails: [
-        {
+    pasteurizedDetails:  {
             pasteurizationDate: {
                 type: Date,
                 required: function () {
@@ -54,10 +53,8 @@ const inventorySchema = new mongoose.Schema({
                     return this.fridgeType === 'Pasteurized';
                 },
             },
-        }
-    ],
-    unpasteurizedDetails: [
-        {
+        },
+    unpasteurizedDetails: {
             donor: {
                 type: ObjectId,
                 required: function () {
@@ -83,8 +80,7 @@ const inventorySchema = new mongoose.Schema({
                     return this.fridgeType === 'Unpasteurized';
                 },
             },
-        }
-    ],
+        },
 });
 
 inventorySchema.virtual('fridgeType').get(function () {

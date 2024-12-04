@@ -32,6 +32,7 @@ const patient = require('./routes/patient');
 const donor = require('./routes/donor');
 const fridge = require('./routes/fridge');
 const inventory = require('./routes/inventory');
+const request = require('./routes/request');
 
 // API routes
 app.use('/api/v1', user);
@@ -40,6 +41,7 @@ app.use('/api/v1', patient);
 app.use('/api/v1', donor);
 app.use('/api/v1', fridge);
 app.use('/api/v1', inventory);
+app.use('/api/v1', request);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
