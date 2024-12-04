@@ -21,11 +21,23 @@ import DonorRecords from "./screens/Superadmin/DonorRecords";
 import RecipientRecords from "./screens/Superadmin/RecipientRecords";
 import Schedule from "./screens/Superadmin/Schedule";
 import Metrics from "./screens/Superadmin/Metrics";
+
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "./utils/helper";
 import AccountManagement from "./screens/Superadmin/AccountManagement";
 import CreateAdmin from "./components/Superadmin/Accounts/CreateAdmin";
 import CreateStaff from "./components/Superadmin/Accounts/CreateStaff";
+
+//Inventory Screens
+import Inventory from "./screens/Superadmin/Inventory";
+import Fridges from "./screens/Superadmin/Inventories/Refrigerator";
+import FridgeDetails from "./components/Superadmin/Inventories/Refrigerators/FridgeDetails";
+import AddFridge from "./components/Superadmin/Inventories/Refrigerators/AddFridge";
+import EditFridge from "./components/Superadmin/Inventories/Refrigerators/EditFridge";
+import AddMilkInventory from "./components/Superadmin/Inventories/Refrigerators/AddMilkInventory";
+import EditMilkInventory from "./components/Superadmin/Inventories/Refrigerators/EditMilkInventory";
+
+
 const CustomDrawerContent = (props) => {
   
   const [userDetails, setUserDetails] = useState(null);
@@ -137,6 +149,16 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_account_management" component={AccountManagement}/>
         <Stack.Screen name="superadmin_account_create_admin" component={CreateAdmin}/>
         <Stack.Screen name="superadmin_account_create_staff" component={CreateStaff}/>
+
+      {/* {Inventory Navigation} */}
+        <Stack.Screen name="superadmin_inventories" component={Inventory}/>
+        <Stack.Screen name="superadmin_fridges" component={Fridges}/>
+        <Stack.Screen name="FridgeDetails" component={FridgeDetails}/>
+        <Stack.Screen name="AddFridge" component={AddFridge}/>
+        <Stack.Screen name="EditFridge" component={EditFridge}/>
+        <Stack.Screen name="AddMilkInventory" component={AddMilkInventory}/>
+        <Stack.Screen name="EditMilkInventory" component={EditMilkInventory}/>
+
       </Stack.Group>
     </Stack.Navigator>
   )
