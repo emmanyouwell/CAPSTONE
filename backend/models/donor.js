@@ -52,7 +52,7 @@ const donorSchema = new mongoose.Schema({
                 required: [true, 'Please enter date of donation']
             },
             milkDonated: {
-                type: String,
+                type: Number,
                 required: [true, 'Please enter amount of milk donated']
             },
             approvedBy: {
