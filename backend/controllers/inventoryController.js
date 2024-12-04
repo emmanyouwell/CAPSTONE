@@ -27,24 +27,15 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     const inventoryData = { fridge: fridgeId, inventoryDate, user: userId };
 
     if (fridge.fridgeType === 'Pasteurized') {
-        if (!pasteurizedDetails || pasteurizedDetails.length === 0) {
-            return next(new ErrorHandler('Pasteurized fridge requires pasteurizedDetails', 400));
+        if (!pasteurizedDetails || !pasteurizedDetails.pasteurizationDate || !pasteurizedDetails.batch ||
+            !pasteurizedDetails.pool || !pasteurizedDetails.bottle || !pasteurizedDetails.volume || !pasteurizedDetails.expiration) {
+            return next(new ErrorHandler('Pasteurized fridge requires complete pasteurizedDetails', 400));
         }
 
-        inventoryData.pasteurizedDetails = pasteurizedDetails.map(item => {
-            if (!item.pasteurizationDate || !item.batch || !item.pool || !item.bottle || !item.volume || !item.expiration) {
-                throw new ErrorHandler('Pasteurized item must include all required fields.', 400);
-            }
-            return item;
-        });
+        inventoryData.pasteurizedDetails = pasteurizedDetails;
 
         // Automatically update fridge capacity
-        let totalVolume = 0;
-        pasteurizedDetails.forEach(item => {
-            totalVolume += parseInt(item.volume, 10); 
-        });
-
-        const updatedCapacity = parseInt(fridge.capacity, 10) - totalVolume;
+        const updatedCapacity = parseInt(fridge.capacity, 10) - parseInt(pasteurizedDetails.volume, 10);
         if (updatedCapacity < 0) {
             return next(new ErrorHandler('Fridge capacity exceeded', 400));
         }
@@ -53,24 +44,15 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
         await fridge.save();
 
     } else if (fridge.fridgeType === 'Unpasteurized') {
-        if (!unpasteurizedDetails || unpasteurizedDetails.length === 0) {
-            return next(new ErrorHandler('Unpasteurized fridge requires unpasteurizedDetails', 400));
+        if (!unpasteurizedDetails || !unpasteurizedDetails.donor || !unpasteurizedDetails.expressDate ||
+            !unpasteurizedDetails.collectionDate || !unpasteurizedDetails.volume) {
+            return next(new ErrorHandler('Unpasteurized fridge requires complete unpasteurizedDetails', 400));
         }
 
-        inventoryData.unpasteurizedDetails = unpasteurizedDetails.map(item => {
-            if (!item.donor || !item.expressDate || !item.collectionDate || !item.volume) {
-                throw new ErrorHandler('Unpasteurized item must include all required fields.', 400);
-            }
-            return item;
-        });
+        inventoryData.unpasteurizedDetails = unpasteurizedDetails;
 
         // Automatically update fridge capacity
-        let totalVolume = 0;
-        unpasteurizedDetails.forEach(item => {
-            totalVolume += parseInt(item.volume, 10); 
-        });
-
-        const updatedCapacity = parseInt(fridge.capacity, 10) - totalVolume;
+        const updatedCapacity = parseInt(fridge.capacity, 10) - parseInt(unpasteurizedDetails.volume, 10);
         if (updatedCapacity < 0) {
             return next(new ErrorHandler('Fridge capacity exceeded', 400));
         }
@@ -87,7 +69,6 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     res.status(201).json({
         success: true,
         inventory,
-        fridge,
     });
 });
 
@@ -117,34 +98,69 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler('Inventory not found', 404));
     }
 
+    const fridge = inventory.fridge;
+
+    // Update inventory date
     if (inventoryDate) {
         inventory.inventoryDate = inventoryDate;
     }
 
     // Update based on fridge type
-    if (inventory.fridge.fridgeType === 'Pasteurized' && pasteurizedDetails) {
-        inventory.pasteurizedDetails = pasteurizedDetails.map(item => {
-            if (!item.pasteurizationDate || !item.batch || !item.pool || !item.bottle || !item.expiration) {
-                throw new ErrorHandler('Pasteurized item must include all required fields.', 400);
-            }
-            return item;
-        });
-    } else if (inventory.fridge.fridgeType === 'Unpasteurized' && unpasteurizedDetails) {
-        inventory.unpasteurizedDetails = unpasteurizedDetails.map(item => {
-            if (!item.donor || !item.expressDate || !item.collectionDate || !item.volume) {
-                throw new ErrorHandler('Unpasteurized item must include all required fields.', 400);
-            }
-            return item;
-        });
+    if (fridge.fridgeType === 'Pasteurized') {
+        if (!pasteurizedDetails || !pasteurizedDetails.pasteurizationDate || !pasteurizedDetails.batch || 
+            !pasteurizedDetails.pool || !pasteurizedDetails.bottle || !pasteurizedDetails.expiration) {
+            return next(new ErrorHandler('Pasteurized fridge requires complete pasteurizedDetails.', 400));
+        }
+
+        // Calculate volume change
+        const oldVolume = inventory.pasteurizedDetails?.volume || 0;
+        const newVolume = pasteurizedDetails.volume;
+
+        const volumeDifference = parseInt(newVolume, 10) - parseInt(oldVolume, 10);
+        const updatedCapacity = parseInt(fridge.capacity, 10) - volumeDifference;
+
+        if (updatedCapacity < 0) {
+            return next(new ErrorHandler('Fridge capacity exceeded', 400));
+        }
+
+        // Update capacity and details
+        fridge.capacity = updatedCapacity;
+        inventory.pasteurizedDetails = pasteurizedDetails;
+
+    } else if (fridge.fridgeType === 'Unpasteurized') {
+        if (!unpasteurizedDetails || !unpasteurizedDetails.donor || !unpasteurizedDetails.expressDate || 
+            !unpasteurizedDetails.collectionDate || !unpasteurizedDetails.volume) {
+            return next(new ErrorHandler('Unpasteurized fridge requires complete unpasteurizedDetails.', 400));
+        }
+
+        // Calculate volume change
+        const oldVolume = inventory.unpasteurizedDetails?.volume || 0;
+        const newVolume = unpasteurizedDetails.volume;
+
+        const volumeDifference = parseInt(newVolume, 10) - parseInt(oldVolume, 10);
+        const updatedCapacity = parseInt(fridge.capacity, 10) - volumeDifference;
+
+        if (updatedCapacity < 0) {
+            return next(new ErrorHandler('Fridge capacity exceeded', 400));
+        }
+
+        // Update capacity and details
+        fridge.capacity = updatedCapacity;
+        inventory.unpasteurizedDetails = unpasteurizedDetails;
+
+    } else {
+        return next(new ErrorHandler('Invalid fridge type', 400));
     }
 
-    await inventory.save();
+    await fridge.save(); // Save fridge updates
+    await inventory.save(); // Save inventory updates
 
     res.status(200).json({
         success: true,
         inventory,
     });
 });
+
 
 // Delete Inventory details => /api/v1/inventory/:id
 exports.deleteInventory = catchAsyncErrors(async (req, res, next) => {
