@@ -3,7 +3,7 @@ import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
 // import {server as REACT_APP_API_URL} from '../store';
-// import {server} from '../store';
+// import {REACT_APP_API_URL} from '../store';
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async (credentials, thunkAPI) => {
@@ -17,11 +17,12 @@ export const loginUser = createAsyncThunk(
     try {
       // console.log(`${REACT_APP_API_URL}/api/v1/login`);
       const response = await axios.post(`${REACT_APP_API_URL}/api/v1/login`, { email, password }, config);
+      
       await authenticate(response.data, () => { });
       return response;
 
     } catch (error) {
-
+      console.log('Error:', error.message);
       return thunkAPI.rejectWithValue(error.message);
     }
   }

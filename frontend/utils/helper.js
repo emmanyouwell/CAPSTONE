@@ -68,3 +68,12 @@ export const viewAsyncStorage = async () => {
       return 'Invalid Date'; // Fallback for invalid dates
     }
   };
+
+
+  export const formatEventDetails = (date, time) => {
+    const eventDateString = date.toISOString().split('T')[0]; // Get the date part (e.g., "2024-11-22")
+    const eventTimeString = time.toTimeString().split(' ')[0];
+    const eventDetails = `${eventDateString}T${eventTimeString}`;
+
+    return eventDetails;
+  }

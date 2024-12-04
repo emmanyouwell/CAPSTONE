@@ -1,14 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addEvents } from '../actions/eventActions';
+import { addEvents, getEvents, editEvents, getEventDetails, deleteEvents } from '../actions/eventActions';
 export const eventSlice = createSlice({
-  name: 'donor',
+  name: 'event',
   initialState: {
-        events: [],
-        loading: false, // Useful for async actions like login/signup
-        error: null, // To handle errors
-
+    events: [],
+    loading: false, // Useful for async actions like login/signup
+    error: null, // To handle errors
+    eventDetails: {},
+    isUpdated: false,
+    isDeleted: false,
   },
   reducers: {
+    resetUpdate: (state) => {
+      state.isUpdated = false;
+    },
+    resetDelete: (state) => {
+      state.isDeleted = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -17,15 +25,58 @@ export const eventSlice = createSlice({
       })
       .addCase(addEvents.fulfilled, (state, action) => {
         state.loading = false;
-        state.events = action.payload.events;
+        state.success = action.payload.success;
       })
       .addCase(addEvents.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-     
-      
-  },
+      .addCase(getEvents.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events = action.payload.events;
+      })
+      .addCase(getEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(editEvents.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(editEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isUpdated = action.payload.success;
+      })
+      .addCase(editEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getEventDetails.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getEventDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.eventDetails = action.payload.event;
+        
+      })
+      .addCase(getEventDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload
+      })
+      .addCase(deleteEvents.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isDeleted = action.payload.success;
+      })
+      .addCase(deleteEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  }
 });
-
+export const {resetUpdate, resetDelete} = eventSlice.actions;
 export default eventSlice.reducer;

@@ -84,6 +84,7 @@ export const SuperAdminMenuGrid = StyleSheet.create({
 });
 export const SuperAdmin = StyleSheet.create({
   container: {
+    
     flex: 1,
   },
   headerText: {
@@ -283,6 +284,14 @@ export const buttonStyle = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start'
   },
+  calendarBtn: {
+    backgroundColor: colors.color1,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    
+    
+  }
 });
 export const defaultStyle = StyleSheet.create({
   container: {
