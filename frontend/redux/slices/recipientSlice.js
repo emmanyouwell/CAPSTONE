@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { getRecipients } from '../actions/recipientActions';
 export const recipientSlice = createSlice({
-  name: 'donor',
+  name: 'recipient',
   initialState: {
     recipients: [],
     loading: false, // Useful for async actions like login/signup

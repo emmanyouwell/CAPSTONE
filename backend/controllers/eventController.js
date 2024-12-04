@@ -55,11 +55,11 @@ exports.getEventDetails = catchAsyncErrors( async (req, res, next) => {
 
 // Update event => /api/v1/event/:id
 exports.updateEvent = catchAsyncErrors( async (req, res, next) => {
-    const eventDate = req.body.eventDetails.date;
-    const eventTime = req.body.eventDetails.time;
+    // const eventDate = req.body.eventDetails.date;
+    // const eventTime = req.body.eventDetails.time;
 
-    const eventDetails = new Date(`${eventDate}T${eventTime}:00Z`)
-
+    // const eventDetails = new Date(`${eventDate}T${eventTime}:00Z`)
+    const eventDetails = req.body.eventDetails;
     const eventStatus = req.body.eventStatus.trim();
     
     const newEventData = {
