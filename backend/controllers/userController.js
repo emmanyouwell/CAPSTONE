@@ -18,13 +18,14 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) => {
     //     console.log(err, res);
     // });
 
-    const {name, email, password, phone} = req.body;
+    const {name, email, password, phone, role} = req.body;
 
     const user = await User.create({
         name,
         email,
         password,
-        phone
+        phone,
+        role
         // avatar: {
         //     public_id: result.public_id,
         //     url: result.secure_url

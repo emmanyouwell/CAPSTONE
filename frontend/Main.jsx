@@ -23,6 +23,9 @@ import Schedule from "./screens/Superadmin/Schedule";
 import Metrics from "./screens/Superadmin/Metrics";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "./utils/helper";
+import AccountManagement from "./screens/Superadmin/AccountManagement";
+import CreateAdmin from "./components/Superadmin/Accounts/CreateAdmin";
+import CreateStaff from "./components/Superadmin/Accounts/CreateStaff";
 const CustomDrawerContent = (props) => {
   
   const [userDetails, setUserDetails] = useState(null);
@@ -131,6 +134,9 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_recipient_record" component={RecipientRecords}/>
         <Stack.Screen name="superadmin_schedules" component={Schedule}/>
         <Stack.Screen name="superadmin_metrics" component={Metrics}/>
+        <Stack.Screen name="superadmin_account_management" component={AccountManagement}/>
+        <Stack.Screen name="superadmin_account_create_admin" component={CreateAdmin}/>
+        <Stack.Screen name="superadmin_account_create_staff" component={CreateStaff}/>
       </Stack.Group>
     </Stack.Navigator>
   )
