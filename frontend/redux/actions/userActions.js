@@ -17,7 +17,7 @@ export const loginUser = createAsyncThunk(
     try {
       // console.log(`${REACT_APP_API_URL}/api/v1/login`);
       const response = await axios.post(`${REACT_APP_API_URL}/api/v1/login`, { email, password }, config);
-      
+
       await authenticate(response.data, () => { });
       return response;
 
@@ -75,7 +75,7 @@ export const getUserDetails = createAsyncThunk(
         `${REACT_APP_API_URL}/api/v1/me`,
         config
       );
-      
+
       return response.data; // Optionally return the response if necessary for further actions
 
     } catch (error) {
@@ -83,3 +83,27 @@ export const getUserDetails = createAsyncThunk(
     }
   }
 );
+
+
+export const registerUser = createAsyncThunk(
+  'user/registerUser',
+
+  async (userData, thunkAPI) => {
+    console.log("Registering User");
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true
+    };
+    try {
+
+      const response = await axios.post(`${REACT_APP_API_URL}/api/v1/register`, userData, config);
+      await authenticate(response.data, () => { });
+      return response;
+
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+)
