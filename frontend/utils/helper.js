@@ -27,10 +27,10 @@ export const getToken = async () => {
 export const getUser = async () => {
   try {
     const user = await AsyncStorage.getItem('user');
-    return user ? JSON.parse(user) : false;
+    return user ? JSON.parse(user) : null; // Return `null` if no user is found
   } catch (error) {
     console.error('Error retrieving user data', error);
-    return false;
+    return null; // Return `null` on error
   }
 };
 

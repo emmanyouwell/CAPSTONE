@@ -15,7 +15,7 @@ export const loginUser = createAsyncThunk(
       withCredentials: true
     };
     try {
-      // console.log(`${REACT_APP_API_URL}/api/v1/login`);
+      console.log(`${REACT_APP_API_URL}/api/v1/login`);
       const response = await axios.post(`${REACT_APP_API_URL}/api/v1/login`, { email, password }, config);
 
       await authenticate(response.data, () => { });
