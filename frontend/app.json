@@ -24,6 +24,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "owner": "tchmb",
     "extra": {
       "eas": {
         "projectId": "f50b6e41-3df5-434c-9976-b2a169603a91"
