@@ -16,6 +16,12 @@ const inventorySchema = new mongoose.Schema({
         ref: 'User',
         required: [true, 'User is needed to complete inventory'],
     },
+    status: {
+        type: String,
+        enum: ['Available', 'Unavailable'],
+        default: 'Available',
+        required: true
+    },
     pasteurizedDetails:  {
             pasteurizationDate: {
                 type: Date,
