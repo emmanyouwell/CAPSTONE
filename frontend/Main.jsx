@@ -1,4 +1,4 @@
-import React, {useState, useEffect } from "react";
+import React, {useState, useEffect, startTransition } from "react";
 import { View, Image, Text, StatusBar } from "react-native";
 import {
   DrawerContentScrollView,
@@ -31,24 +31,33 @@ import CreateStaff from "./components/Superadmin/Accounts/CreateStaff";
 //Inventory Screens
 import Inventory from "./screens/Superadmin/Inventory";
 import Fridges from "./screens/Superadmin/Inventories/Refrigerator";
+import InventoryCards from "./components/Superadmin/Inventories/Refrigerators/InventoryCard"
 import FridgeDetails from "./components/Superadmin/Inventories/Refrigerators/FridgeDetails";
 import AddFridge from "./components/Superadmin/Inventories/Refrigerators/AddFridge";
 import EditFridge from "./components/Superadmin/Inventories/Refrigerators/EditFridge";
 import AddMilkInventory from "./components/Superadmin/Inventories/Refrigerators/AddMilkInventory";
 import EditMilkInventory from "./components/Superadmin/Inventories/Refrigerators/EditMilkInventory";
 
+import MilkLetting from "./screens/Superadmin/Inventories/MilkLetting";
+import Equipment from "./screens/Superadmin/Inventories/Equipment";
+
 
 const CustomDrawerContent = (props) => {
-  
+
   const [userDetails, setUserDetails] = useState(null);
-  useEffect(()=>{
-    setUserDetails(getUser());
-  },[])
-  useEffect(()=>{
-    if (userDetails){
-      console.log("details: ", userDetails);
-    }
-  },[userDetails])
+  useEffect(() => {
+    // Handle async operation with startTransition
+    startTransition(() => {
+      const fetchUserDetails = async () => {
+        const user = await getUser();
+        setUserDetails(user);
+      };
+      fetchUserDetails();
+    });
+  }, []);
+
+  console.log("Logged in User:", userDetails)
+
   return (
     <DrawerContentScrollView {...props}>
       <View style={drawerStyle.profileContainer}>
@@ -56,7 +65,9 @@ const CustomDrawerContent = (props) => {
           source={{ uri: defaultImg }} // Replace with your profile picture URL
           style={drawerStyle.profilePic}
         /> */}
-        <Text style={drawerStyle.profileName}>Logged in as, Superadmin</Text>
+        <Text style={drawerStyle.profileName}>{userDetails
+            ? `Logged in as, ${userDetails.name}`
+            : "Logged in as, Superadmin"}</Text>
       </View>
 
       <View style={divider.divider} />
@@ -150,14 +161,19 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_account_create_admin" component={CreateAdmin}/>
         <Stack.Screen name="superadmin_account_create_staff" component={CreateStaff}/>
 
-      {/* {Inventory Navigation} */}
+      {/* {Fridge Inventory Navigation} */}
         <Stack.Screen name="superadmin_inventories" component={Inventory}/>
         <Stack.Screen name="superadmin_fridges" component={Fridges}/>
+        <Stack.Screen name="InventoryCards" component={InventoryCards}/>
         <Stack.Screen name="FridgeDetails" component={FridgeDetails}/>
         <Stack.Screen name="AddFridge" component={AddFridge}/>
         <Stack.Screen name="EditFridge" component={EditFridge}/>
         <Stack.Screen name="AddMilkInventory" component={AddMilkInventory}/>
         <Stack.Screen name="EditMilkInventory" component={EditMilkInventory}/>
+        
+        <Stack.Screen name="superadmin_milkLetting" component={MilkLetting}/>
+
+        <Stack.Screen name="superadmin_equipment" component={Equipment}/>
 
       </Stack.Group>
     </Stack.Navigator>

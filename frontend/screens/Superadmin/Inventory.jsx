@@ -42,13 +42,13 @@ const InventoryScreen = ({ navigation }) => {
 
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => {} /* Functionality for Milk Letting Inventory */}>
+                    onPress={() => navigation.navigate('superadmin_milkLetting') }>
                     <Text style={styles.buttonText}>Milk Letting Inventory</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.button}
-                    onPress={() => {} /* Functionality for Equipment Inventory */}>
+                    onPress={() => navigation.navigate('superadmin_equipment')}>
                     <Text style={styles.buttonText}>Equipment Inventory</Text>
                 </TouchableOpacity>
             </View>
