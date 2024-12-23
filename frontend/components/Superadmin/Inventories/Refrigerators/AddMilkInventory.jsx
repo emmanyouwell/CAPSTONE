@@ -18,18 +18,34 @@ import { getDonors } from '../../../../redux/actions/donorActions';
 import Header from '../../../../components/Superadmin/Header';
 import { logoutUser } from '../../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../../styles/Styles';
-import { addInventory } from '../../../../redux/actions/inventoryActions';
+import { addInventory, updateInventory } from '../../../../redux/actions/inventoryActions';
+import { getFridges } from '../../../../redux/actions/fridgeActions';
 import { getUser, viewAsyncStorage } from '../../../../utils/helper';
 
 const AddMilkInventory = ({ route, navigation }) => {
-    const fridge = route.params;
+
+    const fridge = route.params.selectedInventories? { fridgeType : "Pasteurized" }  : route.params;
+
+    const items = route.params.selectedInventories? route.params.selectedInventories : [];    
+
+    const totalVolume = items.reduce((total, item) => total + (item.unpasteurizedDetails?.volume || 0), 0);
+
+    console.log('Fridge Data:', fridge);
+    console.log('Item Data:', items);
+
     const dispatch = useDispatch();
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState(() => ({
+        volume: totalVolume || '', 
+    }));
     const { donors, loading, error } = useSelector((state) => state.donors);
+    const { fridges } = useSelector((state) => state.fridges);
 
     const [open, setOpen] = useState(false);
     const [selectedDonor, setSelectedDonor] = useState(null);
     const [donorItems, setDonorItems] = useState([]);
+
+    const [selectedFridge, setSelectedFridge] = useState(null);
+    const [fridgeItems, setFridgeItems] = useState([]);
 
     const [showExpressDatePicker, setShowExpressDatePicker] = useState(false);
     const [showCollectionDatePicker, setShowCollectionDatePicker] = useState(false);
@@ -38,6 +54,7 @@ const AddMilkInventory = ({ route, navigation }) => {
 
     useEffect(() => {
         dispatch(getDonors());
+        dispatch(getFridges())
     }, [dispatch]);
    
     useEffect(() => {
@@ -48,7 +65,14 @@ const AddMilkInventory = ({ route, navigation }) => {
             }));
             setDonorItems(items);
         }
-    }, [donors]);
+        if (fridges) {
+            const items = fridges.map((fridge) => ({
+                label: `${fridge.name}`,
+                value: fridge._id,
+            }));
+            setFridgeItems(items);
+        }
+    }, [donors, fridges]);
 
     const fetchUserDetails = async () => {
         const user = await getUser();
@@ -100,6 +124,11 @@ const AddMilkInventory = ({ route, navigation }) => {
             return;
         }
 
+        if (!formData || (!selectedFridge && !items)) {
+            Alert.alert("Error", "Please fill out all fields.");
+            return;
+        }
+
         const inventoryDate = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
         const user = await fetchUserDetails(); // Await the async function to resolve
 
@@ -108,10 +137,13 @@ const AddMilkInventory = ({ route, navigation }) => {
             return;
         }
 
+        const fid = selectedFridge? selectedFridge : fridge._id
+
         const newData = {
-            fridgeId: fridge._id,
+            fridgeId: fid,
             inventoryDate,
-            userId: user._id, // This will now have the correct value
+            userId: user._id,
+            status: "Available"
         };
 
         if (fridge.fridgeType === 'Pasteurized') {
@@ -138,15 +170,25 @@ const AddMilkInventory = ({ route, navigation }) => {
             console.log('Unknown fridge type');
         }
 
-        dispatch(addInventory(newData))
-            .then(() => {
-                Alert.alert("Success", "Inventory has been added successfully.");
-                navigation.goBack();
-            })
-            .catch((error) => {
-                Alert.alert("Error", "Failed to add Inventory. Please try again.");
-                console.error(error);
-        });
+        try {
+        // Submit the main inventory data
+            dispatch(addInventory(newData));
+            Alert.alert("Success", "Inventory has been added successfully.");
+
+            // Update the status of each item to "Unavailable"
+            if (items && items.length > 0) {
+                for (const item of items) {
+                    const updatedItem = { ...item, status: "Unavailable", id: item._id };
+                    dispatch(updateInventory(updatedItem));
+                    console.log(`Updated item ${item._id} to Unavailable`);
+                }
+            }
+            // Navigate back after successful submission
+            navigation.goBack();
+        } catch (error) {
+            Alert.alert("Error", "Failed to add Inventory or update item status. Please try again.");
+            console.error(error);
+        }
     };
 
     const renderFormFields = () => {
@@ -213,6 +255,17 @@ const AddMilkInventory = ({ route, navigation }) => {
         } else if (fridge.fridgeType === 'Pasteurized') {
             return (
                 <>
+                    <DropDownPicker
+                        open={open}
+                        value={selectedFridge}
+                        items={fridgeItems}
+                        setOpen={setOpen}
+                        setValue={setSelectedFridge}
+                        setItems={setFridgeItems}
+                        placeholder="Select Fridge"
+                        style={styles.dropdown}
+                    />
+
                     <TouchableOpacity
                         onPress={() => setShowPasteurizationDatePicker(true)}
                         style={styles.datePickerButton}
@@ -221,6 +274,7 @@ const AddMilkInventory = ({ route, navigation }) => {
                             {formData.pasteurizationDate || 'Select Pasteurization Date'}
                         </Text>
                     </TouchableOpacity>
+                    
                     {showPasteurizationDatePicker && (
                         <DateTimePicker
                             value={new Date()}
@@ -254,6 +308,7 @@ const AddMilkInventory = ({ route, navigation }) => {
                         style={styles.input}
                         placeholder="Volume"
                         keyboardType="numeric"
+                        value={formData.volume.toString()}
                         onChangeText={(value) => setFormData({ ...formData, volume: Number(value) })}
                     />
 

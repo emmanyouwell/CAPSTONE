@@ -20,14 +20,14 @@ const Refrigerator = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
-    const { fridge, loading, error } = useSelector((state) => state.fridges);
+    const { fridges , loading, error } = useSelector((state) => state.fridges);
 
     useEffect(() => {
         dispatch(getFridges());
     }, [dispatch]);
 
     const handleNavigate = (fridge) => {
-        navigation.navigate('FridgeDetails', { fridge });
+        navigation.navigate('InventoryCards', { fridge });
     };
 
     const showEditDeleteOptions = (item) => {
@@ -96,8 +96,8 @@ const Refrigerator = () => {
         );
     }
 
-    const pasteurizedFridges = fridge ? fridge.filter((f) => f.fridgeType === 'Pasteurized') : [];
-    const unpasteurizedFridges = fridge ? fridge.filter((f) => f.fridgeType === 'Unpasteurized') : [];
+    const pasteurizedFridges = fridges ? fridges.filter((f) => f.fridgeType === 'Pasteurized') : [];
+    const unpasteurizedFridges = fridges ? fridges.filter((f) => f.fridgeType === 'Unpasteurized') : [];
 
     return (
         <ScrollView style={SuperAdmin.container}>

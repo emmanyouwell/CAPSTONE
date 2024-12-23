@@ -100,6 +100,9 @@ const FridgeDetails = ({ route }) => {
                 <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>
                     {formatDate(inv.inventoryDate)}
                 </DataTable.Cell>
+                <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>
+                    {inv.status}
+                </DataTable.Cell>
                 {isPasteurized ? (
                     <>
                         <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>
@@ -149,6 +152,9 @@ const FridgeDetails = ({ route }) => {
                         Inventory Date
                     </DataTable.Title>
                     <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
+                        Status
+                    </DataTable.Title>
+                    <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
                         Pasteur Date
                     </DataTable.Title>
                     <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
@@ -189,6 +195,9 @@ const FridgeDetails = ({ route }) => {
                 <DataTable.Header>
                     <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
                         Inventory Date
+                    </DataTable.Title>
+                    <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
+                        Status
                     </DataTable.Title>
                     <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
                         Donor
