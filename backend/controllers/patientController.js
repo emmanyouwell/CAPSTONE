@@ -54,9 +54,9 @@ exports.createPatient= catchAsyncErrors( async (req, res, next) => {
         name: data.name,
         address: data.address,
         phone: data.phone,
-        milkRequested: data.milkRequested,
         patientType: data.patientType.trim(),
         hospital: data.hospital,
+        requested: data.requested,
     });
 
     res.status(201).json({
@@ -87,9 +87,9 @@ exports.updatePatient = catchAsyncErrors( async (req, res, next) => {
         name: data.name,
         address: data.address,
         phone: data.phone,
-        milkRequested: data.milkRequested,
         patientType: data.patientType.trim(),
-        hospital: data.hospital
+        hospital: data.hospital,
+        requested: data.requested,
     }
 
     const patient = await Patient.findByIdAndUpdate(req.params.id, newPatientData, {

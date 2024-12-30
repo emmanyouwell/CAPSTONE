@@ -13,7 +13,7 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 router.route('/requests')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allRequests)
-    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), createRequest);
+    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), createRequest);
 router.route('/request/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getRequestDetails)
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateRequest)
