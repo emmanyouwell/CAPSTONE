@@ -34,11 +34,6 @@ const patientSchema = new mongoose.Schema({
                 type: Number,
                 required: [true, 'Please enter amount of milk donated']
             },
-            approvedBy: {
-                type: ObjectId,
-                required: true,
-                ref: 'User'
-            },
         }
     ],
     createdAt: {

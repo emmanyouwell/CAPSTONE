@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const {ObjectId} = mongoose.Schema.Types;
 
 const requestSchema = new mongoose.Schema({
-    dateTime: {
+    date: {
         type: Date,
         required: [true, 'Please enter date']
     },
@@ -19,43 +19,47 @@ const requestSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter diagnosis of the patient']
     },
-    ebm: {
-        batch:{
-            type: String,
-            required: [true, 'Please enter EBM batch']
-        },
-        pool:{
-            type: String,
-            required: [true, 'Please enter EBM pool']
-        },
-        bottle:{
-            type: String,
-            required: [true, 'Please enter EBM bottle']
-        },
-    },
-    volume: {
-        type: String,
-        required: [true, 'Please enter volume given to the patient']
-    },
     reason: {
         type: String,
         required: [true, 'Please enter reason for Byteurized EBM']
-    },
-    outcome: {
-        type: String
     },
     doctor: {
         type: String,
         required: [true, 'Please enter prescribing doctor']
     },
-    transport: {
-        type: String,
-        required: [true, 'Please enter transport details']
-    },
-    approvedBy: {
+    staffId: {
         type: ObjectId,
-        required: [true, 'Need admin id of TCHMB'],
+        required: [true, 'Staff ID required'],
         ref: 'User'
+    },
+    status: {
+        type: String,
+        enum: ['Pending', 'Done'],
+        default: 'Pending',
+        required: true
+    },
+    outcome: {
+        type: String
+    },
+    tchmb: {
+        ebm: [
+        {
+            inv: {
+                type: ObjectId,
+                ref: 'Inventory'
+            }
+        }
+        ],
+        volume: {
+            type: Number
+        },
+        transport: {
+            type: String
+        },
+        approvedBy: {
+            type: ObjectId,
+            ref: 'User'
+        },
     },
     createdAt: {
         type: Date,

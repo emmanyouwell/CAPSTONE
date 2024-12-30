@@ -4,7 +4,11 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
 // Get All requests => /api/v1/requests
 exports.allRequests = catchAsyncErrors( async (req, res, next) => {
-    const requests = await Request.find().populate('patient').populate('approvedBy');
+    const requests = await Request.find()
+        .populate('patient', 'name phone patientType')
+        .populate('staffId', 'name email role')
+        .populate('tchmb.approvedBy', 'name email role') 
+        .populate('tchmb.ebm.inv', 'pasteurizedDetails');
 
     const count = await Request.countDocuments();
 
@@ -17,25 +21,19 @@ exports.allRequests = catchAsyncErrors( async (req, res, next) => {
 
 // Create request => /api/v1/requests
 exports.createRequest= catchAsyncErrors( async (req, res, next) => {
-    const { dateTime, ebm, patient, location, diagnosis, volume, reason, outcome, doctor, transport, approvedBy
-    } = req.body;
-    const Dates = dateTime.date;
-    const Time = dateTime.time;
-
-    const day = new Date(`${Dates}T${Time}:00Z`)
-
+    const { date, patient, location, diagnosis, reason, doctor, staffId, outcome, status, tchmb } = req.body;
+    
     const requestData = {
-        dateTime: day,
+        date,
         patient,
         location,
         diagnosis,
-        ebm,
-        volume,
         reason,
-        outcome,
         doctor,
-        transport,
-        approvedBy
+        staffId,
+        status,
+        outcome,
+        tchmb
     }
 
     const request = await Request.create(requestData);
@@ -48,7 +46,9 @@ exports.createRequest= catchAsyncErrors( async (req, res, next) => {
 
 // Get specific request details => /api/v1/request/:id
 exports.getRequestDetails = catchAsyncErrors( async (req, res, next) => {
-    const request = await Request.findById(req.params.id);
+    const request = await Request.findById(req.params.id)
+        .populate('tchmb.approvedBy', 'name email role') 
+        .populate('tchmb.ebm.inv', 'pasteurizedDetails');
 
     if (!request) {
         return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`))
@@ -61,46 +61,38 @@ exports.getRequestDetails = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Update request => /api/v1/request/:id
-exports.updateRequest = catchAsyncErrors( async (req, res, next) => {
-    const { dateTime, ebm, patient, location, diagnosis, volume, reason, outcome, doctor, transport, approvedBy
-    } = req.body;
+exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
+    const { date, patient, location, diagnosis, reason, doctor, staffId, outcome, status, tchmb } = req.body;
 
-    const Dates = dateTime.date;
-    const Time = dateTime.time;
-
-    const day = new Date(`${Dates}T${Time}:00Z`)
-    
     const newRequestData = {
-        dateTime: day,
+        date,
         patient,
         location,
         diagnosis,
-        ebm,
-        volume,
         reason,
-        outcome,
         doctor,
-        transport,
-        approvedBy
-    }
+        staffId,
+        status,
+        outcome,
+        tchmb
+    };
 
     const request = await Request.findByIdAndUpdate(req.params.id, newRequestData, {
         new: true,
         runValidators: true,
         useFindAndModify: false,
-    })
+    })  .populate('tchmb.approvedBy', 'name email role') 
+        .populate('tchmb.ebm.inv', 'pasteurizedDetails');
 
     if (!request) {
-        return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`))
-    }
+        return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`));
+    }     
 
-    
     res.status(200).json({
         success: true,
-        request
-    })
-
-})
+        request,
+    });
+});
 
 // Delete request => /api/v1/request/:id
 exports.deleteRequest = catchAsyncErrors( async (req, res, next) => {
