@@ -17,8 +17,7 @@ const formatDate = (dateString) => {
 };
 
 const FridgeDetails = ({ route }) => {
-    const { fridge } = route.params;
-    console.log('fridge Details',fridge)
+    const fridge  = route.params;
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { inventory, loading, error } = useSelector((state) => state.inventories);
@@ -245,7 +244,6 @@ const FridgeDetails = ({ route }) => {
                         </ScrollView>
                     </ScrollView>
                 </View>
-                <Button title="Add Inventory" onPress={() => navigation.navigate('AddMilkInventory', fridge)} />
             </View>
         </View>
     );
