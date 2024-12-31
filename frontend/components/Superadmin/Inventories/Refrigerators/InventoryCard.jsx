@@ -5,8 +5,10 @@ import { useNavigation } from "@react-navigation/native";
 
 import Header from '../../Header';
 import { logoutUser } from '../../../../redux/actions/userActions';
-import { deleteInventory, getInventories } from '../../../../redux/actions/inventoryActions';
+import { getInventories } from '../../../../redux/actions/inventoryActions';
 import { SuperAdmin } from '../../../../styles/Styles';
+import { dataTableStyle } from '../../../../styles/Styles'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const Inventory = ({ route }) => {
     const { fridge } = route.params;
@@ -36,7 +38,7 @@ const Inventory = ({ route }) => {
 
     const handleNavigate = () => {
         const selectedInventories = inventory.filter(inv => selectedItems.includes(inv._id));
-        const targetScreen = fridge.fridgeType === 'Pasteurized' ? 'PatientDonation' : 'AddMilkInventory';
+        const targetScreen = fridge.fridgeType === 'Pasteurized' ? 'MilkRequest' : 'AddMilkInventory';
         navigation.navigate(targetScreen, { selectedInventories });
         // console.log("Navigation:", targetScreen, "Data Params:", {selectedInventories})
     };
@@ -114,15 +116,30 @@ const Inventory = ({ route }) => {
         <View style={SuperAdmin.container}>
             <Header onLogoutPress={() => onLogoutPress() } onMenuPress={() => navigation.openDrawer()} />
             <Text style={styles.screenTitle}>{fridge.name} Available Milk</Text>
-            <ScrollView style={styles.cardContainer}>
-                {filteredInventories.map((inv) => renderCard(inv))}
+            <View style={styles.buttonRow}>
+                <TouchableOpacity
+                    style={styles.historyButton}
+                    onPress={() => navigation.navigate('FridgeDetails', fridge)}
+                >
+                    <Text style={styles.buttonText}>
+                        <MaterialIcons name="history" size={16} color="white" /> History
+                    </Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                     style={styles.addButton}
                     onPress={() => navigation.navigate('AddMilkInventory', fridge)}
                 >
-                    <Text style={styles.addButtonText}>+ Add Inventory</Text>
+                    <Text style={styles.buttonText}>
+                        <MaterialIcons name="add" size={16} color="white" /> Add
+                    </Text>
                 </TouchableOpacity>
-            </ScrollView>
+            </View>
+            <View style={dataTableStyle.tableContainer}>
+                <ScrollView style={styles.cardContainer}>
+                    {filteredInventories.map((inv) => renderCard(inv))}
+                    
+                </ScrollView>
+            </View>
             {selectionMode && (
                 <View style={styles.selectionFooter}>
                     <Button title="Cancel" onPress={toggleSelectionMode} color="#FF3B30" />
@@ -181,23 +198,48 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 8,
     },
-    addButton: {
-        backgroundColor: '#007AFF',
-        padding: 12,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginTop: 16,
-    },
-    addButtonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
     selectionFooter: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         padding: 16,
         borderTopWidth: 1,
         borderColor: '#ccc',
+    },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    historyButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#4CAF50', 
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 5,
+        flex: 1,
+        marginRight: 5,
+        marginLeft: 10,
+    },
+    addButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#2196F3', 
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 5,
+        flex: 1,
+        marginLeft: 5,
+        marginRight: 10,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 
