@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Button } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Button, RefreshControl } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from "@react-navigation/native";
 
@@ -18,6 +18,7 @@ const Inventory = ({ route }) => {
 
     const [selectionMode, setSelectionMode] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         dispatch(getInventories());
@@ -36,11 +37,17 @@ const Inventory = ({ route }) => {
         }
     };
 
+    const handleRefresh = () => {
+        setRefreshing(true);
+        dispatch(getInventories())
+            .then(() => setRefreshing(false))
+            .catch(() => setRefreshing(false));
+    };
+
     const handleNavigate = () => {
         const selectedInventories = inventory.filter(inv => selectedItems.includes(inv._id));
         const targetScreen = fridge.fridgeType === 'Pasteurized' ? 'MilkRequest' : 'AddMilkInventory';
         navigation.navigate(targetScreen, { selectedInventories });
-        // console.log("Navigation:", targetScreen, "Data Params:", {selectedInventories})
     };
 
     const filteredInventories = inventory.filter(
@@ -114,7 +121,7 @@ const Inventory = ({ route }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={() => onLogoutPress() } onMenuPress={() => navigation.openDrawer()} />
+            <Header onLogoutPress={() => onLogoutPress()} onMenuPress={() => navigation.openDrawer()} />
             <Text style={styles.screenTitle}>{fridge.name} Available Milk</Text>
             <View style={styles.buttonRow}>
                 <TouchableOpacity
@@ -135,9 +142,13 @@ const Inventory = ({ route }) => {
                 </TouchableOpacity>
             </View>
             <View style={dataTableStyle.tableContainer}>
-                <ScrollView style={styles.cardContainer}>
+                <ScrollView
+                    style={styles.cardContainer}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+                    }
+                >
                     {filteredInventories.map((inv) => renderCard(inv))}
-                    
                 </ScrollView>
             </View>
             {selectionMode && (

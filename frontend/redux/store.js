@@ -6,6 +6,7 @@ import recipientReducer from './slices/recipientSlice'
 import eventReducer from './slices/eventSlice'
 import inventoryReducer from './slices/inventorySlice'
 import fridgeReducer from './slices/fridgeSlice'
+import requestReducer from './slices/requestSlice'
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     events: eventReducer,
     inventories: inventoryReducer,
     fridges: fridgeReducer,
+    requests: requestReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
