@@ -41,6 +41,9 @@ import EditMilkInventory from "./components/Superadmin/Inventories/Refrigerators
 import MilkLetting from "./screens/Superadmin/Inventories/MilkLetting";
 import Equipment from "./screens/Superadmin/Inventories/Equipment";
 
+//Request Screens
+import MilkRequest from "./components/Superadmin/Requests/MilkRequest";
+import ConfirmRequest from "./components/Superadmin/Requests/ConfirmRequest";
 
 const CustomDrawerContent = (props) => {
 
@@ -174,6 +177,10 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_milkLetting" component={MilkLetting}/>
 
         <Stack.Screen name="superadmin_equipment" component={Equipment}/>
+
+      {/* {Request Admins Navigation} */}
+        <Stack.Screen name="MilkRequest" component={MilkRequest}/>
+        <Stack.Screen name="ConfirmRequest" component={ConfirmRequest}/>
 
       </Stack.Group>
     </Stack.Navigator>
