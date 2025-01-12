@@ -1,11 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getRecipients } from '../actions/recipientActions';
+import { 
+  addPatient, 
+  deletePatient, 
+  getPatientDetails, 
+  getRecipients, 
+  updatePatient 
+} from '../actions/recipientActions';
+
 export const recipientSlice = createSlice({
   name: 'recipient',
   initialState: {
     recipients: [],
-    loading: false, // Useful for async actions like login/signup
-    error: null, // To handle errors
+    newPatient: {},
+    PatientDetails: {},
+    isUpdated: false,
+    isDeleted: false,
+    loading: false, 
+    error: null, 
     count: 0,
     pageSize: 0,
   },
@@ -27,6 +38,56 @@ export const recipientSlice = createSlice({
         state.loading = false;
         state.error = action.payload; // The error message passed in rejectWithValue
       })
+
+      .addCase(addPatient.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(addPatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = action.payload.success;
+        state.newPatient = action.payload.patient;
+      })
+      .addCase(addPatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+       .addCase(updatePatient.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updatePatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isUpdated = action.payload.success;
+      })
+      .addCase(updatePatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(getPatientDetails.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getPatientDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.PatientDetails = action.payload.patient;
+      })
+      .addCase(getPatientDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload
+      })
+
+      .addCase(deletePatient.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deletePatient.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isDeleted = action.payload.success;
+      })
+      .addCase(deletePatient.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+      
       
   },
 });

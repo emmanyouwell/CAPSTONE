@@ -44,6 +44,8 @@ import Equipment from "./screens/Superadmin/Inventories/Equipment";
 //Request Screens
 import MilkRequest from "./components/Superadmin/Requests/MilkRequest";
 import ConfirmRequest from "./components/Superadmin/Requests/ConfirmRequest";
+import AddPatient from "./screens/Staff/AddPatient";
+import AddRequest from "./screens/Staff/AddRequest";
 
 const CustomDrawerContent = (props) => {
 
@@ -58,8 +60,6 @@ const CustomDrawerContent = (props) => {
       fetchUserDetails();
     });
   }, []);
-
-  console.log("Logged in User:", userDetails)
 
   return (
     <DrawerContentScrollView {...props}>
@@ -181,6 +181,8 @@ const MainStack = () => {
       {/* {Request Admins Navigation} */}
         <Stack.Screen name="MilkRequest" component={MilkRequest}/>
         <Stack.Screen name="ConfirmRequest" component={ConfirmRequest}/>
+        <Stack.Screen name="AddPatient" component={AddPatient}/>
+        <Stack.Screen name="AddRequest" component={AddRequest}/>
 
       </Stack.Group>
     </Stack.Navigator>

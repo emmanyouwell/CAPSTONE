@@ -46,9 +46,6 @@ export const addRequest = createAsyncThunk(
     async (req, thunkAPI) => {
 
         const token = await getToken();
-        console.log('Token Retrieved:', token);
-
-        console.log('Request Add request:', req);
 
         if (!token) {
             throw new Error('No token available');

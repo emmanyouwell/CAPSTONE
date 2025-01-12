@@ -21,7 +21,7 @@ const Dashboard = ({navigation}) => {
     return (
         <View style={SuperAdmin.container}>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress}/>
-            <Text style={SuperAdmin.headerText}>Admin Dashboard</Text>
+            <Text style={SuperAdmin.headerText}>Dashboard</Text>
             <MenuGrid/>
         </View>
     )
