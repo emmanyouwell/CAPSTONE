@@ -24,15 +24,18 @@ const patientSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter the hospital name of the patient is admitted']
     },
+    staff: {
+        type: ObjectId,
+        required: [true, 'Staff ID required'],
+        ref: 'User'
+    },
     requested: [
         {
             date: {
                 type: Date,
-                required: [true, 'Please enter date of donation']
             },
             milkRequested: {
                 type: Number,
-                required: [true, 'Please enter amount of milk donated']
             },
         }
     ],

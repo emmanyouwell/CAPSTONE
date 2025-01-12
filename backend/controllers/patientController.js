@@ -56,6 +56,7 @@ exports.createPatient= catchAsyncErrors( async (req, res, next) => {
         phone: data.phone,
         patientType: data.patientType.trim(),
         hospital: data.hospital,
+        staff: data.staff,
         requested: data.requested,
     });
 
