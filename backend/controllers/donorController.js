@@ -47,18 +47,23 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
 // Create donor => /api/v1/donors
 exports.createDonor = catchAsyncErrors(async (req, res, next) => {
     const data = req.body;
-
-    // const donor = await Donor.create({
-    //     name: data.name,
-    //     address: data.address,
-    //     phone: data.phone,
-    //     age: data.age,
-    //     birthday: data.birthday,
-    //     civilStatus: data.civilStatus,
-    //     spouse: data.spouse,
-    //     children: data.children,
-    //     donation: data.donation
-    // });
+    console.log(data);
+    const name = {
+        first: data.first_name,
+        middle: data.middle_name,
+        last: data.last_name
+    }
+    const donor = await Donor.create({
+        name: name,
+        address: data.home_address,
+        phone: data.contact_number,
+        age: data.age,
+        birthday: data.birthday,
+        // civilStatus: data.civilStatus,
+        // spouse: data.spouse,
+        children: data.child_name,
+        // donation: data.donation
+    });
 
     res.status(201).json({
         success: true,
