@@ -50,6 +50,7 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
         const data = req.body;
 
         if (!data || !data.fields || !Array.isArray(data.fields)) {
+            console.log("no data or fields",data);
             return res.status(400).json({
                 success: false,
                 message: "Invalid request body. 'fields' array is required."
@@ -57,9 +58,10 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
         }
 
         const fields = data.fields;
-
+        console.log("fields: ",fields);
         // Validate required fields
         if (fields.length < 12) {
+            console.log("fields length",fields.length);
             return res.status(400).json({
                 success: false,
                 message: "Incomplete form submission. Please provide all required fields."
