@@ -34,6 +34,7 @@ const donor = require('./routes/donor');
 const fridge = require('./routes/fridge');
 const inventory = require('./routes/inventory');
 const request = require('./routes/request');
+const equipment = require('./routes/equipment');
 
 // API routes
 app.use('/api/v1', user);
@@ -43,6 +44,7 @@ app.use('/api/v1', donor);
 app.use('/api/v1', fridge);
 app.use('/api/v1', inventory);
 app.use('/api/v1', request);
+app.use('/api/v1', equipment);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
