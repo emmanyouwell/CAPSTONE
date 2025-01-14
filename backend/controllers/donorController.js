@@ -45,7 +45,7 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
 })
 exports.testDonors = catchAsyncErrors(async (req, res, next) => {
     try{
-        const fields = req.body;
+        const fields = req.body.data.fields;
         let data = {};
         console.log(fields);
         fields.forEach(field => {
