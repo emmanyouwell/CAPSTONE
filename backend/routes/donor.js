@@ -14,7 +14,8 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 // Super Admin Routes
 router.route('/donors')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allDonors)
-    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), createDonor);
+    .post(createDonor);
+    // .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), createDonor);
 router.route('/donor/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getDonorDetails)
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateDonor)
