@@ -60,7 +60,7 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
         const fields = data.data.fields;
         // Extract the child name
         const childName = fields[11]?.value;
-
+        console.log("Sex: ", fields[5].options)
         // Prepare children array with one child object
         const children = childName ? [{ name: childName }] : [];
         console.log("fields: ", fields);
@@ -90,7 +90,7 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
         // Create donor in the database
         const donor = await Donor.create({
             name: name,
-            address: fields[6].value,
+            home_address: fields[6].value,
             phone: fields[7].value,
             age: fields[4].value,
             birthday: fields[3].value,

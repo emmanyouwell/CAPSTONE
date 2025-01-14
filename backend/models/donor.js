@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const {ObjectId} = mongoose.Schema.Types;
+const { ObjectId } = mongoose.Schema.Types;
 
 const donorSchema = new mongoose.Schema({
     name: {
@@ -16,7 +16,7 @@ const donorSchema = new mongoose.Schema({
             required: [true, 'Please enter middle name']
         }
     },
-    address: {
+    home_address: {
         type: String,
         required: [true, 'Please enter address of the donor']
     },
@@ -32,17 +32,34 @@ const donorSchema = new mongoose.Schema({
         type: Date,
         required: [true, 'Please enter birthday of the donor']
     },
-    civilStatus: {
+    office_address: {
         type: String,
-        enum: ['Single', 'Married', 'Widowed', 'Legally Separated'],
-        default: 'Single'
+        required: [true, 'Please enter office address of the donor']
     },
-    spouse: {
-        type: String
+    contact_number: {
+        type: String,
+        required: [true, 'Please enter contact number of the donor']
+    },
+    occupation: {
+        type: String,
+        required: [true, 'Please enter occupation of the donor']
     },
     children: [
         {
-            name: {type: String}
+            name: { type: String },
+            dateOfBirth: {
+                type: Date,
+            },
+            age: {
+                type: Number,
+            },
+            birth_weight: {
+                type: Number,
+            },
+            aog: {
+                type: Number,
+            }
+
         }
     ],
     donation: [
