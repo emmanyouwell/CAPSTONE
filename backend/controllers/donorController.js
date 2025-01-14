@@ -50,7 +50,7 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
         const data = req.body;
 
         if (!data || !data.data.fields || !Array.isArray(data.data.fields)) {
-            console.log("no data or fields",data);
+            console.log("no data or fields", data);
             return res.status(400).json({
                 success: false,
                 message: "Invalid request body. 'fields' array is required."
@@ -58,10 +58,15 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
         }
 
         const fields = data.data.fields;
-        console.log("fields: ",fields);
+        // Extract the child name
+        const childName = fields[11]?.value;
+
+        // Prepare children array with one child object
+        const children = childName ? [{ name: childName }] : [];
+        console.log("fields: ", fields);
         // Validate required fields
         if (fields.length < 12) {
-            console.log("fields length",fields.length);
+            console.log("fields length", fields.length);
             return res.status(400).json({
                 success: false,
                 message: "Incomplete form submission. Please provide all required fields."
@@ -89,7 +94,7 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
             phone: fields[7].value,
             age: fields[4].value,
             birthday: fields[3].value,
-            children: fields[11]?.value || "N/A", // Default value if children field is missing
+            children: children,
         });
 
         res.status(201).json({
