@@ -46,31 +46,64 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
 
 // Create donor => /api/v1/donors
 exports.createDonor = catchAsyncErrors(async (req, res, next) => {
-    const data = req.body;
-    console.log(data);
-    const fields = data.fields;
-    const name = {
-        first: fields[0].value,
-        middle: fields[1].value,
-        last: fields[2].value
-    }
-    const donor = await Donor.create({
-        name: name,
-        address: fields[6].value,
-        phone: fields[7].value,
-        age: fields[4].value,
-        birthday: fields[3].value,
-        // civilStatus: data.civilStatus,
-        // spouse: data.spouse,
-        children: fields[11].value,
-        // donation: data.donation
-    });
+    try {
+        const data = req.body;
 
-    res.status(201).json({
-        success: true,
-        donor
-    });
-})
+        if (!data || !data.fields || !Array.isArray(data.fields)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid request body. 'fields' array is required."
+            });
+        }
+
+        const fields = data.fields;
+
+        // Validate required fields
+        if (fields.length < 12) {
+            return res.status(400).json({
+                success: false,
+                message: "Incomplete form submission. Please provide all required fields."
+            });
+        }
+
+        const name = {
+            first: fields[0]?.value || "",
+            middle: fields[1]?.value || "",
+            last: fields[2]?.value || "",
+        };
+
+        // Check for missing required field values
+        if (!name.first || !name.last || !fields[6]?.value || !fields[7]?.value || !fields[4]?.value || !fields[3]?.value) {
+            return res.status(400).json({
+                success: false,
+                message: "Missing required fields: first name, last name, address, phone, age, or birthday."
+            });
+        }
+
+        // Create donor in the database
+        const donor = await Donor.create({
+            name: name,
+            address: fields[6].value,
+            phone: fields[7].value,
+            age: fields[4].value,
+            birthday: fields[3].value,
+            children: fields[11]?.value || "N/A", // Default value if children field is missing
+        });
+
+        res.status(201).json({
+            success: true,
+            donor,
+        });
+    } catch (error) {
+        console.error("Error in createDonor:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "An error occurred while creating the donor.",
+            error: error.message,
+        });
+    }
+});
 
 // Get specific donor details => /api/v1/donor/:id
 exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
