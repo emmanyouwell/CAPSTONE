@@ -43,7 +43,33 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     }
 
 })
-
+exports.testDonors = catchAsyncErrors(async (req, res, next) => {
+    try{
+        const fields = req.body;
+        let data = {};
+        console.log(fields);
+        fields.forEach(field => {
+            if (field.type === "MULTIPLE_CHOICE"){
+                const result = field.options.find(item => item.id === field.value)?.text;
+                data[field.label] = result;
+            }
+            else if (field.type==="CHECKBOXES"){
+                
+            }
+            else{
+                data[field.label] = field.value;
+            }
+            
+        })
+        res.status(200).json({
+            success: true,
+            fields
+        });
+    }
+    catch (error){
+        res.status(500).json({ error: error.message });
+    }
+})
 // Create donor => /api/v1/donors
 exports.createDonor = catchAsyncErrors(async (req, res, next) => {
     try {
@@ -63,7 +89,8 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
         console.log("Sex: ", fields[5].options)
         // Prepare children array with one child object
         const children = childName ? [{ name: childName }] : [];
-        console.log("fields: ", fields);
+        console.log("checkbox: ", fields.find(field => field.key==="question_rBK1gL"));
+        console.log("checkbox options: ", fields.find(field => field.key==="question_rBK1gL").options);
         // Validate required fields
         if (fields.length < 12) {
             console.log("fields length", fields.length);

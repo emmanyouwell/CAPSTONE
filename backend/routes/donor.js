@@ -7,11 +7,13 @@ const {
     getDonorDetails,
     updateDonor,
     deleteDonor,
+    testDonors,
 } = require('../controllers/donorController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 // Super Admin Routes
+router.post('/test-donor', testDonors);
 router.route('/donors')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allDonors)
     .post(createDonor);
