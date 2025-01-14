@@ -48,20 +48,21 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
 exports.createDonor = catchAsyncErrors(async (req, res, next) => {
     const data = req.body;
     console.log(data);
+    const fields = data.fields;
     const name = {
-        first: data.first_name,
-        middle: data.middle_name,
-        last: data.last_name
+        first: fields[0].value,
+        middle: fields[1].value,
+        last: fields[2].value
     }
     const donor = await Donor.create({
         name: name,
-        address: data.home_address,
-        phone: data.contact_number,
-        age: data.age,
-        birthday: data.birthday,
+        address: fields[6].value,
+        phone: fields[7].value,
+        age: fields[4].value,
+        birthday: fields[3].value,
         // civilStatus: data.civilStatus,
         // spouse: data.spouse,
-        children: data.child_name,
+        children: fields[11].value,
         // donation: data.donation
     });
 
