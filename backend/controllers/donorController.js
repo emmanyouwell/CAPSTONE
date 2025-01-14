@@ -50,7 +50,10 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
         console.log(fields);
         fields.forEach(field => {
             if (field.type === "MULTIPLE_CHOICE"){
-                const result = field.options.find(item => item.id === field.value)?.text;
+                const result = field.value.map(selected =>{
+                    const match = field.options.find(option => option.id === selected);
+                    return match ? match.text : null;
+                }).filter(item => item !== null);
                 data[field.label] = result;
             }
             else if (field.type==="CHECKBOXES" && field.key === "question_rBK1gL"){
