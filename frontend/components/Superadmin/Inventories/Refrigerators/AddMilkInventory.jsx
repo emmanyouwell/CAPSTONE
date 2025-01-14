@@ -30,9 +30,6 @@ const AddMilkInventory = ({ route, navigation }) => {
 
     const totalVolume = items.reduce((total, item) => total + (item.unpasteurizedDetails?.volume || 0), 0);
 
-    console.log('Fridge Data:', fridge);
-    console.log('Item Data:', items);
-
     const dispatch = useDispatch();
     const [formData, setFormData] = useState(() => ({
         volume: totalVolume || '', 
@@ -129,49 +126,72 @@ const AddMilkInventory = ({ route, navigation }) => {
             return;
         }
 
-        const inventoryDate = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
-        const user = await fetchUserDetails(); // Await the async function to resolve
+        const inventoryDate = new Date().toISOString().split("T")[0];
+        const user = await fetchUserDetails(); 
 
         if (!user || !user._id) {
             Alert.alert("Error", "Failed to retrieve user details.");
             return;
         }
 
-        const fid = selectedFridge? selectedFridge : fridge._id
+        const fid = selectedFridge ? selectedFridge : fridge._id;
 
         const newData = {
             fridgeId: fid,
             inventoryDate,
             userId: user._id,
-            status: "Available"
+            status: "Available",
         };
 
-        if (fridge.fridgeType === 'Pasteurized') {
+        if (fridge.fridgeType === "Pasteurized") {
+            const {
+                pasteurizationDate,
+                batch,
+                pool,
+                bottle,
+                volume,
+                expirationDate,
+            } = formData;
+
+            if (!pasteurizationDate || !batch || !pool || !bottle || !volume || !expirationDate) {
+                Alert.alert("Error", "Please fill out all fields for pasteurized milk.");
+                return;
+            }
+
             newData.pasteurizedDetails = {
-                pasteurizationDate: formData.pasteurizationDate,
-                batch: formData.batch,
-                pool: formData.pool,
-                bottle: formData.bottle,
-                volume: formData.volume,
-                expiration: formData.expirationDate,
+                pasteurizationDate,
+                batch,
+                pool,
+                bottle,
+                volume,
+                expiration: expirationDate,
             };
 
-            console.log('Submitting Pasteurized Data:', newData);
-        } else if (fridge.fridgeType === 'Unpasteurized') {
+            console.log("Submitting Pasteurized Data:", newData);
+        } else if (fridge.fridgeType === "Unpasteurized") {
+            const { expressDate, collectionDate, volume } = formData;
+
+            if (!selectedDonor || !expressDate || !collectionDate || !volume) {
+                Alert.alert("Error", "Please fill out all fields for unpasteurized milk.");
+                return;
+            }
+
             newData.unpasteurizedDetails = {
                 donor: selectedDonor,
-                expressDate: formData.expressDate,
-                collectionDate: formData.collectionDate,
-                volume: formData.volume,
+                expressDate,
+                collectionDate,
+                volume,
             };
 
-            console.log('Submitting Unpasteurized Data:', newData);
+            console.log("Submitting Unpasteurized Data:", newData);
         } else {
-            console.log('Unknown fridge type');
+            console.log("Unknown fridge type");
+            Alert.alert("Error", "Unknown fridge type. Please contact support.");
+            return;
         }
 
         try {
-        // Submit the main inventory data
+            // Submit the main inventory data
             dispatch(addInventory(newData));
             Alert.alert("Success", "Inventory has been added successfully.");
 
