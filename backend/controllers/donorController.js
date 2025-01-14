@@ -53,17 +53,24 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
                 const result = field.options.find(item => item.id === field.value)?.text;
                 data[field.label] = result;
             }
-            else if (field.type==="CHECKBOXES"){
-                
+            else if (field.type==="CHECKBOXES" && field.key === "question_rBK1gL"){
+                const result = field.value.map(selected =>{
+                    const match = field.options.find(option => option.id === selected);
+                    return match ? match.text : null;
+                }).filter(item => item !== null);
+                console.log("result: ", result);
+                data[field.label] = result;
             }
             else{
                 data[field.label] = field.value;
             }
             
         })
+        console.log("data: ", data);
         res.status(200).json({
             success: true,
-            fields
+            fields,
+            data
         });
     }
     catch (error){
