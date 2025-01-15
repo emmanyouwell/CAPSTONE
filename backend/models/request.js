@@ -27,6 +27,12 @@ const requestSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter prescribing doctor']
     },
+    priority: {
+        type: String,
+        enum: ['Low', 'Medium', 'High'],
+        default: 'Low',
+        required: [true, 'Please enter priority level']
+    },
     staffId: {
         type: ObjectId,
         required: [true, 'Staff ID required'],
