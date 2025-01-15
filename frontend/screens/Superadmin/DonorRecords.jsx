@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, Image, ImageBackground, TextInput } from 'react-native'
+import { View, Text, Image, ImageBackground, TextInput, RefreshControl, ScrollView } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Superadmin/Header'
 import DonorRecordsTable from '../../components/Superadmin/DonorRecordTable'
@@ -13,6 +13,8 @@ const DonorRecords = ({ navigation }) => {
   const dispatch = useDispatch();
   const { donors, count, pageSize, loading, error } = useSelector((state) => state.donors);
   const [query, setQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
   const handleMenuClick = () => {
     navigation.openDrawer();
   }
@@ -34,17 +36,20 @@ const DonorRecords = ({ navigation }) => {
       .then((data) => console.log('Donors fetched:', data))
       .catch((err) => console.error('Error fetching donors:', err));
   }, [dispatch])
-  // useEffect(() => {
-  //   if (donors) {
-  //     console.log("Donors: ", donors);
-  //   }
 
-  // }, [donors])
   useEffect(() => {
     if (query) {
       console.log('Query:', query);
     }
   }, [query])
+
+  const handleRefresh = () => {
+        setRefreshing(true);
+        dispatch(getDonors())
+          .then(() => setRefreshing(false))
+          .catch(() => setRefreshing(false));
+    };
+    
   return (
     <View>
       <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
@@ -60,7 +65,14 @@ const DonorRecords = ({ navigation }) => {
           </View>
         </ImageBackground>
       </View>
-      {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} count={count} pageSize={pageSize}/>}
+      <ScrollView
+        refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} count={count} pageSize={pageSize}/>}
+      </ScrollView>
+      
       
     </View>
   )
