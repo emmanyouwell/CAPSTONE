@@ -70,6 +70,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
             
         })
         console.log("data: ", data);
+        console.log("sex: ", data.sex);
         res.status(200).json({
             success: true,
             fields,
