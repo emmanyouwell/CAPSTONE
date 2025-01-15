@@ -37,44 +37,51 @@ const MilkRequest = ({ route, navigation }) => {
     const handleUpdate = (row) => {
         const newData = {
             request: row,
-            inventory: items
+            inventory: items,
         };
         navigation.navigate('ConfirmRequest', newData);
     };
 
-    const filteredRequests = request.filter(
-        (req) => req.status === 'Pending'
-    );
+    // Sort requests by priority: High -> Medium -> Low
+    const sortedRequests = request
+        .filter((req) => req.status === 'Pending')
+        .sort((a, b) => {
+            const priorityOrder = { High: 1, Medium: 2, Low: 3 };
+            return priorityOrder[a.priority] - priorityOrder[b.priority];
+        });
 
-    const renderCard = (req) => (
-        <TouchableOpacity
-            key={req._id}
-            style={styles.card}
-            onPress={() =>
-                Alert.alert(
-                    "Complete Request",
-                    `Do you want to complete Request ${req._id}?`,
-                    [
-                        { text: "Yes", onPress: () => handleUpdate(req) },
-                        { text: "Cancel", style: "cancel" },
-                    ]
-                )
-            }
-        >
-            {filteredRequests ? (
-                <>
-                    <Text style={styles.cardTitle}>Date: {formatDate(req.date)}</Text>
-                    <Text>Status: {req.status}</Text>
-                    <Text>Patient: {req.patient.name}</Text>
-                    <Text>Type: {req.patient.patientType}</Text>
-                    <Text>Location: {req.location}</Text>
-                    <Text>Prescribed By: {req.doctor}</Text>
-                </>
-            ) : (
-                <Text>No Requests available</Text>
-            )}
-        </TouchableOpacity>
-    );
+    const renderCard = (req) => {
+        const cardColors = {
+            High: '#FF6B6B', // Red
+            Medium: '#FFA500', // Orange
+            Low: '#32CD32', // Green
+        };
+
+        return (
+            <TouchableOpacity
+                key={req._id}
+                style={[styles.card, { borderColor: cardColors[req.priority], borderWidth: 2 }]}
+                onPress={() =>
+                    Alert.alert(
+                        "Complete Request",
+                        `Do you want to complete Request ${req._id}?`,
+                        [
+                            { text: "Yes", onPress: () => handleUpdate(req) },
+                            { text: "Cancel", style: "cancel" },
+                        ]
+                    )
+                }
+            >
+                <Text style={[styles.cardTitle, { color: cardColors[req.priority] }]}>Priority: {req.priority}</Text>
+                <Text style={styles.cardTitle}>Date: {formatDate(req.date)}</Text>
+                <Text>Status: {req.status}</Text>
+                <Text>Patient: {req.patient.name}</Text>
+                <Text>Type: {req.patient.patientType}</Text>
+                <Text>Location: {req.location}</Text>
+                <Text>Prescribed By: {req.doctor}</Text>
+            </TouchableOpacity>
+        );
+    };
 
     return (
         <View style={SuperAdmin.container}>
@@ -95,7 +102,7 @@ const MilkRequest = ({ route, navigation }) => {
                         <Text style={styles.errorText}>{error}</Text>
                     </View>
                 ) : (
-                    filteredRequests.map((req) => renderCard(req))
+                    sortedRequests.map((req) => renderCard(req))
                 )}
             </ScrollView>
         </View>
