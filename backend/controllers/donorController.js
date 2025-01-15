@@ -77,12 +77,12 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
         };
         
         // Prepare children array with one child object
-        const children = childName ? [{
+        const children = [{
             name: data.child_name,
             age: data.child_age,
             birth_weight: data.birth_weight,
             aog: data.aog
-        }] : [];
+        }];
         // Create donor in the database
         const donor = await Donor.create({
             name: name,
