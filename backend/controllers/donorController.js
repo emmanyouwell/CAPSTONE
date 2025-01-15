@@ -44,40 +44,65 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
 
 })
 exports.testDonors = catchAsyncErrors(async (req, res, next) => {
-    try{
+    try {
         const fields = req.body.data.fields;
         let data = {};
-        console.log(fields);
+
         fields.forEach(field => {
-            if (field.type === "MULTIPLE_CHOICE"){
-                const result = field.value.map(selected =>{
+            if (field.type === "MULTIPLE_CHOICE") {
+                const result = field.value.map(selected => {
                     const match = field.options.find(option => option.id === selected);
                     return match ? match.text : null;
                 }).filter(item => item !== null);
                 data[field.label] = result;
             }
-            else if (field.type==="CHECKBOXES" && field.key === "question_rBK1gL"){
-                const result = field.value.map(selected =>{
+            else if (field.type === "CHECKBOXES" && field.key === "question_rBK1gL") {
+                const result = field.value.map(selected => {
                     const match = field.options.find(option => option.id === selected);
                     return match ? match.text : null;
                 }).filter(item => item !== null);
                 console.log("result: ", result);
                 data[field.label] = result;
             }
-            else{
+            else {
                 data[field.label] = field.value;
             }
-            
+
         })
         console.log("data: ", data);
-        console.log("sex: ", data.sex);
+        const name = {
+            first: data.first_name || "",
+            middle: data.middle_name || "",
+            last: data.last_name || "",
+        };
+        
+        // Prepare children array with one child object
+        const children = childName ? [{
+            name: data.child_name,
+            age: data.child_age,
+            birth_weight: data.birth_weight,
+            aog: data.aog
+        }] : [];
+        // Create donor in the database
+        const donor = await Donor.create({
+            name: name,
+            home_address: data.home_address,
+            phone: data.contact_number,
+            age: data.age,
+            birthday: data.birthday,
+            children: children,
+            office_address: data.office_address,
+            contact_number: data.contact_number_2,
+            occupation: data.occupation
+        });
         res.status(200).json({
             success: true,
             fields,
-            data
+            data,
+            donor
         });
     }
-    catch (error){
+    catch (error) {
         res.status(500).json({ error: error.message });
     }
 })
@@ -97,11 +122,11 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
         const fields = data.data.fields;
         // Extract the child name
         const childName = fields[11]?.value;
-        console.log("Sex: ", fields[5].options)
+
         // Prepare children array with one child object
         const children = childName ? [{ name: childName }] : [];
-        console.log("checkbox: ", fields.find(field => field.key==="question_rBK1gL"));
-        console.log("checkbox options: ", fields.find(field => field.key==="question_rBK1gL").options);
+        console.log("checkbox: ", fields.find(field => field.key === "question_rBK1gL"));
+        console.log("checkbox options: ", fields.find(field => field.key === "question_rBK1gL").options);
         // Validate required fields
         if (fields.length < 12) {
             console.log("fields length", fields.length);
