@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, ImageBackground, TextInput } from 'react-native'
+import { View, Text, ImageBackground, TextInput, RefreshControl, ScrollView } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Superadmin/Header'
 import RecipientRecordTable from '../../components/Superadmin/RecipientRecordTable'
@@ -14,6 +14,8 @@ const RecipientRecords = ({ navigation }) => {
   const { recipients, count, pageSize, loading, error } = useSelector((state) => state.recipients);
 
   const [query, setQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
   const handleMenuClick = () => {
     navigation.openDrawer();
   }
@@ -35,6 +37,14 @@ const RecipientRecords = ({ navigation }) => {
       .then((data) => console.log('Recipients fetched:', data))
       .catch((err) => console.error('Error fetching donors:', err));
   }, [dispatch])
+
+  const handleRefresh = () => {
+      setRefreshing(true);
+      dispatch(getRecipients())
+        .then(() => setRefreshing(false))
+        .catch(() => setRefreshing(false));
+  };
+
   return (
     <View>
       <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
@@ -49,7 +59,13 @@ const RecipientRecords = ({ navigation }) => {
           </View>
         </ImageBackground>
       </View>
-      {loading ? <Text>Loading...</Text> : recipients && <RecipientRecordTable recipients={recipients} count={count} pageSize={pageSize} />}
+      <ScrollView
+        refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        {loading ? (<Text>Loading...</Text>) : recipients && <RecipientRecordTable recipients={recipients} count={count} pageSize={pageSize} />}
+      </ScrollView>
 
     </View>
   )
