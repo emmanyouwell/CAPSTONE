@@ -20,7 +20,7 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
 
     // Optional: Add pagination (e.g., limit results and skip for page number)
     const page = Number(req.query.page) || 1;
-    const pageSize = 10; // Adjust page size as needed
+    const pageSize = Number(req.query.pageSize) || 10; // Adjust page size as needed
     const skip = (page - 1) * pageSize;
 
     try {
@@ -29,12 +29,14 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
             .skip(skip)
             .limit(pageSize);
 
-        // Count total donors after filtering (for pagination)
-        const count = await Donor.countDocuments(query);
+        const totalDonors = await Donor.countDocuments(query);
+        const totalPages = Math.ceil(totalDonors / pageSize);
 
         res.status(200).json({
             success: true,
-            count,
+            totalDonors,
+            totalPages,
+            currentPage: page,
             pageSize,
             donors
         });
@@ -75,7 +77,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
             middle: data.middle_name || "",
             last: data.last_name || "",
         };
-        
+
         // Prepare children array with one child object
         const children = [{
             name: data.child_name,
