@@ -21,7 +21,7 @@ exports.allRequests = catchAsyncErrors( async (req, res, next) => {
 
 // Create request => /api/v1/requests
 exports.createRequest= catchAsyncErrors( async (req, res, next) => {
-    const { date, patient, location, diagnosis, reason, doctor, staffId, outcome, status, tchmb } = req.body;
+    const { date, patient, location, diagnosis, reason, doctor, staffId, outcome, status, tchmb, priority } = req.body;
     
     const requestData = {
         date,
@@ -30,6 +30,7 @@ exports.createRequest= catchAsyncErrors( async (req, res, next) => {
         diagnosis,
         reason,
         doctor,
+        priority,
         staffId,
         status,
         outcome,
@@ -62,7 +63,7 @@ exports.getRequestDetails = catchAsyncErrors( async (req, res, next) => {
 
 // Update request => /api/v1/request/:id
 exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
-    const { date, patient, location, diagnosis, reason, doctor, staffId, outcome, status, tchmb } = req.body;
+    const { date, patient, location, diagnosis, reason, doctor, staffId, outcome, status, tchmb, priority } = req.body;
 
     const newRequestData = {
         date,
@@ -71,6 +72,7 @@ exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
         diagnosis,
         reason,
         doctor,
+        priority,
         staffId,
         status,
         outcome,

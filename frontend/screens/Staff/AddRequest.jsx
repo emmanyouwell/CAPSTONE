@@ -25,7 +25,6 @@ const AddRequest = ({ navigation, route }) => {
     const newPatient = route.params?.newPatient || null;
     const staff = route.params?.staff || '';
     const [userDetails, setUserDetails] = useState(null);
-
     const [formData, setFormData] = useState({
         patient: newPatient?._id || null,
         location: '',
@@ -34,7 +33,14 @@ const AddRequest = ({ navigation, route }) => {
         doctor: '',
         milkRequested: '',
     });
+    const [priority, setPriority] = useState(null);
+    const [items, setItems] = useState([
+            { label: 'Low', value: 'Low' },
+            { label: 'Medium', value: 'Medium' },
+            { label: 'High', value: 'High' },
+    ]);
     const [open, setOpen] = useState(false);
+    const [open2, setOpen2] = useState(false);
     const [patients, setPatients] = useState([]);
     const [patientItems, setPatientItems] = useState([]);
 
@@ -82,7 +88,7 @@ const AddRequest = ({ navigation, route }) => {
     const handleSubmit = () => {
         const { patient, location, diagnosis, reason, doctor, milkRequested } = formData;
 
-        if (!patient || !location || !diagnosis || !reason || !doctor || !milkRequested) {
+        if (!patient || !location || !diagnosis || !reason || !doctor || !milkRequested || !priority) {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
         }
@@ -90,16 +96,17 @@ const AddRequest = ({ navigation, route }) => {
         const staffId = staff? staff : userDetails._id
 
         const requestData = {
-            date: moment().format('YYYY-MM-DD'), // Current date
+            date: moment().format('YYYY-MM-DD'), 
             patient,
             location,
             diagnosis,
             reason,
             doctor,
+            priority,
             staffId,
             status: 'Pending',
         };
-
+        
         dispatch(addRequest(requestData))
             .then(() => {
                 const milkRequestData = {
@@ -184,6 +191,17 @@ const AddRequest = ({ navigation, route }) => {
                     placeholder="Doctor"
                     value={formData.doctor}
                     onChangeText={(text) => handleChange('doctor', text)}
+                />
+                <DropDownPicker
+                    open={open2}
+                    value={priority}
+                    items={items}
+                    setOpen={setOpen2}
+                    setValue={setPriority}
+                    setItems={setItems}
+                    placeholder="Select Patient Priority"
+                    style={styles.dropdown}
+                    dropDownContainerStyle={styles.dropdownContainer}
                 />
                 <TextInput
                     style={styles.input}
