@@ -51,6 +51,16 @@ const equipmentSchema = new mongoose.Schema({
         required: [true, 'TCHMB ADMIN ID required'],
         ref: 'User'
     },
+    images: [
+        {
+            public_id: {
+                type: String,
+            },
+            url: {
+                type: String,
+            },
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now
