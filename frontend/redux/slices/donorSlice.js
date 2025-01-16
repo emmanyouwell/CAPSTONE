@@ -8,6 +8,8 @@ export const donorSlice = createSlice({
     error: null, // To handle errors
     count: 0,
     pageSize: 0,
+    totalDonors: 0,
+    totalPages: 0
   },
   reducers: {
   },
@@ -22,6 +24,8 @@ export const donorSlice = createSlice({
         state.donors = action.payload.donors;
         state.count = action.payload.count;
         state.pageSize = action.payload.pageSize;
+        state.totalDonors = action.payload.totalDonors;
+        state.totalPages = action.payload.totalPages;
       })
       .addCase(getDonors.rejected, (state, action) => {
         state.loading = false;

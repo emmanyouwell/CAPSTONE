@@ -3,10 +3,13 @@ import { ScrollView, View, TouchableOpacity, Text, Animated } from 'react-native
 import { Checkbox, DataTable } from 'react-native-paper'
 import { dataTableStyle, buttonStyle } from '../../styles/Styles'
 import { formatDate } from '../../utils/helper'
-const DonorRecordsTable = ({donors, count, pageSize}) => {
+import { getDonors } from '../../redux/actions/donorActions'
+import { useDispatch } from 'react-redux'
+const DonorRecordsTable = ({donors,totalDonors, totalPages, count, currentPage, setCurrentPage,pageSize}) => {
+  const dispatch = useDispatch();
   const [isScrollable, setIsScrollable] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
+  
   // Initial data
   const [data, setData] = useState([
     { name: 'John Doe', email: 'johndoe@gmail.com', role: 'user', age: 25, location: 'New York' },
@@ -63,6 +66,7 @@ const DonorRecordsTable = ({donors, count, pageSize}) => {
     }
 
   }, [selectedRows])
+ 
   return (
     <View style={dataTableStyle.container}>
       <View style={dataTableStyle.btnContainer}>
@@ -73,10 +77,7 @@ const DonorRecordsTable = ({donors, count, pageSize}) => {
           page={currentPage}
           numberOfPages={Math.ceil(count/pageSize)}
           onPageChange={(page) => setCurrentPage(page)}
-          label={`${currentPage * pageSize + 1}-${Math.min(
-            (currentPage + 1) * pageSize,
-            donors.length
-          )} of ${donors.length}`}
+          label={`${currentPage} of ${totalPages}`}
         />
         {/* <TouchableOpacity onPress={addRow} style={buttonStyle.smallBtn}><Text style={buttonStyle.btnText}>Add new row</Text></TouchableOpacity> */}
       </View>
