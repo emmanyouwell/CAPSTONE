@@ -1,30 +1,80 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
+import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteEquipments } from '../../../../redux/actions/equipmentActions';
 
 const Equipments = ({ data }) => {
+    const navigation = useNavigation();
+    const dispatch = useDispatch();
+    const { isDeleted } = useSelector((state) => state.equipments);
+
+    const handleEdit = (item) => {
+        navigation.navigate('EditEquipment', { item });
+    };
+
+    const handleDelete = (id) => {
+        Alert.alert(
+            "Confirm Deletion",
+            "Are you sure you want to delete this equipment?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: () => {
+                        dispatch(deleteEquipments(id))
+                            .then(Alert.alert("Deleted", "Equipment deleted successfully."))
+                            .catch((err) => Alert.alert('Error', err.message));;
+                    },
+                },
+            ]
+        );
+    };
+
+    const renderRightActions = (item) => (
+        <View style={styles.actionsContainer}>
+            <TouchableOpacity
+                style={[styles.actionButton, styles.editButton]}
+                onPress={() => handleEdit(item)}
+            >
+                <Text style={styles.actionText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.actionButton, styles.deleteButton]}
+                onPress={() => handleDelete(item._id)}
+            >
+                <Text style={styles.actionText}>Delete</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
     const renderEquipment = ({ item }) => {
         const { name, equipType, condition, location, quantity, images } = item;
 
         return (
-            <View style={styles.card}>
-                {/* Display the first image if available */}
-                {images && images.length > 0 ? (
-                    <Image source={{ uri: images[0].url }} style={styles.image} />
-                ) : (
-                    <View style={styles.imagePlaceholder}>
-                        <Text style={styles.placeholderText}>No Image</Text>
-                    </View>
-                )}
+            <Swipeable renderRightActions={() => renderRightActions(item)}>
+                <View style={styles.card}>
+                    {/* Display the first image if available */}
+                    {images && images.length > 0 ? (
+                        <Image source={{ uri: images[0].url }} style={styles.image} />
+                    ) : (
+                        <View style={styles.imagePlaceholder}>
+                            <Text style={styles.placeholderText}>No Image</Text>
+                        </View>
+                    )}
 
-                {/* Equipment details */}
-                <View style={styles.info}>
-                    <Text style={styles.title}>{name}</Text>
-                    <Text style={styles.details}>Type: {equipType}</Text>
-                    <Text style={styles.details}>Condition: {condition}</Text>
-                    <Text style={styles.details}>Location: {location}</Text>
-                    <Text style={styles.details}>Quantity: {quantity}</Text>
+                    {/* Equipment details */}
+                    <View style={styles.info}>
+                        <Text style={styles.title}>{name}</Text>
+                        <Text style={styles.details}>Type: {equipType}</Text>
+                        <Text style={styles.details}>Condition: {condition}</Text>
+                        <Text style={styles.details}>Location: {location}</Text>
+                        <Text style={styles.details}>Quantity: {quantity}</Text>
+                    </View>
                 </View>
-            </View>
+            </Swipeable>
         );
     };
 
@@ -81,6 +131,33 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#555',
         marginBottom: 2,
+    },
+    actionsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        elevation: 3,
+        marginBottom: 10,
+        overflow: 'hidden',
+    },
+    actionButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: '100%',
+    },
+    editButton: {
+        backgroundColor: '#4CAF50',
+    },
+    deleteButton: {
+        backgroundColor: '#F44336',
+    },
+    actionText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 

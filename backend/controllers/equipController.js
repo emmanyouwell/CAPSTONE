@@ -19,6 +19,7 @@ exports.allEquipments = catchAsyncErrors( async (req, res, next) => {
 // Create Equipment => /api/v1/Equipments
 exports.createEquipment = catchAsyncErrors(async (req, res, next) => {
     try {
+        console.log(req.body)
         let images = []
         if (typeof req.body.images === 'string') {
             images.push(req.body.images)
@@ -41,17 +42,17 @@ exports.createEquipment = catchAsyncErrors(async (req, res, next) => {
 
         req.body.images = imagesLinks
 
-        // Create equipment entry in the database
+
         const equipment = await Equipment.create(req.body);
 
-        // Send response
+
         res.status(201).json({
             success: true,
             equipment,
         });
     } catch (error) {
-        // Handle errors and avoid duplicate headers
-        return next(error);
+        console.log('Error: ', error.message);
+        next(error);
     }
 });
 
@@ -70,57 +71,59 @@ exports.getEquipmentDetails = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Update Equipment => /api/v1/Equipment/:id
-exports.updateEquipment = catchAsyncErrors( async (req, res, next) => {
-    // const { name, equipType, quantity, condition, location, invBy, mainDate, usageLogs } = req.body;
-    let equipment = await Equipment.findById(req.params.id);
-
-    if (!equipment) {
-        return next(new ErrorHandler('Equipment not Found', 400));
-    };
-    
-    let images = []
-    if (typeof req.body.images === 'string') {
-        images.push(req.body.images)
-    } else {
-        images = req.body.images
-    }
-
-    if (images !== undefined) {
-
-        // Deleting images associated with the equipment
-        for (let i = 0; i < equipment.images.length; i++) {
-            const result = await cloudinary.v2.uploader.destroy(equipment.images[i].public_id)
+exports.updateEquipment = catchAsyncErrors(async (req, res, next) => {
+    console.log(req.body);
+    try {
+        let equipment = await Equipment.findById(req.params.id);
+        if (!equipment) {
+            return next(new ErrorHandler('Equipment not Found', 400));
         }
 
-        let imagesLinks = [];
+        let images = [];
 
-        for (let i = 0; i < images.length; i++) {
-            const result = await cloudinary.v2.uploader.upload(images[i], {
-                folder: 'equipments'
-            });
-
-            imagesLinks.push({
-                public_id: result.public_id,
-                url: result.secure_url
-            })
+        if (Array.isArray(req.body.images)) {
+            images = req.body.images.map(image => 
+                typeof image === 'object' && image.url ? image.url : image
+            );
+        } else if (typeof req.body.images === 'string') {
+            images.push(req.body.images);
         }
 
-        req.body.images = imagesLinks
+        if (images.length > 0) {
+            for (let i = 0; i < equipment.images.length; i++) {
+                await cloudinary.v2.uploader.destroy(equipment.images[i].public_id);
+            }
 
+            let imagesLinks = [];
+            for (let i = 0; i < images.length; i++) {
+                const result = await cloudinary.v2.uploader.upload(images[i], {
+                    folder: 'equipments',
+                });
+
+                imagesLinks.push({
+                    public_id: result.public_id,
+                    url: result.secure_url,
+                });
+            }
+
+            req.body.images = imagesLinks;
+        }
+
+        equipment = await Equipment.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+            useFindAndModify: false,
+        });
+
+        res.status(200).json({
+            success: true,
+            equipment,
+        });
+    } catch (error) {
+        console.log('Error: ', error.message);
+        next(error);
     }
-
-    equipment = await Equipment.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false,
-    })
-    
-    res.status(200).json({
-        success: true,
-        equipment
-    })
-
-})
+});
 
 // Delete Equipment => /api/v1/Equipment/:id
 exports.deleteEquipment = catchAsyncErrors( async (req, res, next) => {
