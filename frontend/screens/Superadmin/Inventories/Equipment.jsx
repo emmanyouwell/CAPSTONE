@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -6,14 +6,33 @@ import {
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    RefreshControl, 
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Header from '../../../components/Superadmin/Header';
 import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { getEquipments } from '../../../redux/actions/equipmentActions';
+import Equipments from '../../../components/Superadmin/Inventories/Equipment/Equipments';
 
-const InventoryScreen = ({ navigation }) => {
+const Equipment = ({ navigation }) => {
     const dispatch = useDispatch();
+    const { equipments, loading, error } = useSelector((state) => state.equipments);
+    const [refreshing, setRefreshing] = useState(false);
+
+    console.log("Equipments: ", equipments)
+
+    useEffect(() => {
+        dispatch(getEquipments());
+    }, [dispatch]);
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+        dispatch(getEquipments())
+            .then(() => setRefreshing(false))
+            .catch(() => setRefreshing(false));
+    };
 
     const onMenuPress = () => {
         navigation.openDrawer();
@@ -29,10 +48,40 @@ const InventoryScreen = ({ navigation }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            {/* Header Component */}
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
 
             <Text style={styles.screenTitle}>Equipment Management</Text>
+
+            <View style={styles.buttonRow}>
+                <TouchableOpacity
+                    style={styles.historyButton}
+                    onPress={() => navigation.navigate('next')}
+                >
+                <Text style={styles.buttonText}>
+                <MaterialIcons name="history" size={16} color="white" /> History
+                </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate('AddEquipment')}
+                >
+                <Text style={styles.buttonText}>
+                <MaterialIcons name="add" size={16} color="white" /> Add
+                </Text>
+                </TouchableOpacity>
+            </View>
+
+            <ScrollView
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+                }
+            >
+                {loading ? (
+                    <Text>Loading...</Text>
+                ) : (
+                    <Equipments data={equipments} />
+                )}
+            </ScrollView>
 
         </View>
     );
@@ -51,6 +100,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 16,
     },
+    buttonRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
     button: {
         backgroundColor: '#007AFF',
         paddingVertical: 12,
@@ -60,11 +115,36 @@ const styles = StyleSheet.create({
         width: '80%', 
         alignItems: 'center',
     },
+    historyButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#4CAF50', 
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 5,
+        flex: 1,
+        marginRight: 5,
+        marginLeft: 10,
+    },
+    addButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#2196F3', 
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        borderRadius: 5,
+        flex: 1,
+        marginLeft: 5,
+        marginRight: 10,
+    },
     buttonText: {
-        color: '#fff',
-        fontSize: 16,
+        color: 'white',
+        fontSize: 14,
         fontWeight: 'bold',
+        textAlign: 'center',
     },
 });
 
-export default InventoryScreen;
+export default Equipment;
