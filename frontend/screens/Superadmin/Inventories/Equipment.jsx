@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
-    Button,
+    SafeAreaView,
     StyleSheet,
     TouchableOpacity,
     ScrollView,
@@ -20,8 +20,6 @@ const Equipment = ({ navigation }) => {
     const dispatch = useDispatch();
     const { equipments, loading, error } = useSelector((state) => state.equipments);
     const [refreshing, setRefreshing] = useState(false);
-
-    console.log("Equipments: ", equipments)
 
     useEffect(() => {
         dispatch(getEquipments());
@@ -76,11 +74,13 @@ const Equipment = ({ navigation }) => {
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
                 }
             >
-                {loading ? (
+                <SafeAreaView style={styles.form}>
+                    {loading ? (
                     <Text>Loading...</Text>
                 ) : (
                     <Equipments data={equipments} />
                 )}
+                </SafeAreaView> 
             </ScrollView>
 
         </View>
@@ -93,6 +93,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginVertical: 16,
+    },
+    form: {
+        flex: 1,
+        paddingHorizontal: 16,
     },
     navButtons: {
         flex: 1,
