@@ -39,7 +39,10 @@ import AddMilkInventory from "./components/Superadmin/Inventories/Refrigerators/
 import EditMilkInventory from "./components/Superadmin/Inventories/Refrigerators/EditMilkInventory";
 
 import MilkLetting from "./screens/Superadmin/Inventories/MilkLetting";
+
 import Equipment from "./screens/Superadmin/Inventories/Equipment";
+import AddEquipment from "./components/Superadmin/Inventories/Equipment/AddEquipment";
+import EditEquipment from "./components/Superadmin/Inventories/Equipment/EditEquipment";
 
 //Request Screens
 import MilkRequest from "./components/Superadmin/Requests/MilkRequest";
@@ -177,6 +180,8 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_milkLetting" component={MilkLetting}/>
 
         <Stack.Screen name="superadmin_equipment" component={Equipment}/>
+        <Stack.Screen name="AddEquipment" component={AddEquipment}/>
+        <Stack.Screen name="EditEquipment" component={EditEquipment}/>
 
       {/* {Request Admins Navigation} */}
         <Stack.Screen name="MilkRequest" component={MilkRequest}/>

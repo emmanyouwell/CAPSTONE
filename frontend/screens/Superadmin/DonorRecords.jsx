@@ -11,10 +11,10 @@ import { getDonors } from '../../redux/actions/donorActions';
 import { getToken, viewAsyncStorage } from '../../utils/helper';
 const DonorRecords = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { donors, count, pageSize, loading, error } = useSelector((state) => state.donors);
-  const [query, setQuery] = useState('');
+  const { donors, count, pageSize, totalDonors, totalPages, loading, error } = useSelector((state) => state.donors);
+  const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(1);
   const handleMenuClick = () => {
     navigation.openDrawer();
   }
@@ -23,25 +23,23 @@ const DonorRecords = ({ navigation }) => {
   }
   // Using onChangeText to update the state when text changes
   const handleTextChange = (newText) => {
-    setQuery(newText);
+    setSearch(newText);
   };
   const handleSubmit = () => {
-    dispatch(getDonors(query));
+    setCurrentPage(1);
+    dispatch(getDonors({search: search}));
+
   }
   useEffect(() => {
     console.log('Dispatching getDonors...');
 
-    dispatch(getDonors())
+    dispatch(getDonors({search: search, page: currentPage, pageSize: pageSize}))
       .unwrap()
       .then((data) => console.log('Donors fetched:', data))
       .catch((err) => console.error('Error fetching donors:', err));
-  }, [dispatch])
+  }, [dispatch, search, currentPage])
 
-  useEffect(() => {
-    if (query) {
-      console.log('Query:', query);
-    }
-  }, [query])
+  
 
   const handleRefresh = () => {
         setRefreshing(true);
@@ -70,7 +68,7 @@ const DonorRecords = ({ navigation }) => {
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} count={count} pageSize={pageSize}/>}
+        {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} count={count} setCurrentPage={setCurrentPage} currentPage={currentPage} pageSize={pageSize} totalDonors={totalDonors} totalPages={totalPages}/>}
       </ScrollView>
       
       
