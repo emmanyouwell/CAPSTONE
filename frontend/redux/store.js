@@ -1,12 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import counterReducer from './slices/counterSlice'; // Example reducer
-import userReducer from './slices/userSlice'; // User reducer
-import donorReducer from './slices/donorSlice'; // Donor reducer
+import counterReducer from './slices/counterSlice'; 
+import userReducer from './slices/userSlice'; 
+import donorReducer from './slices/donorSlice'; 
 import recipientReducer from './slices/recipientSlice'
 import eventReducer from './slices/eventSlice'
 import inventoryReducer from './slices/inventorySlice'
 import fridgeReducer from './slices/fridgeSlice'
 import requestReducer from './slices/requestSlice'
+import equipmentReducer from './slices/equipmentSlice'
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     inventories: inventoryReducer,
     fridges: fridgeReducer,
     requests: requestReducer,
+    equipments: equipmentReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
