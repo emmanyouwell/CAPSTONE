@@ -4,6 +4,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteEquipments } from '../../../../redux/actions/equipmentActions';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const Equipments = ({ data }) => {
     const navigation = useNavigation();
@@ -39,13 +40,13 @@ const Equipments = ({ data }) => {
                 style={[styles.actionButton, styles.editButton]}
                 onPress={() => handleEdit(item)}
             >
-                <Text style={styles.actionText}>Edit</Text>
+                <MaterialIcons name="edit" size={30} color="white" /> 
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.actionButton, styles.deleteButton]}
                 onPress={() => handleDelete(item._id)}
             >
-                <Text style={styles.actionText}>Delete</Text>
+                <MaterialIcons name="delete" size={30} color="white" /> 
             </TouchableOpacity>
         </View>
     );
@@ -56,7 +57,6 @@ const Equipments = ({ data }) => {
         return (
             <Swipeable renderRightActions={() => renderRightActions(item)}>
                 <View style={styles.card}>
-                    {/* Display the first image if available */}
                     {images && images.length > 0 ? (
                         <Image source={{ uri: images[0].url }} style={styles.image} />
                     ) : (
@@ -65,7 +65,6 @@ const Equipments = ({ data }) => {
                         </View>
                     )}
 
-                    {/* Equipment details */}
                     <View style={styles.info}>
                         <Text style={styles.title}>{name}</Text>
                         <Text style={styles.details}>Type: {equipType}</Text>
