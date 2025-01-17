@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Alert, RefreshControl, SafeAreaView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '../Header';
 import { logoutUser } from '../../../redux/actions/userActions';
@@ -7,7 +7,7 @@ import { SuperAdmin } from '../../../styles/Styles';
 import { getRequests } from '../../../redux/actions/requestActions';
 
 const MilkRequest = ({ route, navigation }) => {
-    const items = route.params.selectedInventories ? route.params.selectedInventories : [];
+    const items = route.params? route.params.selectedInventories : [];
     const dispatch = useDispatch();
     const { request, loading, error } = useSelector((state) => state.requests);
     const [refreshing, setRefreshing] = useState(false);
@@ -42,7 +42,6 @@ const MilkRequest = ({ route, navigation }) => {
         navigation.navigate('ConfirmRequest', newData);
     };
 
-    // Sort requests by priority: High -> Medium -> Low
     const sortedRequests = request
         .filter((req) => req.status === 'Pending')
         .sort((a, b) => {
@@ -52,9 +51,9 @@ const MilkRequest = ({ route, navigation }) => {
 
     const renderCard = (req) => {
         const cardColors = {
-            High: '#FF6B6B', // Red
-            Medium: '#FFA500', // Orange
-            Low: '#32CD32', // Green
+            High: '#FF6B6B', 
+            Medium: '#FFA500', 
+            Low: '#32CD32', 
         };
 
         return (
@@ -93,23 +92,24 @@ const MilkRequest = ({ route, navigation }) => {
                     <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
                 }
             >
-                {loading ? (
-                    <View style={styles.center}>
-                        <ActivityIndicator size="large" color="#007AFF" />
-                    </View>
-                ) : error ? (
-                    <View style={styles.center}>
-                        <Text style={styles.errorText}>{error}</Text>
-                    </View>
-                ) : (
-                    sortedRequests.map((req) => renderCard(req))
-                )}
+                <SafeAreaView style={styles.form}>
+                    {loading ? (
+                        <View style={styles.center}>
+                            <ActivityIndicator size="large" color="#007AFF" />
+                        </View>
+                    ) : error ? (
+                        <View style={styles.center}>
+                            <Text style={styles.errorText}>{error}</Text>
+                        </View>
+                    ) : (
+                        sortedRequests.map((req) => renderCard(req))
+                    )}
+                </SafeAreaView>
             </ScrollView>
         </View>
     );
 };
 
-// Helper function to format date
 const formatDate = (dateString) => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -120,6 +120,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    form: {
+        flex: 1,
+        paddingHorizontal: 16,
     },
     errorText: {
         color: 'red',
