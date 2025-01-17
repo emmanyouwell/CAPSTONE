@@ -186,6 +186,8 @@ const MainStack = () => {
       {/* {Request Admins Navigation} */}
         <Stack.Screen name="MilkRequest" component={MilkRequest}/>
         <Stack.Screen name="ConfirmRequest" component={ConfirmRequest}/>
+        
+      {/* {Request Staff Navigation} */}
         <Stack.Screen name="AddPatient" component={AddPatient}/>
         <Stack.Screen name="AddRequest" component={AddRequest}/>
 
