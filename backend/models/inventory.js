@@ -53,6 +53,9 @@ const inventorySchema = new mongoose.Schema({
                     return this.fridgeType === 'Unpasteurized';
                 },
             },
+            temp: {
+                type: Number,
+            },
             expiration: {
                 type: Date,
                 required: function () {
@@ -85,6 +88,9 @@ const inventorySchema = new mongoose.Schema({
                 required: function () {
                     return this.fridgeType === 'Unpasteurized';
                 },
+            },
+            temp: {
+                type: Number,
             },
         },
 });
