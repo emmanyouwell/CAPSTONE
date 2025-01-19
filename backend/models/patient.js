@@ -31,11 +31,9 @@ const patientSchema = new mongoose.Schema({
     },
     requested: [
         {
-            date: {
-                type: Date,
-            },
-            milkRequested: {
-                type: Number,
+            reqId: {
+                type: ObjectId,
+                ref: 'Request'
             },
         }
     ],

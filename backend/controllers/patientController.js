@@ -27,8 +27,9 @@ exports.allPatients = catchAsyncErrors( async (req, res, next) => {
      try {
          // Find donors based on the query object
          const patients = await Patient.find(query)
-             .skip(skip)
-             .limit(pageSize);
+            .populate('requested.reqId', 'date volume')
+            .skip(skip)
+            .limit(pageSize);
  
          // Count total donors after filtering (for pagination)
          const count = await Patient.countDocuments(query);

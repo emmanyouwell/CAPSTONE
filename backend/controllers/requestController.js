@@ -21,23 +21,8 @@ exports.allRequests = catchAsyncErrors( async (req, res, next) => {
 
 // Create request => /api/v1/requests
 exports.createRequest= catchAsyncErrors( async (req, res, next) => {
-    const { date, patient, location, diagnosis, reason, doctor, staffId, outcome, status, tchmb, priority } = req.body;
-    
-    const requestData = {
-        date,
-        patient,
-        location,
-        diagnosis,
-        reason,
-        doctor,
-        priority,
-        staffId,
-        status,
-        outcome,
-        tchmb
-    }
 
-    const request = await Request.create(requestData);
+    const request = await Request.create(req.body);
 
     res.status(201).json({
         success: true,
@@ -63,23 +48,8 @@ exports.getRequestDetails = catchAsyncErrors( async (req, res, next) => {
 
 // Update request => /api/v1/request/:id
 exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
-    const { date, patient, location, diagnosis, reason, doctor, staffId, outcome, status, tchmb, priority } = req.body;
 
-    const newRequestData = {
-        date,
-        patient,
-        location,
-        diagnosis,
-        reason,
-        doctor,
-        priority,
-        staffId,
-        status,
-        outcome,
-        tchmb
-    };
-
-    const request = await Request.findByIdAndUpdate(req.params.id, newRequestData, {
+    const request = await Request.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
         useFindAndModify: false,
