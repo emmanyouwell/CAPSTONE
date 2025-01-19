@@ -11,11 +11,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 const RecipientRecords = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { recipients, count, pageSize, loading, error } = useSelector((state) => state.recipients);
+  const { recipients, totalPatients, totalPages, pageSize, loading, error } = useSelector((state) => state.recipients);
 
-  const [query, setQuery] = useState('');
+  const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(0);
   const handleMenuClick = () => {
     navigation.openDrawer();
   }
@@ -24,15 +24,16 @@ const RecipientRecords = ({ navigation }) => {
   }
   // Using onChangeText to update the state when text changes
   const handleTextChange = (newText) => {
-    setQuery(newText);
+    setSearch(newText);
   };
   const handleSubmit = () => {
-    dispatch(getRecipients(query));
+    setCurrentPage(1);
+    dispatch(getRecipients({search: search}));
   }
   useEffect(() => {
     console.log('Dispatching getDonors...');
 
-    dispatch(getRecipients())
+    dispatch(getRecipients({search: search, page:currentPage +1, pageSize: pageSize}))
       .unwrap()
       .then((data) => console.log('Recipients fetched:', data))
       .catch((err) => console.error('Error fetching donors:', err));
@@ -64,7 +65,7 @@ const RecipientRecords = ({ navigation }) => {
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {loading ? (<Text>Loading...</Text>) : recipients && <RecipientRecordTable recipients={recipients} count={count} pageSize={pageSize} />}
+        {loading ? (<Text>Loading...</Text>) : recipients && <RecipientRecordTable recipients={recipients} setCurrentPage={setCurrentPage} currentPage={currentPage} totalPages={totalPages} totalPatients={totalPatients} pageSize={pageSize} />}
       </ScrollView>
 
     </View>

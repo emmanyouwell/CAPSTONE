@@ -17,7 +17,8 @@ export const recipientSlice = createSlice({
     isDeleted: false,
     loading: false, 
     error: null, 
-    count: 0,
+    totalPatients: 0,
+    totalPages: 0,
     pageSize: 0,
   },
   reducers: {
@@ -31,8 +32,9 @@ export const recipientSlice = createSlice({
       .addCase(getRecipients.fulfilled, (state, action) => {
         state.loading = false;
         state.recipients = action.payload.patients;
-        state.count = action.payload.count;
+        state.totalPatients = action.payload.totalPatients;
         state.pageSize = action.payload.pageSize;
+        state.totalPages = action.payload.totalPages;
       })
       .addCase(getRecipients.rejected, (state, action) => {
         state.loading = false;

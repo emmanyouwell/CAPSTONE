@@ -11,10 +11,10 @@ import { getDonors } from '../../redux/actions/donorActions';
 import { getToken, viewAsyncStorage } from '../../utils/helper';
 const DonorRecords = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { donors, count, pageSize, totalDonors, totalPages, loading, error } = useSelector((state) => state.donors);
+  const { donors, pageSize, totalDonors, totalPages, loading, error } = useSelector((state) => state.donors);
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const handleMenuClick = () => {
     navigation.openDrawer();
   }
@@ -26,14 +26,14 @@ const DonorRecords = ({ navigation }) => {
     setSearch(newText);
   };
   const handleSubmit = () => {
-    setCurrentPage(1);
+    setCurrentPage(0);
     dispatch(getDonors({search: search}));
 
   }
   useEffect(() => {
     console.log('Dispatching getDonors...');
 
-    dispatch(getDonors({search: search, page: currentPage, pageSize: pageSize}))
+    dispatch(getDonors({search: search, page: currentPage+1, pageSize: pageSize}))
       .unwrap()
       .then((data) => console.log('Donors fetched:', data))
       .catch((err) => console.error('Error fetching donors:', err));
@@ -68,7 +68,7 @@ const DonorRecords = ({ navigation }) => {
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} count={count} setCurrentPage={setCurrentPage} currentPage={currentPage} pageSize={pageSize} totalDonors={totalDonors} totalPages={totalPages}/>}
+        {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} setCurrentPage={setCurrentPage} currentPage={currentPage} pageSize={pageSize} totalDonors={totalDonors} totalPages={totalPages}/>}
       </ScrollView>
       
       
