@@ -59,9 +59,9 @@ const RecipientRecordsTable = ({ recipients, totalDonors, totalPages, currentPag
     <View style={dataTableStyle.container}>
       <DataTable.Pagination
         page={currentPage}
-        numberOfPages={Math.ceil(count / pageSize)}
+        numberOfPages={totalPages}
         onPageChange={(page) => setCurrentPage(page)}
-        label={`${currentPage} of ${totalPages}`}
+        label={`${currentPage + 1} of ${totalPages}`}
       />
 
       <View style={dataTableStyle.tableContainer}>
