@@ -49,6 +49,8 @@ import MilkRequest from "./components/Superadmin/Requests/MilkRequest";
 import ConfirmRequest from "./components/Superadmin/Requests/ConfirmRequest";
 import AddPatient from "./screens/Staff/AddPatient";
 import AddRequest from "./screens/Staff/AddRequest";
+import Articles from "./screens/Superadmin/Articles";
+import AddArticles from "./components/Superadmin/Articles/AddArticles";
 
 const CustomDrawerContent = (props) => {
 
@@ -156,7 +158,7 @@ const MainStack = () => {
       }}
     >
       <Stack.Group>
-        
+        {/* Superadmin navigations */}
         <Stack.Screen name="login" component={Login} />
         <Stack.Screen name="superadmin_dashboard" component={Dashboard} />
         <Stack.Screen name="superadmin_donor_record" component={DonorRecords}/>
@@ -166,6 +168,12 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_account_management" component={AccountManagement}/>
         <Stack.Screen name="superadmin_account_create_admin" component={CreateAdmin}/>
         <Stack.Screen name="superadmin_account_create_staff" component={CreateStaff}/>
+        
+        {/* Articles */}
+        <Stack.Screen name="superadmin_articles"
+        component={Articles}/>
+        <Stack.Screen name="add_articles" component={AddArticles}/>
+
 
       {/* {Fridge Inventory Navigation} */}
         <Stack.Screen name="superadmin_inventories" component={Inventory}/>

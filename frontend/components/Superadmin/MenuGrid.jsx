@@ -12,7 +12,7 @@ const superAdminItems = [
   { id: '4', title: 'Inventory', route: 'superadmin_inventories', image: require('../../assets/image/inventory-and-metrics.png') },
   { id: '5', title: 'Account Management', route: 'superadmin_account_management', image: require('../../assets/image/account-management.png') },
   { id: '6', title: 'Announcement Creation', image: require('../../assets/image/announcement-creation.png') },
-  { id: '7', title: 'Resources Management', image: require('../../assets/image/resources-management.png') },
+  { id: '7', title: 'Resources Management', route: 'superadmin_articles', image: require('../../assets/image/resources-management.png') },
   { id: '8', title: 'Metrics', route: 'superadmin_metrics', image: require('../../assets/image/metrics.png') },
 ];
 
