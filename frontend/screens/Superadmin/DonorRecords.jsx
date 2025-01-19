@@ -11,7 +11,7 @@ import { getDonors } from '../../redux/actions/donorActions';
 import { getToken, viewAsyncStorage } from '../../utils/helper';
 const DonorRecords = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { donors, count, pageSize, totalDonors, totalPages, loading, error } = useSelector((state) => state.donors);
+  const { donors, pageSize, totalDonors, totalPages, loading, error } = useSelector((state) => state.donors);
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,7 +68,7 @@ const DonorRecords = ({ navigation }) => {
         <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} count={count} setCurrentPage={setCurrentPage} currentPage={currentPage} pageSize={pageSize} totalDonors={totalDonors} totalPages={totalPages}/>}
+        {loading ? (<Text>Loading...</Text>) : donors && <DonorRecordsTable donors={donors} setCurrentPage={setCurrentPage} currentPage={currentPage} pageSize={pageSize} totalDonors={totalDonors} totalPages={totalPages}/>}
       </ScrollView>
       
       
