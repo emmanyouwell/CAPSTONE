@@ -27,6 +27,7 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
     try {
         // Find donors based on the query object
         const patients = await Patient.find(query)
+            .populate('requested.reqId', 'date volume')
             .skip(skip)
             .limit(pageSize);
 

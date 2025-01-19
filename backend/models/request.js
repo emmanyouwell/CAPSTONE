@@ -44,6 +44,10 @@ const requestSchema = new mongoose.Schema({
         default: 'Pending',
         required: true
     },
+    volume: {
+        type: Number,
+        required: [true, 'Please enter Volume Requested']
+    },
     outcome: {
         type: String
     },
@@ -56,9 +60,6 @@ const requestSchema = new mongoose.Schema({
             }
         }
         ],
-        volume: {
-            type: Number
-        },
         transport: {
             type: String
         },
