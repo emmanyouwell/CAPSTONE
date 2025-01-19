@@ -3,10 +3,10 @@ import { ScrollView, View, Animated } from 'react-native';
 import { DataTable, Checkbox } from 'react-native-paper';
 import { dataTableStyle } from '../../styles/Styles';
 
-const RecipientRecordsTable = ({ recipients, count, pageSize }) => {
-  const [isScrollable, setIsScrollable] = useState(true);
+const RecipientRecordsTable = ({ recipients, totalDonors, totalPages, currentPage, setCurrentPage, pageSize }) => {
+
   const [selectedRows, setSelectedRows] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
+
 
   const checkboxColumnWidth = useRef(new Animated.Value(0)).current;
   const checkboxColumnOpacity = useRef(new Animated.Value(0)).current;
@@ -59,12 +59,9 @@ const RecipientRecordsTable = ({ recipients, count, pageSize }) => {
     <View style={dataTableStyle.container}>
       <DataTable.Pagination
         page={currentPage}
-        numberOfPages={Math.ceil(count / pageSize)}
+        numberOfPages={totalPages}
         onPageChange={(page) => setCurrentPage(page)}
-        label={`${currentPage * pageSize + 1}-${Math.min(
-          (currentPage + 1) * pageSize,
-          recipients.length
-        )} of ${recipients.length}`}
+        label={`${currentPage + 1} of ${totalPages}`}
       />
 
       <View style={dataTableStyle.tableContainer}>

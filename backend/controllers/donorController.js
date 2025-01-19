@@ -36,7 +36,6 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
             success: true,
             totalDonors,
             totalPages,
-            currentPage: page,
             pageSize,
             donors
         });
