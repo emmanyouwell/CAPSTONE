@@ -59,96 +59,68 @@ const DonorRecordsTable = ({ donors, totalDonors, totalPages, currentPage, setCu
   return (
     <View style={dataTableStyle.container}>
       <View style={dataTableStyle.btnContainer}>
-        {/* <TouchableOpacity onPress={toggleScroll} style={buttonStyle.smallBtn}><Text>{isScrollable ? "Fixed View" : "Scroll View"}</Text></TouchableOpacity> */}
+
 
 
         <DataTable.Pagination
           page={currentPage}
-          numberOfPages={Math.ceil(count / pageSize)}
-          onPageChange={(page) => setCurrentPage(page)}
-          label={`${currentPage} of ${totalPages}`}
+          numberOfPages={totalPages}
+          onPageChange={(page) => {
+            setCurrentPage(page)
+          }}
+          label={`${currentPage+1} of ${totalPages}`}
         />
-        {/* <TouchableOpacity onPress={addRow} style={buttonStyle.smallBtn}><Text style={buttonStyle.btnText}>Add new row</Text></TouchableOpacity> */}
+
       </View>
 
-      {isScrollable ? (
-        <View style={dataTableStyle.tableContainer}>
-          <ScrollView horizontal>
-            <ScrollView style={{ height: '100%' }} contentContainerStyle={dataTableStyle.verticalContainer}>
-              <DataTable>
-                <DataTable.Header>
-                  <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
-                    <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.checkboxColumn}>Select</DataTable.Title>
-                  </Animated.View>
-
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>First Name</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Last Name</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Middle Name</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Address</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Phone</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Age</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Birthday</DataTable.Title>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Civil Status</DataTable.Title>
-                  {/* <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.locationColumn}>Children</DataTable.Title> */}
-
-                </DataTable.Header>
-
-                {donors && donors.map((row, index) => (
-                  <DataTable.Row key={index} onLongPress={() => { handleLongPress(index) }}>
-                    <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
-                      <DataTable.Cell style={dataTableStyle.checkboxColumn}>
-                        <Checkbox
-                          status={selectedRows.includes(index) ? 'checked' : 'unchecked'}
-                          onPress={() => handleLongPress(index)} />
-                      </DataTable.Cell>
-
-                    </Animated.View>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.first}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.last}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.middle}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.address}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.phone}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.age}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{formatDate(row.birthday)}</DataTable.Cell>
-                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.civilStatus}</DataTable.Cell>
-                  </DataTable.Row>
-                ))}
-
-
-              </DataTable>
-            </ScrollView>
-          </ScrollView>
-
-        </View>
-      ) : (
-
-        <View style={dataTableStyle.tableContainer}>
+      <View style={dataTableStyle.tableContainer}>
+        <ScrollView horizontal>
           <ScrollView style={{ height: '100%' }} contentContainerStyle={dataTableStyle.verticalContainer}>
             <DataTable>
               <DataTable.Header>
-                <DataTable.Title style={dataTableStyle.nameColumn}>Name</DataTable.Title>
-                <DataTable.Title style={dataTableStyle.emailColumn}>Email</DataTable.Title>
-                <DataTable.Title style={dataTableStyle.roleColumn}>Role</DataTable.Title>
-                <DataTable.Title style={dataTableStyle.ageColumn}>Age</DataTable.Title>
-                <DataTable.Title style={dataTableStyle.locationColumn}>Location</DataTable.Title>
+                <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
+                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.checkboxColumn}>Select</DataTable.Title>
+                </Animated.View>
+
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>First Name</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Last Name</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Middle Name</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Address</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Phone</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Age</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Birthday</DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Civil Status</DataTable.Title>
+                {/* <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.locationColumn}>Children</DataTable.Title> */}
 
               </DataTable.Header>
 
-              {data.map((row, index) => (
-                <DataTable.Row key={index}>
-                  <DataTable.Cell style={dataTableStyle.nameColumn}>{row.name}</DataTable.Cell>
-                  <DataTable.Cell style={dataTableStyle.emailColumn}>{row.email}</DataTable.Cell>
-                  <DataTable.Cell style={dataTableStyle.roleColumn}>{row.role}</DataTable.Cell>
-                  <DataTable.Cell style={dataTableStyle.ageColumn}>{row.age}</DataTable.Cell>
-                  <DataTable.Cell style={dataTableStyle.locationColumn}>{row.location}</DataTable.Cell>
+              {donors && donors.map((row, index) => (
+                <DataTable.Row key={index} onLongPress={() => { handleLongPress(index) }}>
+                  <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
+                    <DataTable.Cell style={dataTableStyle.checkboxColumn}>
+                      <Checkbox
+                        status={selectedRows.includes(index) ? 'checked' : 'unchecked'}
+                        onPress={() => handleLongPress(index)} />
+                    </DataTable.Cell>
+
+                  </Animated.View>
+                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.first}</DataTable.Cell>
+                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.last}</DataTable.Cell>
+                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.name.middle}</DataTable.Cell>
+                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.address}</DataTable.Cell>
+                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.phone}</DataTable.Cell>
+                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.age}</DataTable.Cell>
+                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{formatDate(row.birthday)}</DataTable.Cell>
+                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.civilStatus}</DataTable.Cell>
                 </DataTable.Row>
               ))}
 
 
             </DataTable>
           </ScrollView>
-        </View>
-      )}
+        </ScrollView>
+
+      </View>
 
     </View>
   )

@@ -15,7 +15,7 @@ const RecipientRecords = ({ navigation }) => {
 
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
-
+  const [currentPage, setCurrentPage] = useState(0);
   const handleMenuClick = () => {
     navigation.openDrawer();
   }
@@ -33,7 +33,7 @@ const RecipientRecords = ({ navigation }) => {
   useEffect(() => {
     console.log('Dispatching getDonors...');
 
-    dispatch(getRecipients({search: search, page:currentPage, pageSize: pageSize}))
+    dispatch(getRecipients({search: search, page:currentPage +1, pageSize: pageSize}))
       .unwrap()
       .then((data) => console.log('Recipients fetched:', data))
       .catch((err) => console.error('Error fetching donors:', err));
