@@ -5,24 +5,15 @@ import { dataTableStyle, buttonStyle } from '../../styles/Styles'
 import { formatDate } from '../../utils/helper'
 import { getDonors } from '../../redux/actions/donorActions'
 import { useDispatch } from 'react-redux'
-const DonorRecordsTable = ({donors,totalDonors, totalPages, count, currentPage, setCurrentPage,pageSize}) => {
-  const dispatch = useDispatch();
-  const [isScrollable, setIsScrollable] = useState(true);
+const DonorRecordsTable = ({ donors, totalDonors, totalPages, currentPage, setCurrentPage, pageSize }) => {
+
+
   const [selectedRows, setSelectedRows] = useState([]);
-  
-  // Initial data
-  const [data, setData] = useState([
-    { name: 'John Doe', email: 'johndoe@gmail.com', role: 'user', age: 25, location: 'New York' },
-    { name: 'Jane Smith', email: 'janesmith@gmail.com', role: 'user', age: 30, location: 'Los Angeles' },
-    // Add more initial rows as needed
-  ]);
+
+
   const checkboxColumnWidth = useRef(new Animated.Value(0)).current;
   const checkboxColumnOpacity = useRef(new Animated.Value(0)).current;
-  // Function to add a new row
-  const addRow = () => {
-    const newRow = { name: 'New Donor', email: 'newdonor@gmail.com', role: 'user', age: 28, location: 'Chicago' };
-    setData([...data, newRow]);
-  };
+
   const handleLongPress = (id) => {
     setSelectedRows((prevSelectedRows) => {
       if (prevSelectedRows.includes(id)) {
@@ -32,9 +23,7 @@ const DonorRecordsTable = ({donors,totalDonors, totalPages, count, currentPage, 
       }
     })
   }
-  const toggleScroll = () => {
-    setIsScrollable(!isScrollable);
-  }
+
   useEffect(() => {
     if (selectedRows.length > 0) {
       Animated.parallel([
@@ -66,7 +55,7 @@ const DonorRecordsTable = ({donors,totalDonors, totalPages, count, currentPage, 
     }
 
   }, [selectedRows])
- 
+
   return (
     <View style={dataTableStyle.container}>
       <View style={dataTableStyle.btnContainer}>
@@ -75,7 +64,7 @@ const DonorRecordsTable = ({donors,totalDonors, totalPages, count, currentPage, 
 
         <DataTable.Pagination
           page={currentPage}
-          numberOfPages={Math.ceil(count/pageSize)}
+          numberOfPages={Math.ceil(count / pageSize)}
           onPageChange={(page) => setCurrentPage(page)}
           label={`${currentPage} of ${totalPages}`}
         />
@@ -101,7 +90,7 @@ const DonorRecordsTable = ({donors,totalDonors, totalPages, count, currentPage, 
                   <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Birthday</DataTable.Title>
                   <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Civil Status</DataTable.Title>
                   {/* <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.locationColumn}>Children</DataTable.Title> */}
-                  
+
                 </DataTable.Header>
 
                 {donors && donors.map((row, index) => (
