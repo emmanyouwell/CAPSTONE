@@ -35,11 +35,7 @@ const MilkRequest = ({ route, navigation }) => {
     };
 
     const handleUpdate = (row) => {
-        const newData = {
-            request: row,
-            inventory: items,
-        };
-        navigation.navigate('ConfirmRequest', newData);
+        navigation.navigate('superadmin_fridges', {request: row});
     };
 
     const sortedRequests = request
@@ -76,7 +72,7 @@ const MilkRequest = ({ route, navigation }) => {
                 <Text>Status: {req.status}</Text>
                 <Text>Patient: {req.patient.name}</Text>
                 <Text>Type: {req.patient.patientType}</Text>
-                <Text>Location: {req.location}</Text>
+                <Text>Requested Volume: {req.volume} mL</Text>
                 <Text>Prescribed By: {req.doctor}</Text>
             </TouchableOpacity>
         );

@@ -29,9 +29,9 @@ export const getRequests = createAsyncThunk(
             else {
                 urlString = `${REACT_APP_API_URL}/api/v1/requests`
             }
-            console.log('URL:', urlString);
+            
             const response = await axios.get(urlString, config);
-            console.log('DATA:', response.data);
+
             return response.data;
 
         } catch (error) {
@@ -77,7 +77,6 @@ export const updateRequest = createAsyncThunk(
     async (req, thunkAPI) => {
 
         const token = await getToken();
-        console.log('Token Retrieved:', token);
         console.log('Request:', req);
 
         if (!token) {
@@ -93,7 +92,7 @@ export const updateRequest = createAsyncThunk(
         }
         try {
             const response = await axios.put(`${REACT_APP_API_URL}/api/v1/request/${req.id}`, req, config)
-            console.log(response.data)
+            console.log("Response: ", response.data)
             return response.data;
 
         } catch (error) {

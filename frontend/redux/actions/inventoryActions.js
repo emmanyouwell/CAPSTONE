@@ -30,9 +30,7 @@ export const getInventories = createAsyncThunk(
             else {
                 urlString = `${REACT_APP_API_URL}/api/v1/inventories`
             }
-            console.log('URL:', urlString);
             const response = await axios.get(urlString, config);
-            console.log('DATA:', response.data);
             return response.data;
 
         } catch (error) {
@@ -65,7 +63,7 @@ export const addInventory = createAsyncThunk(
         try {
 
             const response = await axios.post(`${REACT_APP_API_URL}/api/v1/inventories`, req, config)
-
+            console.log("Inventory Add: ", response.data)
             return response.data;
 
         } catch (error) {
@@ -81,8 +79,6 @@ export const updateInventory = createAsyncThunk(
     async (req, thunkAPI) => {
 
         const token = await getToken();
-        console.log('Token Retrieved:', token);
-        console.log('Request:', req);
 
         if (!token) {
             throw new Error('No token available');
@@ -97,7 +93,7 @@ export const updateInventory = createAsyncThunk(
         }
         try {
             const response = await axios.put(`${REACT_APP_API_URL}/api/v1/inventory/${req.id}`, req, config)
-            console.log(response.data)
+            console.log("Updated Inventory: ", req.id)
             return response.data;
 
         } catch (error) {

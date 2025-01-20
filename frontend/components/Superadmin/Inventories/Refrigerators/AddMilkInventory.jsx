@@ -50,8 +50,8 @@ const AddMilkInventory = ({ route, navigation }) => {
     const [showExpirationDatePicker, setShowExpirationDatePicker] = useState(false);
 
     useEffect(() => {
-        dispatch(getDonors());
         dispatch(getFridges())
+        dispatch(getDonors({ search: "", page: 1, pageSize: 100 }))
     }, [dispatch]);
    
     useEffect(() => {
@@ -141,6 +141,7 @@ const AddMilkInventory = ({ route, navigation }) => {
             inventoryDate,
             userId: user._id,
             status: "Available",
+            temp: 0
         };
 
         if (fridge.fridgeType === "Pasteurized") {
@@ -183,7 +184,7 @@ const AddMilkInventory = ({ route, navigation }) => {
                 volume,
             };
 
-            console.log("Submitting Unpasteurized Data:", newData);
+            // console.log("Submitting Unpasteurized Data:", newData);
         } else {
             console.log("Unknown fridge type");
             Alert.alert("Error", "Unknown fridge type. Please contact support.");

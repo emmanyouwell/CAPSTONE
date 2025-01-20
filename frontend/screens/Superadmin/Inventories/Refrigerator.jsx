@@ -16,7 +16,9 @@ import Header from '../../../components/Superadmin/Header';
 import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
 
-const Refrigerator = () => {
+const Refrigerator = ({ route }) => {
+    const request = route.params? route.params.request : null
+    console.log("Request in ref: ",request)
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
@@ -27,7 +29,11 @@ const Refrigerator = () => {
     }, [dispatch]);
 
     const handleNavigate = (fridge) => {
-        navigation.navigate('InventoryCards', { fridge });
+        if (request){
+            navigation.navigate('PasteurCards', { fridge, request });
+        } else {
+            navigation.navigate('InventoryCards', { fridge });
+        }
     };
 
     const showEditDeleteOptions = (item) => {
@@ -50,7 +56,7 @@ const Refrigerator = () => {
         dispatch(deleteFridges(fridgeId))
             .then(() => {
                 Alert.alert('Success', 'Fridge deleted successfully.');
-                dispatch(getFridges()); // Refresh the list after deletion
+                dispatch(getFridges()); 
             })
             .catch((err) => {
                 Alert.alert('Error', 'Failed to delete the fridge.');
@@ -102,38 +108,63 @@ const Refrigerator = () => {
     return (
         <ScrollView style={SuperAdmin.container}>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
-
-            <Text style={styles.screenTitle}>Refrigerator Management</Text>
-
-            <Text style={styles.sectionTitle}>Pasteurized Fridges</Text>
-            {pasteurizedFridges.length > 0 ? (
-                <FlatList
-                    data={pasteurizedFridges}
-                    renderItem={({ item }) => renderFridgeCard(item)}
-                    keyExtractor={(item) => item._id}
-                    horizontal
-                />
+            {request ? (
+                <>
+                    <View style={styles.section}>
+                        <Text style={styles.screenTitle}>Select Pasteurized Fridges</Text>
+                        {pasteurizedFridges.length > 0 ? (
+                            <FlatList
+                                data={pasteurizedFridges}
+                                renderItem={({ item }) => renderFridgeCard(item)}
+                                keyExtractor={(item) => item._id}
+                                horizontal
+                            />
+                        ) : (
+                            <Text style={styles.noFridgeText}>No Pasteurized Fridges Available</Text>
+                        )}
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.requestTitleText}>Request to be completed...</Text>
+                        <Text style={styles.requestText}>Requested id: {request._id}</Text>
+                        <Text style={styles.requestText}>Priority: {request.priority}</Text>
+                        <Text style={styles.requestText}>Required Volume: {request.volume}</Text>
+                    </View>
+                </>
             ) : (
-                <Text style={styles.noFridgeText}>No Pasteurized Fridges Available</Text>
+                <>
+                    <Text style={styles.screenTitle}>Refrigerator Management</Text>
+                    <Text style={styles.sectionTitle}>Pasteurized Fridges</Text>
+                    {pasteurizedFridges.length > 0 ? (
+                        <FlatList
+                            data={pasteurizedFridges}
+                            renderItem={({ item }) => renderFridgeCard(item)}
+                            keyExtractor={(item) => item._id}
+                            horizontal
+                        />
+                    ) : (
+                        <Text style={styles.noFridgeText}>No Pasteurized Fridges Available</Text>
+                    )}
+
+                    <Text style={styles.sectionTitle}>Unpasteurized Fridges</Text>
+                    {unpasteurizedFridges.length > 0 ? (
+                        <FlatList
+                            data={unpasteurizedFridges}
+                            renderItem={({ item }) => renderFridgeCard(item)}
+                            keyExtractor={(item) => item._id}
+                            horizontal
+                        />
+                    ) : (
+                        <Text style={styles.noFridgeText}>No Unpasteurized Fridges Available</Text>
+                    )}
+
+                    <TouchableOpacity
+                        style={styles.addButton}
+                        onPress={() => navigation.navigate('AddFridge')}>
+                        <Text style={styles.addButtonText}>+ Add New Fridge</Text>
+                    </TouchableOpacity>
+                </>
             )}
 
-            <Text style={styles.sectionTitle}>Unpasteurized Fridges</Text>
-            {unpasteurizedFridges.length > 0 ? (
-                <FlatList
-                    data={unpasteurizedFridges}
-                    renderItem={({ item }) => renderFridgeCard(item)}
-                    keyExtractor={(item) => item._id}
-                    horizontal
-                />
-            ) : (
-                <Text style={styles.noFridgeText}>No Unpasteurized Fridges Available</Text>
-            )}
-
-            <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddFridge')}>
-                <Text style={styles.addButtonText}>+ Add New Fridge</Text>
-            </TouchableOpacity>
         </ScrollView>
     );
 };
@@ -187,6 +218,17 @@ const styles = StyleSheet.create({
         color: '#999',
         marginVertical: 8,
     },
+    requestText: {
+        textAlign: 'left',
+        color: '#999',
+        marginVertical: 8,
+    },
+    requestTitleText: {
+        textAlign: 'center',
+        color: '#999',
+        marginVertical: 8,
+        fontWeight: 'bold'
+    },
     center: {
         flex: 1,
         justifyContent: 'center',
@@ -195,6 +237,14 @@ const styles = StyleSheet.create({
     errorText: {
         color: 'red',
         fontSize: 16,
+    },
+    section: {
+        marginBottom: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        backgroundColor: '#f9f9f9',
     },
 });
 

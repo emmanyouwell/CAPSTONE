@@ -93,7 +93,7 @@ exports.getInventoryDetails = catchAsyncErrors(async (req, res, next) => {
 
 // Update Inventory details => /api/v1/inventory/:id
 exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
-    const { pasteurizedDetails, unpasteurizedDetails, inventoryDate, status } = req.body;
+    const { pasteurizedDetails, unpasteurizedDetails, inventoryDate, status, temp } = req.body;
 
     const inventory = await Inventory.findById(req.params.id).populate('fridge');
 
@@ -108,10 +108,14 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
         inventory.inventoryDate = inventoryDate;
     }
 
-     if (status) {
+    if (status) {
         inventory.status = status;
     }
 
+    if (temp) {
+        inventory.temp = temp;
+    }
+    console.log("Inventory Data: ",inventory)
     // Validation of Updating based on fridge type
     if (fridge.fridgeType === 'Pasteurized') {
         if (!pasteurizedDetails || !pasteurizedDetails.pasteurizationDate || !pasteurizedDetails.batch || 
@@ -119,41 +123,11 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler('Pasteurized fridge requires complete pasteurizedDetails.', 400));
         }
 
-        // Calculate volume change
-        // const oldVolume = inventory.pasteurizedDetails?.volume || 0;
-        // const newVolume = pasteurizedDetails.volume;
-
-        // const volumeDifference = parseInt(newVolume, 10) - parseInt(oldVolume, 10);
-        // const updatedCapacity = parseInt(fridge.capacity, 10) - volumeDifference;
-
-        // if (updatedCapacity < 0) {
-        //     return next(new ErrorHandler('Fridge capacity exceeded', 400));
-        // }
-
-        // Update capacity and details
-        // fridge.capacity = updatedCapacity;
-        // inventory.pasteurizedDetails = pasteurizedDetails;
-
     } else if (fridge.fridgeType === 'Unpasteurized') {
         if (!unpasteurizedDetails || !unpasteurizedDetails.donor || !unpasteurizedDetails.expressDate || 
             !unpasteurizedDetails.collectionDate || !unpasteurizedDetails.volume) {
             return next(new ErrorHandler('Unpasteurized fridge requires complete unpasteurizedDetails.', 400));
         }
-
-        // Calculate volume change
-        // const oldVolume = inventory.unpasteurizedDetails?.volume || 0;
-        // const newVolume = unpasteurizedDetails.volume;
-
-        // const volumeDifference = parseInt(newVolume, 10) - parseInt(oldVolume, 10);
-        // const updatedCapacity = parseInt(fridge.capacity, 10) - volumeDifference;
-
-        // if (updatedCapacity < 0) {
-        //     return next(new ErrorHandler('Fridge capacity exceeded', 400));
-        // }
-
-        // Update capacity and details
-        // fridge.capacity = updatedCapacity;
-        // inventory.unpasteurizedDetails = unpasteurizedDetails;
 
     } else {
         return next(new ErrorHandler('Invalid fridge type', 400));

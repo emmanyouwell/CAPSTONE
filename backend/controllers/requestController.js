@@ -48,7 +48,7 @@ exports.getRequestDetails = catchAsyncErrors( async (req, res, next) => {
 
 // Update request => /api/v1/request/:id
 exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
-
+    console.log("Request Update: ", req.body)
     const request = await Request.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
