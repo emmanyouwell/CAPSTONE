@@ -32,6 +32,7 @@ import CreateStaff from "./components/Superadmin/Accounts/CreateStaff";
 import Inventory from "./screens/Superadmin/Inventory";
 import Fridges from "./screens/Superadmin/Inventories/Refrigerator";
 import InventoryCards from "./components/Superadmin/Inventories/Refrigerators/InventoryCard"
+import PasteurCards from "./components/Superadmin/Inventories/Refrigerators/PasteurCards"
 import FridgeDetails from "./components/Superadmin/Inventories/Refrigerators/FridgeDetails";
 import AddFridge from "./components/Superadmin/Inventories/Refrigerators/AddFridge";
 import EditFridge from "./components/Superadmin/Inventories/Refrigerators/EditFridge";
@@ -179,6 +180,7 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_inventories" component={Inventory}/>
         <Stack.Screen name="superadmin_fridges" component={Fridges}/>
         <Stack.Screen name="InventoryCards" component={InventoryCards}/>
+        <Stack.Screen name="PasteurCards" component={PasteurCards}/>
         <Stack.Screen name="FridgeDetails" component={FridgeDetails}/>
         <Stack.Screen name="AddFridge" component={AddFridge}/>
         <Stack.Screen name="EditFridge" component={EditFridge}/>

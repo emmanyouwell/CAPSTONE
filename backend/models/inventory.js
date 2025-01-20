@@ -22,6 +22,10 @@ const inventorySchema = new mongoose.Schema({
         default: 'Available',
         required: true
     },
+    temp: {
+        type: Number,
+        default: 0
+    },
     pasteurizedDetails:  {
             pasteurizationDate: {
                 type: Date,
@@ -52,9 +56,6 @@ const inventorySchema = new mongoose.Schema({
                 required: function () {
                     return this.fridgeType === 'Unpasteurized';
                 },
-            },
-            temp: {
-                type: Number,
             },
             expiration: {
                 type: Date,

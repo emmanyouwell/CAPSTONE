@@ -46,7 +46,7 @@ const AddRequest = ({ navigation, route }) => {
 
     useEffect(() => {
         if (!newPatient) {
-            dispatch(getRecipients())
+            dispatch(getRecipients({ search: "", page: 1, pageSize: 100 }))
                 .then((response) => {
                     const patientList = response.payload?.patients?.map((patient) => ({
                         label: patient.name,

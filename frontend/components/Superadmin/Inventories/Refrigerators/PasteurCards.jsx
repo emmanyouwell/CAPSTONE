@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Button, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Button, RefreshControl, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from "@react-navigation/native";
 
@@ -7,18 +7,22 @@ import Header from '../../Header';
 import { logoutUser } from '../../../../redux/actions/userActions';
 import { getInventories } from '../../../../redux/actions/inventoryActions';
 import { SuperAdmin } from '../../../../styles/Styles';
-import { dataTableStyle } from '../../../../styles/Styles'
+import { dataTableStyle } from '../../../../styles/Styles';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const Inventory = ({ route }) => {
-    const { fridge } = route.params;
+    const { fridge } = route.params ? route.params : null;
+    const { request } = route.params ? route.params : null;
     const dispatch = useDispatch();
     const navigation = useNavigation();
     const { inventory, loading, error } = useSelector((state) => state.inventories);
+    const [refreshing, setRefreshing] = useState(false);
 
     const [selectionMode, setSelectionMode] = useState(false);
     const [selectedItems, setSelectedItems] = useState([]);
-    const [refreshing, setRefreshing] = useState(false);
+    const [selectedVolume, setSelectedVolume] = useState(0); 
+    const [tempVolume, setTempVolume] = useState(null); 
+    const [lastInventoryId, setLastInventoryId] = useState(null);
 
     useEffect(() => {
         dispatch(getInventories());
@@ -26,14 +30,56 @@ const Inventory = ({ route }) => {
 
     const toggleSelectionMode = () => {
         setSelectionMode(!selectionMode);
-        setSelectedItems([]); 
+        setSelectedItems([]);
+        setSelectedVolume(0);
     };
 
-    const toggleSelectItem = (id) => {
+    const toggleSelectItem = (id, volume) => {
         if (selectedItems.includes(id)) {
             setSelectedItems(selectedItems.filter(itemId => itemId !== id));
+            setSelectedVolume(selectedVolume - volume);
         } else {
-            setSelectedItems([...selectedItems, id]);
+            const newTotal = selectedVolume + volume;
+            if (newTotal > request.volume) {
+                handleExcessVolume(id, volume, newTotal);
+            } else {
+                setSelectedItems([...selectedItems, id]);
+                setSelectedVolume(newTotal);
+            }
+        }
+    };
+
+    const handleExcessVolume = (id, volume, newTotal) => {
+        const excess = newTotal - request.volume;
+        Alert.alert(
+            "Volume Exceeds Requested Amount",
+            `The total volume exceeds the requested volume by ${excess}. Adjust your selection or split the excess.`,
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+                {
+                    text: "Remove Excess",
+                    onPress: () => adjustLastInventory(id, volume, excess),
+                },
+            ]
+        );
+    };
+
+    const adjustLastInventory = (id, volume, excess) => {
+        // Add the inventory with adjusted volume
+        setSelectedItems([...selectedItems, id]);
+        setSelectedVolume(request.volume);
+
+        // Store temp volume and inventory ID
+        setTempVolume(excess);
+        setLastInventoryId(id);
+
+        // Update the inventory's temp volume for the excess
+        const inventoryIndex = inventory.findIndex((inv) => inv._id === id);
+        if (inventoryIndex > -1) {
+            inventory[inventoryIndex].tempVolume = excess;
         }
     };
 
@@ -46,38 +92,43 @@ const Inventory = ({ route }) => {
 
     const handleNavigate = () => {
         const selectedInventories = inventory.filter(inv => selectedItems.includes(inv._id));
-        const targetScreen = fridge.fridgeType === 'Pasteurized' ? 'MilkRequest' : 'AddMilkInventory';
-        navigation.navigate(targetScreen, { selectedInventories });
+        
+        navigation.navigate('ConfirmRequest', {
+            selectedInventories,
+            request,
+            tempVolume,
+            lastInventoryId,
+        });
     };
 
     const filteredInventories = inventory.filter(
         (inv) => inv.fridge && inv.fridge._id === fridge._id && inv.status === 'Available'
     );
+    console.log("Filtered: ", filteredInventories)
 
     const renderCard = (inv) => {
         const isSelected = selectedItems.includes(inv._id);
-        const details = fridge.fridgeType === 'Pasteurized' ? inv.pasteurizedDetails : inv.unpasteurizedDetails;
-         const temp = inv.temp
+        const details = fridge.fridgeType === 'Pasteurized' ? inv.pasteurizedDetails : null;
+        const temp = inv.temp
 
         return (
             <TouchableOpacity
                 key={inv._id}
                 style={[styles.card, isSelected && styles.selectedCard]}
                 onLongPress={() => {
-                    if ((fridge.fridgeType === 'Unpasteurized')) {
+                    if ((request)) {
                         toggleSelectionMode();
                     }
                 }}
                 onPress={() => {
                     if (selectionMode) {
-                        toggleSelectItem(inv._id);
+                        toggleSelectItem(inv._id, temp ? temp : details?.volume || 0);
                     }
                 }}
             >
                 <Text style={styles.cardTitle}>Date: {formatDate(inv.inventoryDate)}</Text>
                 <Text>Status: {inv.status}</Text>
-                {details ? (
-                    fridge.fridgeType === 'Pasteurized' ? (
+                {details && fridge.fridgeType === 'Pasteurized' ? (
                         <>
                             <Text>Pasteur Date: {formatDate(details.pasteurizationDate)}</Text>
                             <Text>Batch: {details.batch}</Text>
@@ -88,16 +139,9 @@ const Inventory = ({ route }) => {
                             <Text>Expiration: {formatDate(details.expiration)}</Text>
                         </>
                     ) : (
-                        <>
-                            <Text>Donor: {details.donor?.name?.last || 'Unknown'}</Text>
-                            <Text>Express Date: {formatDate(details.expressDate)}</Text>
-                            <Text>Collection Date: {formatDate(details.collectionDate)}</Text>
-                            <Text>Volume: {details.volume}</Text>
-                        </>
-                    )
-                ) : (
                     <Text>No details available</Text>
-                )}
+                    )
+                }
             </TouchableOpacity>
         );
     };
@@ -129,50 +173,59 @@ const Inventory = ({ route }) => {
     return (
         <View style={SuperAdmin.container}>
             <Header onLogoutPress={() => onLogoutPress()} onMenuPress={() => navigation.openDrawer()} />
-            <Text style={styles.screenTitle}>{fridge.name} Available Milk</Text>
-            <View style={styles.buttonRow}>
-                <TouchableOpacity
-                    style={styles.historyButton}
-                    onPress={() => navigation.navigate('FridgeDetails', fridge)}
-                >
-                    <Text style={styles.buttonText}>
-                        <MaterialIcons name="history" size={16} color="white" /> History
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={() => navigation.navigate('AddMilkInventory', fridge)}
-                >
-                    <Text style={styles.buttonText}>
-                        <MaterialIcons name="add" size={16} color="white" /> Add
-                    </Text>
-                </TouchableOpacity>
-            </View>
-            <View style={dataTableStyle.tableContainer}>
-                <ScrollView
-                    style={styles.cardContainer}
-                    refreshControl={
-                        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-                    }
-                >
-                    {filteredInventories.map((inv) => renderCard(inv))}
-                </ScrollView>
-            </View>
-            {selectionMode && (
-                <View style={styles.selectionFooter}>
-                    <Button title="Cancel" onPress={toggleSelectionMode} color="#FF3B30" />
-                    <Button
-                        title={`Next (${selectedItems.length} Selected)`}
-                        onPress={handleNavigate}
-                        disabled={selectedItems.length === 0}
-                    />
+
+                <Text style={styles.screenTitle}>{fridge.name} Available Milk</Text>
+                {!request && (
+                    <View style={styles.buttonRow}>
+                        <TouchableOpacity
+                            style={styles.historyButton}
+                            onPress={() => navigation.navigate('FridgeDetails', fridge)}
+                        >
+                            <Text style={styles.buttonText}>
+                                <MaterialIcons name="history" size={16} color="white" /> History
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.addButton}
+                            onPress={() => navigation.navigate('AddMilkInventory', fridge)}
+                        >
+                            <Text style={styles.buttonText}>
+                                <MaterialIcons name="add" size={16} color="white" /> Add
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+                <View style={dataTableStyle.tableContainer}>
+                    <ScrollView
+                        style={styles.cardContainer}
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+                        }
+                    >
+                        {filteredInventories.map((inv) => renderCard(inv))}
+                    </ScrollView>
                 </View>
-            )}
+                {request && (
+                    <View style={styles.section}>
+                        <Text style={styles.requestTitleText}>Select Milk for Request</Text>
+                        <Text style={styles.requestText}>Requested Volume: {request.volume}</Text>
+                        <Text style={styles.requestText}>Selected Volume: {selectedVolume}</Text>
+                    </View>
+                )}
+                {selectionMode && (
+                    <View style={styles.selectionFooter}>
+                        <Button title="Cancel" onPress={toggleSelectionMode} color="#FF3B30" />
+                        <Button
+                            title={`Next (${selectedItems.length} Selected)`}
+                            onPress={handleNavigate}
+                            disabled={selectedVolume < request.volume}
+                        />
+                    </View>
+                )}
         </View>
     );
 };
 
-// Helper function to format date
 const formatDate = (dateString) => {
     const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -258,6 +311,17 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
         textAlign: 'center',
+    },
+    requestText: {
+        textAlign: 'left',
+        color: '#999',
+        marginVertical: 8,
+    },
+    requestTitleText: {
+        textAlign: 'center',
+        color: '#999',
+        marginVertical: 8,
+        fontWeight: 'bold'
     },
 });
 

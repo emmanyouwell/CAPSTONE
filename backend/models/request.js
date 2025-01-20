@@ -68,6 +68,14 @@ const requestSchema = new mongoose.Schema({
             ref: 'User'
         },
     },
+    temp: {
+        id: {
+            type: String,
+        },
+        vol: {
+            type: Number,
+        }
+    },
     createdAt: {
         type: Date,
         default: Date.now
