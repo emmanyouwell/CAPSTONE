@@ -19,7 +19,7 @@ import { useDispatch } from 'react-redux';
 import DocumentPicker from 'react-native-document-picker';
 import { addArticles } from '../../../redux/actions/articleActions';
 const AddArticles = ({ navigation }) => {
-
+    const dispatch = useDispatch();
     const [title, setTitle] = useState('');
     const [images, setImages] = useState([]);
     const [article, setArticle] = useState(null);
@@ -98,22 +98,24 @@ const AddArticles = ({ navigation }) => {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
         }
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('image', images);
-        formData.append('file', {
-            uri: article.uri,
-            type: article.type,
-            name: article.name,
+
+        const data = new FormData();
+        data.append('title', title); // Add title
+        data.append('images', JSON.stringify(images)); // Add images as JSON string
+        data.append('file', {
+            uri: article.uri, // File URI
+            type: article.type, // MIME type
+            name: article.name, // File name
         });
-         dispatch(addArticles(formData))
-                    .then(() => {
-                        Alert.alert('Success', 'Article published successfully!');
-                        navigation.goBack();
-                    })
-                    .catch((err) => Alert.alert('Error', err.message));
-        
-     };
+
+        dispatch(addArticles(data))
+            .then(() => {
+                Alert.alert('Success', 'Article published successfully!');
+                navigation.goBack();
+            })
+            .catch((err) => Alert.alert('Error', err.message));
+
+    };
     return (
         <View style={SuperAdmin.container}>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
@@ -274,7 +276,7 @@ const styles = StyleSheet.create({
         height: 50,
         justifyContent: 'space-between',
         alignItems: 'center',
-        flexDirection: 'row',  
+        flexDirection: 'row',
     },
     fileNameText: {
         fontSize: 12,
