@@ -8,7 +8,7 @@ import inventoryReducer from './slices/inventorySlice'
 import fridgeReducer from './slices/fridgeSlice'
 import requestReducer from './slices/requestSlice'
 import equipmentReducer from './slices/equipmentSlice'
-
+import articleReducer from './slices/articleSlice'
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
@@ -20,6 +20,7 @@ export const store = configureStore({
     fridges: fridgeReducer,
     requests: requestReducer,
     equipments: equipmentReducer,
+    articles: articleReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

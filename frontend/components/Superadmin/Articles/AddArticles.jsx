@@ -17,11 +17,12 @@ import { logoutUser } from '../../../redux/actions/userActions';
 import Header from '../../../components/Superadmin/Header';
 import { useDispatch } from 'react-redux';
 import DocumentPicker from 'react-native-document-picker';
+import { addArticles } from '../../../redux/actions/articleActions';
 const AddArticles = ({ navigation }) => {
 
     const [title, setTitle] = useState('');
     const [images, setImages] = useState([]);
-
+    const [article, setArticle] = useState(null);
 
     const [userDetails, setUserDetails] = useState(null);
     useEffect(() => {
@@ -70,8 +71,49 @@ const AddArticles = ({ navigation }) => {
             setImages((prevImages) => [...prevImages, ...base64Images]);
         }
     };
-
-    const handleSubmit = () => {};
+    const handleRemoveImage = (index) => {
+        setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    };
+    const handleRemoveFile = () => {
+        setArticle(null);
+    }
+    const pickFile = async () => {
+        try {
+            const res = await DocumentPicker.pick({
+                type: [DocumentPicker.types.pdf, DocumentPicker.types.docx],
+            });
+            console.log('File selected:', res);
+            // Upload file to backend
+            setArticle(res[0]);
+        } catch (err) {
+            if (DocumentPicker.isCancel(err)) {
+                console.log('User canceled the picker');
+            } else {
+                console.error('Unknown error:', err);
+            }
+        }
+    };
+    const handleSubmit = () => {
+        if (!title || !images.length || !article) {
+            Alert.alert('Error', 'Please fill out all fields.');
+            return;
+        }
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('image', images);
+        formData.append('file', {
+            uri: article.uri,
+            type: article.type,
+            name: article.name,
+        });
+         dispatch(addArticles(formData))
+                    .then(() => {
+                        Alert.alert('Success', 'Article published successfully!');
+                        navigation.goBack();
+                    })
+                    .catch((err) => Alert.alert('Error', err.message));
+        
+     };
     return (
         <View style={SuperAdmin.container}>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
@@ -84,6 +126,25 @@ const AddArticles = ({ navigation }) => {
                     value={title}
                     onChangeText={setTitle}
                 />
+                {article && article.name && (
+                    <View style={styles.fileNameContainer}>
+
+                        <Text style={styles.fileNameText}>{article.name}</Text>
+                        <TouchableOpacity
+                            style={styles.removeFileButton}
+                            onPress={() => handleRemoveFile()}
+                        >
+                            <Text style={styles.removeImageText}>X</Text>
+                        </TouchableOpacity>
+
+
+                    </View>
+                )}
+
+                <TouchableOpacity disabled={article ? true : false} style={styles.imageButton} onPress={pickFile}>
+                    <Text style={styles.imageButtonText}>Upload Article</Text>
+                </TouchableOpacity>
+
 
                 {/* Image Upload Button */}
                 <TouchableOpacity style={styles.imageButton} onPress={handlePickImage}>
@@ -94,7 +155,15 @@ const AddArticles = ({ navigation }) => {
                 {images.length > 0 && (
                     <View style={styles.imagePreviewContainer}>
                         {images.map((uri, index) => (
-                            <Image key={index} source={{ uri }} style={styles.imagePreview} />
+                            <View key={index} style={styles.imageWrapper}>
+                                <Image source={{ uri }} style={styles.imagePreview} />
+                                <TouchableOpacity
+                                    style={styles.removeImageButton}
+                                    onPress={() => handleRemoveImage(index)}
+                                >
+                                    <Text style={styles.removeImageText}>X</Text>
+                                </TouchableOpacity>
+                            </View>
                         ))}
                     </View>
                 )}
@@ -141,11 +210,38 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         marginVertical: 8,
     },
+    imageWrapper: {
+        position: 'relative',
+        margin: 4,
+    },
     imagePreview: {
         width: 80,
         height: 80,
         borderRadius: 8,
-        margin: 4,
+    },
+    removeImageButton: {
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        backgroundColor: 'rgb(255, 255, 255)',
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    'removeFileButton': {
+        backgroundColor: 'rgb(255, 255, 255)',
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    removeImageText: {
+        color: 'red',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
     submitButton: {
         backgroundColor: '#28a745',
@@ -169,6 +265,20 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,
+    },
+    fileNameContainer: {
+        marginVertical: 20,
+        borderWidth: 2,
+        padding: 8,
+        borderRadius: 8,
+        height: 50,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexDirection: 'row',  
+    },
+    fileNameText: {
+        fontSize: 12,
+        color: '#333',
     },
 });
 

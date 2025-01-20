@@ -79,7 +79,8 @@ export const SuperAdminMenuGrid = StyleSheet.create({
   icon: {
     height: 50,
     resizeMode: 'contain',
-    marginBottom: 5
+    marginBottom: 5,
+    width: 50,
   }
 });
 export const SuperAdmin = StyleSheet.create({
