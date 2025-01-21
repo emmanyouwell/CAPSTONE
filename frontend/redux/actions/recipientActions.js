@@ -46,7 +46,6 @@ export const addPatient = createAsyncThunk(
     async (req, thunkAPI) => {
 
         const token = await getToken();
-        console.log('Token Retrieved:', token);
 
         if (!token) {
             throw new Error('No token available');
