@@ -7,7 +7,7 @@ import { SuperAdmin } from '../../../styles/Styles';
 import { getRequests } from '../../../redux/actions/requestActions';
 
 const MilkRequest = ({ route, navigation }) => {
-    const items = route.params? route.params.selectedInventories : [];
+    const items = route.params ? route.params.selectedInventories : [];
     const dispatch = useDispatch();
     const { request, loading, error } = useSelector((state) => state.requests);
     const [refreshing, setRefreshing] = useState(false);
@@ -35,27 +35,14 @@ const MilkRequest = ({ route, navigation }) => {
     };
 
     const handleUpdate = (row) => {
-        navigation.navigate('superadmin_fridges', {request: row});
+        navigation.navigate('superadmin_fridges', { request: row });
     };
 
-    const sortedRequests = request
-        .filter((req) => req.status === 'Pending')
-        .sort((a, b) => {
-            const priorityOrder = { High: 1, Medium: 2, Low: 3 };
-            return priorityOrder[a.priority] - priorityOrder[b.priority];
-        });
-
     const renderCard = (req) => {
-        const cardColors = {
-            High: '#FF6B6B', 
-            Medium: '#FFA500', 
-            Low: '#32CD32', 
-        };
-
         return (
             <TouchableOpacity
                 key={req._id}
-                style={[styles.card, { borderColor: cardColors[req.priority], borderWidth: 2 }]}
+                style={styles.card}
                 onPress={() =>
                     Alert.alert(
                         "Complete Request",
@@ -67,7 +54,6 @@ const MilkRequest = ({ route, navigation }) => {
                     )
                 }
             >
-                <Text style={[styles.cardTitle, { color: cardColors[req.priority] }]}>Priority: {req.priority}</Text>
                 <Text style={styles.cardTitle}>Date: {formatDate(req.date)}</Text>
                 <Text>Status: {req.status}</Text>
                 <Text>Patient: {req.patient.name}</Text>
@@ -98,7 +84,7 @@ const MilkRequest = ({ route, navigation }) => {
                             <Text style={styles.errorText}>{error}</Text>
                         </View>
                     ) : (
-                        sortedRequests.map((req) => renderCard(req))
+                        request.filter((req) => req.status === 'Pending').map((req) => renderCard(req))
                     )}
                 </SafeAreaView>
             </ScrollView>
