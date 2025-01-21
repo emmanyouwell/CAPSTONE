@@ -77,7 +77,6 @@ export const updatePatient = createAsyncThunk(
     async (req, thunkAPI) => {
 
         const token = await getToken();
-        console.log('Token Retrieved:', token);
 
         if (!token) {
             throw new Error('No token available');
@@ -92,7 +91,7 @@ export const updatePatient = createAsyncThunk(
         }
         try {
             const response = await axios.put(`${REACT_APP_API_URL}/api/v1/patient/${req.id}`, req, config)
-            console.log(response)
+
             return response.data;
 
         } catch (error) {

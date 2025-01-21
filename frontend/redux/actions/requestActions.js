@@ -61,7 +61,7 @@ export const addRequest = createAsyncThunk(
         try {
 
             const response = await axios.post(`${REACT_APP_API_URL}/api/v1/requests`, req, config)
-
+ 
             return response.data;
 
         } catch (error) {
@@ -92,7 +92,7 @@ export const updateRequest = createAsyncThunk(
         }
         try {
             const response = await axios.put(`${REACT_APP_API_URL}/api/v1/request/${req.id}`, req, config)
-            console.log("Response: ", response.data)
+
             return response.data;
 
         } catch (error) {

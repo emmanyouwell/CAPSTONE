@@ -18,7 +18,7 @@ import { getRecipients, updatePatient } from '../../redux/actions/recipientActio
 import { addRequest } from '../../redux/actions/requestActions';
 import { SuperAdmin } from '../../styles/Styles';
 import { getUser } from '../../utils/helper';
-import moment from 'moment'; // For date formatting
+import moment from 'moment'; 
 
 const AddRequest = ({ navigation, route }) => {
     const dispatch = useDispatch();
@@ -33,16 +33,9 @@ const AddRequest = ({ navigation, route }) => {
         doctor: '',
         milkRequested: '',
     });
-    const [priority, setPriority] = useState(null);
-    const [items, setItems] = useState([
-            { label: 'Low', value: 'Low' },
-            { label: 'Medium', value: 'Medium' },
-            { label: 'High', value: 'High' },
-    ]);
     const [open, setOpen] = useState(false);
-    const [open2, setOpen2] = useState(false);
-    const [patients, setPatients] = useState([]);
     const [patientItems, setPatientItems] = useState([]);
+    const [patients, setPatients] = useState([]);
 
     useEffect(() => {
         if (!newPatient) {
@@ -88,12 +81,12 @@ const AddRequest = ({ navigation, route }) => {
     const handleSubmit = () => {
         const { patient, location, diagnosis, reason, doctor, milkRequested } = formData;
 
-        if (!patient || !location || !diagnosis || !reason || !doctor || !milkRequested || !priority) {
+        if (!patient || !location || !diagnosis || !reason || !doctor || !milkRequested) {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
         }
 
-        const staffId = staff? staff : userDetails._id
+        const staffId = staff? staff : userDetails?._id
 
         const requestData = {
             date: moment().format('YYYY-MM-DD'), 
@@ -102,16 +95,15 @@ const AddRequest = ({ navigation, route }) => {
             diagnosis,
             reason,
             doctor,
-            priority,
             staffId,
             status: 'Pending',
+            volume: milkRequested
         };
-        
+
         dispatch(addRequest(requestData))
-            .then(() => {
+            .then((res) => {
                 const milkRequestData = {
-                    date: moment().format('YYYY-MM-DD'),
-                    milkRequested: parseInt(milkRequested, 10),
+                    reqId: res.payload.request._id
                 };
 
                 const patientToUpdate = patients.find((p) => p._id === patient) || newPatient;
@@ -192,20 +184,9 @@ const AddRequest = ({ navigation, route }) => {
                     value={formData.doctor}
                     onChangeText={(text) => handleChange('doctor', text)}
                 />
-                <DropDownPicker
-                    open={open2}
-                    value={priority}
-                    items={items}
-                    setOpen={setOpen2}
-                    setValue={setPriority}
-                    setItems={setItems}
-                    placeholder="Select Patient Priority"
-                    style={styles.dropdown}
-                    dropDownContainerStyle={styles.dropdownContainer}
-                />
                 <TextInput
                     style={styles.input}
-                    placeholder="Volume of Milk Requested (ml)"
+                    placeholder="Volume of Milk Requested (mL/day)"
                     keyboardType="numeric"
                     value={formData.milkRequested}
                     onChangeText={(text) => handleChange('milkRequested', text)}
