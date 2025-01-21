@@ -50,6 +50,7 @@ export const addArticles = createAsyncThunk(
         }
         try {
             console.log("sending request");
+            console.log(`${REACT_APP_API_URL}/api/v1/articles`)
             const response = await axios.post(`${REACT_APP_API_URL}/api/v1/articles`, req, config);
             console.log("response: ", response);
             return response.data;
