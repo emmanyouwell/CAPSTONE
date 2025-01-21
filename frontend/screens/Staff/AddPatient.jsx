@@ -25,16 +25,10 @@ const AddPatient = ({ navigation }) => {
         name: '',
         address: '',
         phone: '',
-        patientType: '',
-        hospital: '',
+        motherName: '',
+        patientType: 'Inpatient',
+        hospital: 'Taguig-Pateros District Hospital',
     });
-
-    const [open, setOpen] = useState(false); // Dropdown open state
-    const [patientType, setPatientType] = useState(null); // Dropdown value
-    const [items, setItems] = useState([
-        { label: 'Inpatient', value: 'Inpatient' },
-        { label: 'Outpatient', value: 'Outpatient' },
-    ]);
 
     useEffect(() => {
         startTransition(() => {
@@ -63,23 +57,24 @@ const AddPatient = ({ navigation }) => {
     };
 
     const handleSubmit = () => {
-        const { name, address, phone, hospital } = formData;
+        const { name, address, phone, hospital, patientType, motherName } = formData;
 
-        if (!name || !address || !phone || !hospital || !patientType) {
+        if (!name || !address || !phone || !hospital || !patientType || !motherName) {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
         }
 
-        dispatch(addPatient({ ...formData, patientType, staff: userDetails._id }))
+    console.log("Form Data: ", formData)
+        dispatch(addPatient({ ...formData, staff: userDetails._id }))
             .then((response) => {
                 const Params = {
                     newPatient: response.payload.patient,
                     staff: userDetails._id
                 }
-                console.log("Params: ", Params)  
+
                 Alert.alert(
                     'Success',
-                    'Patient added successfully! Do you want to add a Request?',
+                    'Patient added successfully! Do you want to add a Request for the new patient?',
                     [
                         {
                             text: 'Request',
@@ -106,14 +101,20 @@ const AddPatient = ({ navigation }) => {
             <Text style={styles.screenTitle}>Patient Information</Text>
 
             <FlatList
-                data={[{ key: 'form' }]} // Single-item list for layout
+                data={[{ key: 'form' }]}
                 renderItem={() => (
                     <View style={styles.form}>
                         <TextInput
                             style={styles.input}
-                            placeholder="Name"
+                            placeholder="Name of the patient"
                             value={formData.name}
                             onChangeText={(text) => handleChange('name', text)}
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Mother's Name"
+                            value={formData.motherName}
+                            onChangeText={(text) => handleChange('motherName', text)}
                         />
                         <TextInput
                             style={styles.input}
@@ -127,23 +128,6 @@ const AddPatient = ({ navigation }) => {
                             keyboardType="phone-pad"
                             value={formData.phone}
                             onChangeText={(text) => handleChange('phone', text)}
-                        />
-                        <DropDownPicker
-                            open={open}
-                            value={patientType}
-                            items={items}
-                            setOpen={setOpen}
-                            setValue={setPatientType}
-                            setItems={setItems}
-                            placeholder="Select Patient Type"
-                            style={styles.dropdown}
-                            dropDownContainerStyle={styles.dropdownContainer}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Hospital"
-                            value={formData.hospital}
-                            onChangeText={(text) => handleChange('hospital', text)}
                         />
                         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                             <Text style={styles.submitButtonText}>Add Patient</Text>
