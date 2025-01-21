@@ -36,19 +36,22 @@ export const getArticles = createAsyncThunk(
 export const addArticles = createAsyncThunk(
     'article/addArticles',
     async(req, thunkAPI) => {
+        
         const token = await getToken();
         if (!token) {
             throw new Error('No token available');
         }
         const config = {
             headers: {
-                'Content-Type': 'multipart/form-data',
+                
                 Authorization: `Bearer ${token}`
             },
             withCredentials: true
         }
         try {
+            console.log("sending request");
             const response = await axios.post(`${REACT_APP_API_URL}/api/v1/articles`, req, config);
+            console.log("response: ", response);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);

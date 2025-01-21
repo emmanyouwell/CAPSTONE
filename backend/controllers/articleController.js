@@ -18,8 +18,8 @@ exports.allArticles = catchAsyncErrors(async (req, res, next) => {
 
 exports.createArticle = catchAsyncErrors(async (req, res, next) => {
     try {
-        console.log(req.body)
-        const filePath = req.file.path;
+        console.log(req.file);
+        const filePath = req.file;
 
         let text = '';
         if (req.file.mimetype === 'application/pdf') {
@@ -31,8 +31,6 @@ exports.createArticle = catchAsyncErrors(async (req, res, next) => {
             const data = await mammoth.extractRawText({ path: filePath });
             text = data.value;
         }
-
-
 
         let images = []
         if (typeof req.body.images === 'string') {

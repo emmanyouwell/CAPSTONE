@@ -99,16 +99,16 @@ const AddArticles = ({ navigation }) => {
             return;
         }
 
-        const data = new FormData();
-        data.append('title', title); // Add title
-        data.append('images', JSON.stringify(images)); // Add images as JSON string
-        data.append('file', {
+        const formData = new FormData();
+        formData.append('title', title); // Add title
+        formData.append('images', images); // Add images as JSON string
+        formData.append('file', {
             uri: article.uri, // File URI
             type: article.type, // MIME type
             name: article.name, // File name
         });
-
-        dispatch(addArticles(data))
+        
+        dispatch(addArticles(formData))
             .then(() => {
                 Alert.alert('Success', 'Article published successfully!');
                 navigation.goBack();
