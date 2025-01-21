@@ -9,6 +9,11 @@ import {
     Alert,
     Image,
 } from 'react-native';
+import RNFS from 'react-native-fs';
+import * as Mammoth from 'mammoth';
+import { PDFDocument } from 'pdf-lib';
+import { Buffer } from 'buffer';
+import { TextDecoder, TextEncoder } from 'text-encoding'
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { getUser } from '../../../utils/helper';
@@ -18,11 +23,14 @@ import Header from '../../../components/Superadmin/Header';
 import { useDispatch } from 'react-redux';
 import DocumentPicker from 'react-native-document-picker';
 import { addArticles } from '../../../redux/actions/articleActions';
+global.TextDecoder = TextDecoder;
+global.TextEncoder = TextEncoder;
+global.Buffer = Buffer;
 const AddArticles = ({ navigation }) => {
     const dispatch = useDispatch();
     const [title, setTitle] = useState('');
     const [images, setImages] = useState([]);
-    const [article, setArticle] = useState(null);
+    const [article, setArticle] = useState('');
 
     const [userDetails, setUserDetails] = useState(null);
     useEffect(() => {
@@ -80,18 +88,32 @@ const AddArticles = ({ navigation }) => {
     const pickFile = async () => {
         try {
             const res = await DocumentPicker.pick({
-                type: [DocumentPicker.types.pdf, DocumentPicker.types.docx],
+                type: [DocumentPicker.types.docx],
             });
-            console.log('File selected:', res);
-            // Upload file to backend
-            setArticle(res[0]);
-        } catch (err) {
-            if (DocumentPicker.isCancel(err)) {
+
+            const fileType = res[0].type;
+            const filePath = res[0].uri;
+
+            // Read file as base64
+            const fileData = await RNFS.readFile(filePath, 'base64');
+
+            let extractedText = '';
+            if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+                // Extract text from Word document
+                const binaryData = Buffer.from(fileData, 'base64');
+                const result = await Mammoth.extractRawText({ arrayBuffer: binaryData });
+                extractedText = result.value;
+            }
+
+            setArticle(extractedText);
+        } catch (error) {
+            if (DocumentPicker.isCancel(error)) {
                 console.log('User canceled the picker');
             } else {
-                console.error('Unknown error:', err);
+                console.error('Error:', error);
             }
         }
+
     };
     const handleSubmit = () => {
         if (!title || !images.length || !article) {
@@ -99,16 +121,13 @@ const AddArticles = ({ navigation }) => {
             return;
         }
 
-        const formData = new FormData();
-        formData.append('title', title); // Add title
-        formData.append('images', images); // Add images as JSON string
-        formData.append('file', {
-            uri: article.uri, // File URI
-            type: article.type, // MIME type
-            name: article.name, // File name
-        });
-        
-        dispatch(addArticles(formData))
+        const data = {
+            title,
+            images,
+            description: article,
+        }
+
+        dispatch(addArticles(data))
             .then(() => {
                 Alert.alert('Success', 'Article published successfully!');
                 navigation.goBack();

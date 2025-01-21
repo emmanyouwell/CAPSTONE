@@ -18,20 +18,6 @@ exports.allArticles = catchAsyncErrors(async (req, res, next) => {
 
 exports.createArticle = catchAsyncErrors(async (req, res, next) => {
     try {
-        console.log(req.file);
-        const filePath = req.file;
-
-        let text = '';
-        if (req.file.mimetype === 'application/pdf') {
-            const pdfParser = require('pdf-parse');
-            const data = await pdfParser(fs.readFileSync(filePath));
-            text = data.text;
-        } else if (req.file.mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-            const mammoth = require('mammoth');
-            const data = await mammoth.extractRawText({ path: filePath });
-            text = data.value;
-        }
-
         let images = []
         if (typeof req.body.images === 'string') {
             images.push(req.body.images)
@@ -54,11 +40,9 @@ exports.createArticle = catchAsyncErrors(async (req, res, next) => {
         }
         req.body.images = imagesLinks;
 
-        const articles = await Article.create({
-            title: req.body.title,
-            images: req.body.images,
-            description: text,
-        });
+        const articles = await Article.create(
+            req.body
+        );
 
         res.status(201).json({
             success: true,
