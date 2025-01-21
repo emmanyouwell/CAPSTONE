@@ -64,7 +64,6 @@ const AddPatient = ({ navigation }) => {
             return;
         }
 
-    console.log("Form Data: ", formData)
         dispatch(addPatient({ ...formData, staff: userDetails._id }))
             .then((response) => {
                 const Params = {
