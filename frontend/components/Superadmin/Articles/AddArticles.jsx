@@ -31,7 +31,7 @@ const AddArticles = ({ navigation }) => {
     const [title, setTitle] = useState('');
     const [images, setImages] = useState([]);
     const [article, setArticle] = useState('');
-
+    const [fileName, setFileName] = useState('');
     const [userDetails, setUserDetails] = useState(null);
     useEffect(() => {
         startTransition(() => {
@@ -93,7 +93,7 @@ const AddArticles = ({ navigation }) => {
 
             const fileType = res[0].type;
             const filePath = res[0].uri;
-
+            setFileName(res[0].name);
             // Read file as base64
             const fileData = await RNFS.readFile(filePath, 'base64');
 
@@ -147,10 +147,10 @@ const AddArticles = ({ navigation }) => {
                     value={title}
                     onChangeText={setTitle}
                 />
-                {article && article.name && (
+                {fileName && (
                     <View style={styles.fileNameContainer}>
 
-                        <Text style={styles.fileNameText}>{article.name}</Text>
+                        <Text style={styles.fileNameText}>{fileName}</Text>
                         <TouchableOpacity
                             style={styles.removeFileButton}
                             onPress={() => handleRemoveFile()}

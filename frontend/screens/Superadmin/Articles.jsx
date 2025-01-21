@@ -1,9 +1,20 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl, SafeAreaView } from 'react-native'
 import { SuperAdmin } from '../../styles/Styles'
 import Header from '../../components/Superadmin/Header';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useDispatch, useSelector } from 'react-redux';
+import { getArticles } from '../../redux/actions/articleActions';
+import ArticleList from '../../components/Superadmin/Articles/ArticleList';
+
 const Articles = ({ navigation }) => {
+    const dispatch = useDispatch();
+    const [refreshing, setRefreshing] = useState(false);
+    const { articles, loading, error } = useSelector((state) => state.articles);
+
+    useEffect(() => {
+        dispatch(getArticles());
+    }, [dispatch])
     const onMenuPress = () => {
         navigation.openDrawer();
     };
@@ -15,12 +26,19 @@ const Articles = ({ navigation }) => {
             })
             .catch((err) => console.log(err));
     };
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+        dispatch(getArticles())
+            .then(() => setRefreshing(false))
+            .catch(() => setRefreshing(false));
+    };
     return (
         <View style={SuperAdmin.container}>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
             <Text style={styles.screenTitle}>Articles</Text>
             <View style={styles.buttonRow}>
-                
+
                 <TouchableOpacity
                     style={styles.addButton}
                     onPress={() => navigation.navigate('add_articles')}
@@ -30,6 +48,21 @@ const Articles = ({ navigation }) => {
                     </Text>
                 </TouchableOpacity>
             </View>
+
+            <ScrollView
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+                }>
+                <SafeAreaView style={styles.form}>
+                    {loading ? (
+                        <Text>Loading...</Text>
+                    ) : error ? (
+                        <Text>{error}</Text>
+                    ) : (
+                        <ArticleList data={articles}/>
+                        )}
+                </SafeAreaView>
+            </ScrollView>
         </View>
     )
 }
