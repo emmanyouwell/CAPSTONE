@@ -128,6 +128,8 @@ const Refrigerator = ({ route }) => {
                         <Text style={styles.requestText}>Requested id: {request._id}</Text>
                         <Text style={styles.requestText}>Requested Date: {formatDate(request.date)}</Text>
                         <Text style={styles.requestText}>Patient Name: {request.patient.name}</Text>
+                        <Text style={styles.requestText}>Reason: {request.reason}</Text>
+                        <Text style={styles.requestText}>Diagnosis: {request.diagnosis}</Text>
                         <Text style={styles.requestText}>Required Volume: {request.volume}</Text>
                     </View>
                 </>
@@ -228,12 +230,14 @@ const styles = StyleSheet.create({
         textAlign: 'left',
         color: '#999',
         marginVertical: 8,
+        fontSize: 16
     },
     requestTitleText: {
         textAlign: 'center',
         color: '#999',
         marginVertical: 8,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        fontSize: 18
     },
     center: {
         flex: 1,

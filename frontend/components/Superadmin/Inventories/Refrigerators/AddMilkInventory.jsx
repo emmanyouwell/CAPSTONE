@@ -225,6 +225,7 @@ const AddMilkInventory = ({ route, navigation }) => {
                         setItems={setDonorItems}
                         placeholder="Select Donor"
                         style={styles.dropdown}
+                        listItemContainerStyle={{ height: 60, borderBottomWidth: 1 }}
                         searchable={true} // Enable the searchable functionality
                         searchPlaceholder='Search for a donor...'
                     />
