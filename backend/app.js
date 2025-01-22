@@ -12,7 +12,7 @@ const errorMiddleware = require('./middlewares/errors');
 dotenv.config({ path: 'config/.env' });
 
 const corsOptions = {
-    origin:['*','http://localhost:5173','http://192.168.5.235:8081','http://192.168.5.234:8081', 'https://yourfrontenddomain.com'], // Add your frontend's URL here
+    origin:['*','http://localhost:5173','http://192.168.5.235:8081','http://192.168.5.234:8081', 'https://tchmb-portal.vercel.app'], // Add your frontend's URL here
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
