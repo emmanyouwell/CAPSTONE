@@ -24,15 +24,15 @@ import { getUser, viewAsyncStorage } from '../../../../utils/helper';
 
 const AddMilkInventory = ({ route, navigation }) => {
 
-    const fridge = route.params.selectedInventories? { fridgeType : "Pasteurized" }  : route.params;
+    const fridge = route.params.selectedInventories ? { fridgeType: "Pasteurized" } : route.params;
 
-    const items = route.params.selectedInventories? route.params.selectedInventories : [];    
+    const items = route.params.selectedInventories ? route.params.selectedInventories : [];
 
     const totalVolume = items.reduce((total, item) => total + (item.unpasteurizedDetails?.volume || 0), 0);
 
     const dispatch = useDispatch();
     const [formData, setFormData] = useState(() => ({
-        volume: totalVolume || '', 
+        volume: totalVolume || '',
     }));
     const { donors, loading, error } = useSelector((state) => state.donors);
     const { fridges } = useSelector((state) => state.fridges);
@@ -53,11 +53,11 @@ const AddMilkInventory = ({ route, navigation }) => {
         dispatch(getFridges())
         dispatch(getDonors({ search: "", page: 1, pageSize: 100 }))
     }, [dispatch]);
-   
+
     useEffect(() => {
         if (donors) {
             const items = donors.map((donor) => ({
-                label: `${donor.name.first} ${donor.name.last}`,
+                label: `${donor.name.first} ${donor.name.last} (${donor.home_address} | ${donor.phone} | ${donor.donorType})`,
                 value: donor._id,
             }));
             setDonorItems(items);
@@ -127,7 +127,7 @@ const AddMilkInventory = ({ route, navigation }) => {
         }
 
         const inventoryDate = new Date().toISOString().split("T")[0];
-        const user = await fetchUserDetails(); 
+        const user = await fetchUserDetails();
 
         if (!user || !user._id) {
             Alert.alert("Error", "Failed to retrieve user details.");
@@ -225,6 +225,8 @@ const AddMilkInventory = ({ route, navigation }) => {
                         setItems={setDonorItems}
                         placeholder="Select Donor"
                         style={styles.dropdown}
+                        searchable={true} // Enable the searchable functionality
+                        searchPlaceholder='Search for a donor...'
                     />
 
                     <TouchableOpacity
@@ -295,7 +297,7 @@ const AddMilkInventory = ({ route, navigation }) => {
                             {formData.pasteurizationDate || 'Select Pasteurization Date'}
                         </Text>
                     </TouchableOpacity>
-                    
+
                     {showPasteurizationDatePicker && (
                         <DateTimePicker
                             value={new Date()}

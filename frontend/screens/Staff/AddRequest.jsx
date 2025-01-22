@@ -159,10 +159,13 @@ const AddRequest = ({ navigation, route }) => {
                     style={styles.dropdown}
                     dropDownContainerStyle={styles.dropdownContainer}
                     disabled={!!newPatient}
+                    searchable={true} // Enable the searchable functionality
+                    searchPlaceholder='Search for a patient...'
+                    
                 />
                 <TextInput
                     style={styles.input}
-                    placeholder="Location"
+                    placeholder="Department"
                     value={formData.location}
                     onChangeText={(text) => handleChange('location', text)}
                 />

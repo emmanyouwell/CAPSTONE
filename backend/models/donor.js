@@ -44,6 +44,11 @@ const donorSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter occupation of the donor']
     },
+    donorType: {
+        type: String,
+        enum: ['Community', 'Private', 'Employee', 'Network Office/Agency'],
+        required: [true, 'Please enter type of donor']
+    },
     children: [
         {
             name: { type: String },
