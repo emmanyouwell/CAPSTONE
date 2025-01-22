@@ -1,6 +1,7 @@
 import React, { useState, useEffect, startTransition } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import { useDispatch } from 'react-redux';
+import DropDownPicker from 'react-native-dropdown-picker';
 import Header from '../Header';
 import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
@@ -14,9 +15,17 @@ const ConfirmRequest = ({ route, navigation }) => {
     const dispatch = useDispatch();
     const [userDetails, setUserDetails] = useState(null);
     const [outcome, setOutcome] = useState('');
-    const [transport, setTransport] = useState('');
     const [loading, setLoading] = useState(false);
 
+    const [transport, setTransport] = useState('');
+    const [useOtherTransport, setUseOtherTransport] = useState(false); 
+    const [open, setOpen] = useState(false);
+    const [items, setItems] = useState([
+        { label: 'Insulated Bag w/ Ice Pack', value: 'Insulated Bag w/ Ice Pack' },
+        { label: 'Cooler w/ Ice Pack', value: 'Cooler w/ Ice Pack' },
+        { label: 'Styro box w/ Ice Pack', value: 'Styro box w/ Ice Pack' },
+    ]);
+    console.log(transport)
     useEffect(() => {
         startTransition(() => {
             const fetchUserDetails = async () => {
@@ -66,9 +75,9 @@ const ConfirmRequest = ({ route, navigation }) => {
         }
 
         try {
-            // Update the request
+
             await dispatch(updateRequest(updatedRequest));
-            console.log("Request update: ", updatedRequest)
+
             // Update inventory statuses and handle tempVolume update for lastInventoryId
             if (inventory && inventory.length > 0) {
                 for (const item of inventory) {
@@ -80,8 +89,7 @@ const ConfirmRequest = ({ route, navigation }) => {
                         updatedItem.temp = 0
                         updatedItem.status = "Unavailable"
                     }
-                    console.log("Inventory update: ", updatedItem)
-                    // Dispatch the updateInventory action
+
                     await dispatch(updateInventory(updatedItem));
                 }
             }
@@ -100,7 +108,7 @@ const ConfirmRequest = ({ route, navigation }) => {
         <View style={SuperAdmin.container}>
             <Header onLogoutPress={() => dispatch(logoutUser())} onMenuPress={() => navigation.openDrawer()} />
             <Text style={styles.screenTitle}>Complete Request</Text>
-            <ScrollView style={styles.receiptContainer}>
+            <ScrollView >
                 {/* Request Details */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Request Details</Text>
@@ -143,21 +151,47 @@ const ConfirmRequest = ({ route, navigation }) => {
 
                 {/* Form for Additional Details */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Complete Transaction</Text>
-                    <Text style={styles.label}>Outcome:</Text>
+                    <Text style={styles.sectionTitle}>Outcome:</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Enter outcome"
                         value={outcome}
                         onChangeText={setOutcome}
                     />
-                    <Text style={styles.label}>Transport:</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter transport details"
-                        value={transport}
-                        onChangeText={setTransport}
-                    />
+                </View>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Transportation Details:</Text>
+                    {!useOtherTransport ? (
+                        <DropDownPicker
+                            open={open}
+                            value={transport}
+                            items={items}
+                            setOpen={setOpen}
+                            setValue={setTransport}
+                            setItems={setItems}
+                            placeholder="Select Transportation Method"
+                            style={styles.dropdown}
+                            dropDownContainerStyle={styles.dropdownContainer}
+                        />
+                    ) : (
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter other transport method"
+                            value={transport}
+                            onChangeText={setTransport}
+                        />
+                    )}
+                    <View style={styles.radioContainer}>
+                        <TouchableOpacity
+                            style={styles.radioButton}
+                            onPress={() => setUseOtherTransport(!useOtherTransport)}
+                        >
+                            <View style={styles.radioCircle}>
+                                {useOtherTransport && <View style={styles.radioSelected} />}
+                            </View>
+                            <Text style={styles.radioLabel}>Other methods</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </ScrollView>
 
@@ -236,7 +270,7 @@ const styles = StyleSheet.create({
     input: {
         borderWidth: 1,
         borderColor: '#ddd',
-        borderRadius: 4,
+        borderRadius: 8,
         padding: 8,
         marginBottom: 12,
         backgroundColor: '#fff',
@@ -253,6 +287,47 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    dropdown: {
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        marginBottom: 12,
+        backgroundColor: '#fff',
+        padding: 8,
+    },
+    dropdownContainer: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+    },
+    radioContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    radioButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    radioCircle: {
+        height: 15,
+        width: 15,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: '#000',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    radioSelected: {
+        height: 10,
+        width: 10,
+        borderRadius: 5,
+        backgroundColor: '#000',
+    },
+    radioLabel: {
+        fontSize: 15,
     },
 });
 

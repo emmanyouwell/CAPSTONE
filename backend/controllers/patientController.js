@@ -51,17 +51,8 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
 
 // Create Patient => /api/v1/patients
 exports.createPatient = catchAsyncErrors(async (req, res, next) => {
-    const data = req.body;
-
-    const patient = await Patient.create({
-        name: data.name,
-        address: data.address,
-        phone: data.phone,
-        patientType: data.patientType.trim(),
-        hospital: data.hospital,
-        staff: data.staff,
-        requested: data.requested,
-    });
+console.log(req.body)
+    const patient = await Patient.create(req.body);
 
     res.status(201).json({
         success: true,
@@ -85,18 +76,8 @@ exports.getPatientDetails = catchAsyncErrors(async (req, res, next) => {
 
 // Update Patient => /api/v1/patient/:id
 exports.updatePatient = catchAsyncErrors(async (req, res, next) => {
-    const data = req.body;
 
-    const newPatientData = {
-        name: data.name,
-        address: data.address,
-        phone: data.phone,
-        patientType: data.patientType.trim(),
-        hospital: data.hospital,
-        requested: data.requested,
-    }
-
-    const patient = await Patient.findByIdAndUpdate(req.params.id, newPatientData, {
+    const patient = await Patient.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
         useFindAndModify: false,

@@ -126,7 +126,8 @@ const Refrigerator = ({ route }) => {
                     <View style={styles.section}>
                         <Text style={styles.requestTitleText}>Request to be completed...</Text>
                         <Text style={styles.requestText}>Requested id: {request._id}</Text>
-                        <Text style={styles.requestText}>Priority: {request.priority}</Text>
+                        <Text style={styles.requestText}>Requested Date: {formatDate(request.date)}</Text>
+                        <Text style={styles.requestText}>Patient Name: {request.patient.name}</Text>
                         <Text style={styles.requestText}>Required Volume: {request.volume}</Text>
                     </View>
                 </>
@@ -167,6 +168,11 @@ const Refrigerator = ({ route }) => {
 
         </ScrollView>
     );
+};
+
+const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
 const styles = StyleSheet.create({

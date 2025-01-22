@@ -14,6 +14,10 @@ const patientSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter contact number of the patient']
     },
+    motherName: {
+        type: String,
+        required: [true, 'Please enter the name of the mother of patient']
+    },
     patientType: {
         type: String,
         enum: ['Inpatient', 'Outpatient'],
