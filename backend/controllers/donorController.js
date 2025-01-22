@@ -94,6 +94,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
             children: children,
             office_address: data.office_address,
             contact_number: data.contact_number_2,
+            donorType: data.donor_type[0],
             occupation: data.occupation
         });
         res.status(200).json({
