@@ -111,16 +111,6 @@ const Calendar = ({ modalVisible, setModalVisible, setEventDetails, editModalVis
         const processedEvents = processEvents(events);
         setItems(processedEvents); // Replace items entirely
     }, [events]);
-    // useEffect(() => {
-    //     if (userDetails) {
-    //         console.log("userDetails: ", userDetails);
-    //     }
-    // }, [userDetails])
-    // useEffect(() => {
-    //     if (events) {
-    //         console.log("Events: ", events);
-    //     }
-    // }, [events])
     // Function to render each item in the Agenda
     const renderItem = useCallback((item) => {
         const date = format(new Date(item.eventDetails), 'MM/dd/yyyy')
