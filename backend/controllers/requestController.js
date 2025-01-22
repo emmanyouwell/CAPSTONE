@@ -3,11 +3,11 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
 // Get All requests => /api/v1/requests
-exports.allRequests = catchAsyncErrors( async (req, res, next) => {
+exports.allRequests = catchAsyncErrors(async (req, res, next) => {
     const requests = await Request.find()
         .populate('patient', 'name phone patientType')
         .populate('staffId', 'name email role')
-        .populate('tchmb.approvedBy', 'name email role') 
+        .populate('tchmb.approvedBy', 'name email role')
         .populate('tchmb.ebm.inv', 'pasteurizedDetails');
 
     const count = await Request.countDocuments();
@@ -20,7 +20,7 @@ exports.allRequests = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Create request => /api/v1/requests
-exports.createRequest= catchAsyncErrors( async (req, res, next) => {
+exports.createRequest = catchAsyncErrors(async (req, res, next) => {
 
     const request = await Request.create(req.body);
 
@@ -31,9 +31,9 @@ exports.createRequest= catchAsyncErrors( async (req, res, next) => {
 })
 
 // Get specific request details => /api/v1/request/:id
-exports.getRequestDetails = catchAsyncErrors( async (req, res, next) => {
+exports.getRequestDetails = catchAsyncErrors(async (req, res, next) => {
     const request = await Request.findById(req.params.id)
-        .populate('tchmb.approvedBy', 'name email role') 
+        .populate('tchmb.approvedBy', 'name email role')
         .populate('tchmb.ebm.inv', 'pasteurizedDetails');
 
     if (!request) {
@@ -53,12 +53,14 @@ exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
         new: true,
         runValidators: true,
         useFindAndModify: false,
-    })  .populate('tchmb.approvedBy', 'name email role') 
+    }).populate('tchmb.approvedBy', 'name email role')
+        .populate('patient', 'name phone patientType')
+        .populate('staffId', 'name email role')
         .populate('tchmb.ebm.inv', 'pasteurizedDetails');
 
     if (!request) {
         return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`));
-    }     
+    }
 
     res.status(200).json({
         success: true,
@@ -67,7 +69,7 @@ exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Delete request => /api/v1/request/:id
-exports.deleteRequest = catchAsyncErrors( async (req, res, next) => {
+exports.deleteRequest = catchAsyncErrors(async (req, res, next) => {
     const request = await Request.findById(req.params.id);
 
     if (!request) {
