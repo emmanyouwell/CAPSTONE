@@ -35,7 +35,8 @@ const MilkRequest = ({ route, navigation }) => {
     };
 
     const handleUpdate = (row) => {
-        navigation.navigate('superadmin_fridges', { request: row });
+        console.log(row);
+        navigation.navigate('EditRequest', { request: row });
     };
 
     const renderCard = (req) => {

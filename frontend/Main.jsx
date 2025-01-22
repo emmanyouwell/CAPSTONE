@@ -52,6 +52,7 @@ import AddPatient from "./screens/Staff/AddPatient";
 import AddRequest from "./screens/Staff/AddRequest";
 import Articles from "./screens/Superadmin/Articles";
 import AddArticles from "./components/Superadmin/Articles/AddArticles";
+import EditRequest from "./components/Superadmin/Requests/EditRequest";
 
 const CustomDrawerContent = (props) => {
 
@@ -196,7 +197,7 @@ const MainStack = () => {
       {/* {Request Admins Navigation} */}
         <Stack.Screen name="MilkRequest" component={MilkRequest}/>
         <Stack.Screen name="ConfirmRequest" component={ConfirmRequest}/>
-        
+        <Stack.Screen name="EditRequest" component={EditRequest}/>
       {/* {Request Staff Navigation} */}
         <Stack.Screen name="AddPatient" component={AddPatient}/>
         <Stack.Screen name="AddRequest" component={AddRequest}/>
