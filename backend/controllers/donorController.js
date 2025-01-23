@@ -48,7 +48,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
     try {
         const fields = req.body.data.fields;
         let data = {};
-
+        console.log("fields: ", fields);
         fields.forEach(field => {
             if (field.type === "MULTIPLE_CHOICE") {
                 const result = field.value.map(selected => {
