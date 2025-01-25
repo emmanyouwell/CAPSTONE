@@ -28,8 +28,10 @@ export const getRecipients = createAsyncThunk(
                 urlString += `&search=${encodeURIComponent(search)}`;
             }
            
-            console.log('URL:', urlString);
             const response = await axios.get(urlString, config);
+
+            console.log("Response", response.data)
+            console.log("URL: ", urlString)
 
             return response.data;
 

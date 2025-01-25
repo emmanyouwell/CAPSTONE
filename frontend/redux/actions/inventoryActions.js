@@ -45,9 +45,6 @@ export const addInventory = createAsyncThunk(
     async (req, thunkAPI) => {
 
         const token = await getToken();
-        console.log('Token Retrieved:', token);
-
-        console.log('Request Add Inventory:', req);
 
         if (!token) {
             throw new Error('No token available');
@@ -63,7 +60,8 @@ export const addInventory = createAsyncThunk(
         try {
 
             const response = await axios.post(`${REACT_APP_API_URL}/api/v1/inventories`, req, config)
-            console.log("Inventory Add: ", response.data)
+            console.log("Response", response.data)
+            console.log("URL: ", urlString)
             return response.data;
 
         } catch (error) {
