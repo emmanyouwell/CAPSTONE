@@ -60,8 +60,7 @@ export const addInventory = createAsyncThunk(
         try {
 
             const response = await axios.post(`${REACT_APP_API_URL}/api/v1/inventories`, req, config)
-            console.log("Response", response.data)
-            console.log("URL: ", urlString)
+
             return response.data;
 
         } catch (error) {

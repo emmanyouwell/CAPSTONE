@@ -69,19 +69,10 @@ const donorSchema = new mongoose.Schema({
     ],
     donation: [
         {
-            date: {
-                type: Date,
-                required: [true, 'Please enter date of donation']
-            },
-            milkDonated: {
-                type: Number,
-                required: [true, 'Please enter amount of milk donated']
-            },
-            approvedBy: {
+            invId: {
                 type: ObjectId,
-                required: true,
-                ref: 'User'
-            },
+                ref: 'Inventory'
+            }
         }
     ],
     createdAt: {
