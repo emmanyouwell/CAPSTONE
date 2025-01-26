@@ -1,26 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import {
-    View,
-    Alert,
-    Text,
-    Button,
-    StyleSheet,
-    ScrollView,
-    TextInput,
-    ActivityIndicator,
-    TouchableOpacity,
-} from 'react-native';
+import { View, Alert, Text, Button, StyleSheet, ScrollView, TextInput, ActivityIndicator, TouchableOpacity } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch, useSelector } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { getDonors } from '../../../../redux/actions/donorActions';
-
 import Header from '../../../../components/Superadmin/Header';
 import { logoutUser } from '../../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../../styles/Styles';
 import { addInventory, updateInventory } from '../../../../redux/actions/inventoryActions';
 import { getFridges } from '../../../../redux/actions/fridgeActions';
-import { getUser, viewAsyncStorage } from '../../../../utils/helper';
+import { getUser } from '../../../../utils/helper';
+import { updateDonor } from '../../../../redux/actions/donorActions';
 
 const AddMilkInventory = ({ route, navigation }) => {
 
@@ -33,6 +23,7 @@ const AddMilkInventory = ({ route, navigation }) => {
     const dispatch = useDispatch();
     const [formData, setFormData] = useState(() => ({
         volume: totalVolume || '',
+        quantity: '',
     }));
     const { donors, loading, error } = useSelector((state) => state.donors);
     const { fridges } = useSelector((state) => state.fridges);
@@ -44,6 +35,7 @@ const AddMilkInventory = ({ route, navigation }) => {
     const [selectedFridge, setSelectedFridge] = useState(null);
     const [fridgeItems, setFridgeItems] = useState([]);
 
+    const [donations, setDonations] = useState([]);
     const [showExpressDatePicker, setShowExpressDatePicker] = useState(false);
     const [showCollectionDatePicker, setShowCollectionDatePicker] = useState(false);
     const [showPasteurizationDatePicker, setShowPasteurizationDatePicker] = useState(false);
@@ -63,7 +55,8 @@ const AddMilkInventory = ({ route, navigation }) => {
             setDonorItems(items);
         }
         if (fridges) {
-            const items = fridges.map((fridge) => ({
+            const filteredFridges = fridges.filter((fridge) => fridge.fridgeType === 'Pasteurized');
+            const items = filteredFridges.map((fridge) => ({
                 label: `${fridge.name}`,
                 value: fridge._id,
             }));
@@ -73,7 +66,6 @@ const AddMilkInventory = ({ route, navigation }) => {
 
     const fetchUserDetails = async () => {
         const user = await getUser();
-        console.log('User:', user)
         return user
     };
 
@@ -89,6 +81,29 @@ const AddMilkInventory = ({ route, navigation }) => {
         if (field === 'collectionDate') setShowCollectionDatePicker(false);
         if (field === 'pasteurizationDate') setShowPasteurizationDatePicker(false);
         if (field === 'expirationDate') setShowExpirationDatePicker(false);
+    };
+
+    const addDonation = () => {
+        const { expressDate, collectionDate, volume, quantity } = formData;
+
+        if (!expressDate || !collectionDate || !volume || !quantity) {
+            Alert.alert("Error", "Please fill out all fields for the donation.");
+            return;
+        }
+        const expiration = new Date(expressDate);
+        expiration.setDate(expiration.getDate() + 14);
+        
+        const newDonation = {
+            donor: selectedDonor,
+            expressDate,
+            collectionDate,
+            volume: Number(volume),
+            expiration: expiration.getTime(),
+            quantity: Number(quantity),
+        };
+
+        setDonations([...donations, newDonation]);
+        setFormData({ ...formData, expressDate: '', collectionDate: '', volume: '', quantity: '' });
     };
 
     if (loading) {
@@ -168,47 +183,65 @@ const AddMilkInventory = ({ route, navigation }) => {
                 expiration: expirationDate,
             };
 
-            console.log("Submitting Pasteurized Data:", newData);
-        } else if (fridge.fridgeType === "Unpasteurized") {
-            const { expressDate, collectionDate, volume } = formData;
+            try {
+                dispatch(addInventory(newData));
+                Alert.alert("Success", "Inventory has been added successfully.");
 
-            if (!selectedDonor || !expressDate || !collectionDate || !volume) {
-                Alert.alert("Error", "Please fill out all fields for unpasteurized milk.");
+                if (items && items.length > 0) {
+                    for (const item of items) {
+                        const updatedItem = { ...item, status: "Unavailable", id: item._id };
+                        dispatch(updateInventory(updatedItem));
+                        console.log(`Updated item ${item._id} to Unavailable`);
+                    }
+                }
+
+                navigation.goBack();
+            } catch (error) {
+                Alert.alert("Error", "Failed to add Inventory or update item status. Please try again.");
+                console.error(error);
+            }
+        } else if (fridge.fridgeType === "Unpasteurized") {
+            if (!selectedDonor || donations.length === 0) {
+                Alert.alert("Error", "Please add at least one donation.");
                 return;
             }
 
-            newData.unpasteurizedDetails = {
-                donor: selectedDonor,
-                expressDate,
-                collectionDate,
-                volume,
-            };
+            try {
+                const inventoryId = [];
+                for (const donation of donations) {
+                    const newInventoryData = {
+                        ...newData,
+                        unpasteurizedDetails: donation,
+                    };
+                    await dispatch(addInventory(newInventoryData))
+                        .then((res) => {
+                            const newInvId = res.payload.inventory._id; 
+                            inventoryId.push({ invId: newInvId }); 
+                        })
+                        .catch((error) => {
+                            console.error('Error adding inventory:', error);
+                            Alert.alert('Error', 'Failed to add inventory.');
+                        });
+                }
 
-            // console.log("Submitting Unpasteurized Data:", newData);
+                const donorToUpdate = donors.find((donor) => donor._id === selectedDonor);
+                const updatedDonor = {
+                    ...donorToUpdate,
+                    donation: [...(donorToUpdate.donation || []), ...inventoryId], 
+                    id: selectedDonor,
+                };
+
+                dispatch(updateDonor(updatedDonor))
+
+                Alert.alert("Success", "Inventory Added and Donor Updated");
+                navigation.goBack();
+            } catch (error) {
+                Alert.alert("Error", "Failed to add Inventory. Please try again.");
+                console.error(error);
+            }
         } else {
             console.log("Unknown fridge type");
             Alert.alert("Error", "Unknown fridge type. Please contact support.");
-            return;
-        }
-
-        try {
-            // Submit the main inventory data
-            dispatch(addInventory(newData));
-            Alert.alert("Success", "Inventory has been added successfully.");
-
-            // Update the status of each item to "Unavailable"
-            if (items && items.length > 0) {
-                for (const item of items) {
-                    const updatedItem = { ...item, status: "Unavailable", id: item._id };
-                    dispatch(updateInventory(updatedItem));
-                    console.log(`Updated item ${item._id} to Unavailable`);
-                }
-            }
-            // Navigate back after successful submission
-            navigation.goBack();
-        } catch (error) {
-            Alert.alert("Error", "Failed to add Inventory or update item status. Please try again.");
-            console.error(error);
         }
     };
 
@@ -216,6 +249,7 @@ const AddMilkInventory = ({ route, navigation }) => {
         if (fridge.fridgeType === 'Unpasteurized') {
             return (
                 <>
+                    <View style={styles.section}>
                     <DropDownPicker
                         open={open}
                         value={selectedDonor}
@@ -226,8 +260,9 @@ const AddMilkInventory = ({ route, navigation }) => {
                         placeholder="Select Donor"
                         style={styles.dropdown}
                         listItemContainerStyle={{ height: 60, borderBottomWidth: 1 }}
-                        searchable={true} // Enable the searchable functionality
+                        searchable={true}
                         searchPlaceholder='Search for a donor...'
+                        disabled={donations.length > 0 ? true : false}
                     />
 
                     <TouchableOpacity
@@ -274,6 +309,32 @@ const AddMilkInventory = ({ route, navigation }) => {
                         keyboardType="numeric"
                         onChangeText={(value) => setFormData({ ...formData, volume: Number(value) })}
                     />
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Quantity"
+                        keyboardType="numeric"
+                        onChangeText={(value) => setFormData({ ...formData, quantity: Number(value) })}
+                    />
+
+                    <Button title="Add Milk Info" onPress={addDonation} />
+                    </View>
+                    
+                    {donations.length > 0 && (
+                        <View style={styles.section}>
+                            <View style={styles.donationsList}>
+                                <Text style={styles.subTitle}>Donations:</Text>
+                                {donations.map((donation, index) => (
+                                    <View key={index} style={styles.itemContainer}>
+                                        <Text>Express Date: {donation.expressDate}</Text>
+                                        <Text>Collection Date: {donation.collectionDate}</Text>
+                                        <Text>Volume: {donation.volume} mL</Text>
+                                        <Text>Quantity: {donation.quantity}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    )}
                 </>
             );
         } else if (fridge.fridgeType === 'Pasteurized') {
@@ -289,7 +350,6 @@ const AddMilkInventory = ({ route, navigation }) => {
                         placeholder="Select Fridge"
                         style={styles.dropdown}
                     />
-
                     <TouchableOpacity
                         onPress={() => setShowPasteurizationDatePicker(true)}
                         style={styles.datePickerButton}
@@ -298,7 +358,6 @@ const AddMilkInventory = ({ route, navigation }) => {
                             {formData.pasteurizationDate || 'Select Pasteurization Date'}
                         </Text>
                     </TouchableOpacity>
-
                     {showPasteurizationDatePicker && (
                         <DateTimePicker
                             value={new Date()}
@@ -309,7 +368,6 @@ const AddMilkInventory = ({ route, navigation }) => {
                             }
                         />
                     )}
-
                     <TextInput
                         style={styles.input}
                         placeholder="Batch"
@@ -366,8 +424,11 @@ const AddMilkInventory = ({ route, navigation }) => {
             <ScrollView style={styles.container}>
                 <Text style={styles.title}>Add Inventory</Text>
                 {renderFormFields()}
-                <Button title="Submit" onPress={handleSubmit} />
             </ScrollView>
+            <Button title="Submit Inventory" onPress={handleSubmit} />
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.cancelButton}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -414,6 +475,49 @@ const styles = StyleSheet.create({
     },
     datePickerText: {
         color: '#000',
+    },
+    donationsList: {
+        marginTop: 20,
+    },
+    subTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 16,
+    },
+    cancelButton: {
+        marginTop: 20,
+        padding: 10,
+        backgroundColor: '#ccc',
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    cancelButtonText: {
+        color: '#333',
+        fontSize: 16,
+    },
+    itemContainer: {
+        marginBottom: 8,
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        backgroundColor: '#ffffff',
+    },
+    section: {
+        marginBottom: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        backgroundColor: '#f9f9f9',
     },
 });
 

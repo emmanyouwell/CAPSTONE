@@ -27,8 +27,6 @@ export const getDonors = createAsyncThunk(
             }
 
             const response = await axios.get(urlString, config);
-            console.log("Response", response.data)
-            console.log("URL: ", urlString)
 
             return response.data;
         } catch (error) {
@@ -36,3 +34,34 @@ export const getDonors = createAsyncThunk(
         }
     }
 );
+
+// Update donor
+export const updateDonor = createAsyncThunk(
+    'donor/updateDonor',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        
+        try {
+            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/donor/${req.id}`, req, config)
+
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
