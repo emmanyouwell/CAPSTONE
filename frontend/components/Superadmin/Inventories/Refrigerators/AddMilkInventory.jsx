@@ -18,7 +18,7 @@ const AddMilkInventory = ({ route, navigation }) => {
 
     const items = route.params.selectedInventories ? route.params.selectedInventories : [];
 
-    const totalVolume = items.reduce((total, item) => total + (item.unpasteurizedDetails?.volume || 0), 0);
+    const totalVolume = items.reduce((total, item) => total + (item.unpasteurizedDetails?.quantity * item.unpasteurizedDetails?.volume || 0), 0);
 
     const dispatch = useDispatch();
     const [formData, setFormData] = useState(() => ({
