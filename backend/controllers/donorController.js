@@ -44,6 +44,72 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     }
 
 })
+
+exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const fields = req.body.data.fields;
+        let data = {};
+        console.log("fields: ", fields);
+        fields.forEach(field => {
+            if (field.type === "MULTIPLE_CHOICE") {
+                const result = field.value.map(selected => {
+                    const match = field.options.find(option => option.id === selected);
+                    return match ? match.text : null;
+                }).filter(item => item !== null);
+                data[field.label] = {label: field.label, value: result};
+            }
+            else if (field.type === "CHECKBOXES" && field.key === "question_rBK1gL") {
+                const result = field.value.map(selected => {
+                    const match = field.options.find(option => option.id === selected);
+                    return match ? match.text : null;
+                }).filter(item => item !== null);
+                console.log("result: ", result);
+                data[field.label] = {label: field.label, value: result};
+            }
+            else {
+                data[field.label] = {label: field.label, value: field.value};
+            }
+
+        })
+
+        const relevantQuestions = [
+            "Have you for any reason been deferred as a milk donor? (Ikaw ba ay natangihan na magbigay ng iyong gata / breastmilk?)",
+            "Do you have any acute or chronic infection, systemic disorders, tuberculosis or history of hepatitis? (Mayroon ka bang kahit anong impeksyon o sakit? Nagkaroon ng sakit sa atay dati?)",
+            "Have you received any blood transfusion or other blood products within the last 12 months? (Ikaw ba ay nasalinan ng dugo o kahit anong produkto mula sa dugo nitong nakaraang 12 buwan?)",
+            "Have you received any organ or tissue transplant within the last 12 months? (Ikaw ba ay nakatanggap ng parte ng katawan mula sa ibang tao nitong nakaraang 12 buwan?)",
+            "Within the last 24 hours, have you had intake of any hard liquor or alcohol? (Nakainom ka ba ng alak nitong nakaraang 24 oras?)",
+            "Do you regularly use over-the-counter medications or systemic preparations such as replacement hormones and some birth control hormones? (Regular ka bang gumagamit ng mga gamot gaya ng mga hormones o pills?)",
+            "Do you use illicit drugs? (Gumagamit ka ba ng ipinagbabawal na gamot?)",
+            "Do you smoke? (Ikaw ba ay naninigarilyo?)",
+            "Have you had syphilis, HIV, herpes, or any sexually-transmitted disease? (Nagkakaroon ka ba ng sakit na nakukuha sa pakikipagtalik /sex?)",
+            "Do you have multiple sex partners? (Nagkaroon ka ba ng karanasang makipagtalik sa hindi lang iisang lalaki?)",
+            "Have you had a sexual partner from any of the following? (Nagkaroon ka ba ng partner mula sa mga sumusunod?)"
+        ];
+        const values = [relevantQuestions.map((key) => {
+            // Find the question in the response object that matches the label
+            for (const question in data) {
+              if (data[question].label === key) {
+                return data[question].value === "Yes" || data[question].value === "None of the above" ? 1 : 0;
+              }
+            }
+            return null; // Default if not found
+          })];
+        // console.log("data: ", data);
+        console.log("values: ", values);
+
+        // res.status(200).json({
+        //     success: true,
+        //     fields,
+        //     data,
+        //     donor
+        // });
+    }
+    catch (error) {
+        console.error("Error in createDonor:", error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 exports.testDonors = catchAsyncErrors(async (req, res, next) => {
     try {
         const fields = req.body.data.fields;
