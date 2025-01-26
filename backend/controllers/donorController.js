@@ -85,10 +85,17 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             "Do you have multiple sex partners? (Nagkaroon ka ba ng karanasang makipagtalik sa hindi lang iisang lalaki?)",
             "Have you had a sexual partner from any of the following? (Nagkaroon ka ba ng partner mula sa mga sumusunod?)"
         ];
-
-        
-
-        console.log("data: ", data);
+        const values = [relevantQuestions.map((key) => {
+            // Find the question in the response object that matches the label
+            for (const question in data) {
+              if (data[question].label === key) {
+                return data[question].value === "Yes" || data[question].value === "None of the above" ? 1 : 0;
+              }
+            }
+            return null; // Default if not found
+          })];
+        // console.log("data: ", data);
+        console.log("values: ", values);
 
         // res.status(200).json({
         //     success: true,
