@@ -117,11 +117,11 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
         console.log("prediction: ", prediction);
         res.status(200).json({
             success: true,
-            prediction: prediction === 1 ? "Eligible" : "Not Eligible"
+            prediction: prediction.data.predictions.includes(1) ? "Eligible" : "Not Eligible"
         });
     }
     catch (error) {
-        console.error("Error in createDonor:", error);
+        console.error("Error in predicting eligibility:", error);
         res.status(500).json({ error: error.message });
     }
 });
