@@ -17,8 +17,18 @@ const donorSchema = new mongoose.Schema({
         }
     },
     home_address: {
-        type: String,
-        required: [true, 'Please enter address of the donor']
+        street: {
+            type: String,
+            required: [true, 'Enter Street']
+        },
+        brgy: {
+            type: String,
+            required: [true, 'Enter Baranggay']
+        },
+        city: {
+            type: String,
+            required: [true, 'Enter City']
+        }
     },
     phone: {
         type: String,
