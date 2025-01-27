@@ -96,6 +96,9 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
           })];
         
         console.log("values: ", values);
+        const json = {
+            data: values
+        }
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -103,7 +106,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             },
             
         };
-        const prediction = await axios.post("https://python-server-production-a72b.up.railway.app/predict/", values, config);
+        const prediction = await axios.post("https://python-server-production-a72b.up.railway.app/predict/", json, config);
         
         if (!prediction) {
             return res.status(500).json({
