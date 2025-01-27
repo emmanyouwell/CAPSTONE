@@ -1,7 +1,7 @@
 const Donor = require('../models/donor')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
-
+const axios = require('axios');
 // Get All Donors => /api/v1/donors
 exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     // Destructure search query parameters from the request
@@ -94,15 +94,28 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             }
             return null; // Default if not found
           })];
-        console.log("data: ", data);
+        
         console.log("values: ", values);
-
-        // res.status(200).json({
-        //     success: true,
-        //     fields,
-        //     data,
-        //     donor
-        // });
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                
+            },
+            
+        };
+        const prediction = await axios.post("https://python-server-production-a72b.up.railway.app/predict/", values, config);
+        
+        if (!prediction) {
+            return res.status(500).json({
+                success: false,
+                message: "An error occurred while predicting eligibility."
+            });
+        }
+        console.log("prediction: ", prediction);
+        res.status(200).json({
+            success: true,
+            prediction: prediction === 1 ? "Eligible" : "Not Eligible"
+        });
     }
     catch (error) {
         console.error("Error in createDonor:", error);
