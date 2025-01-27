@@ -1,14 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getDonors } from '../actions/donorActions';
+import { getDonors, updateDonor } from '../actions/donorActions';
 export const donorSlice = createSlice({
   name: 'donor',
   initialState: {
     donors: [],
-    loading: false, // Useful for async actions like login/signup
-    error: null, // To handle errors
+    loading: false, 
+    error: null, 
     pageSize: 0,
     totalDonors: 0,
-    totalPages: 0
+    totalPages: 0,
+    isUpdated: false
   },
   reducers: {
   },
@@ -27,7 +28,19 @@ export const donorSlice = createSlice({
       })
       .addCase(getDonors.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // The error message passed in rejectWithValue
+        state.error = action.payload; 
+      })
+
+      .addCase(updateDonor.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updateDonor.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isUpdated = action.payload.success;
+      })
+      .addCase(updateDonor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       })
       
   },

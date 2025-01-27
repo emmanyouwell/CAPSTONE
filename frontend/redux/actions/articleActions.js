@@ -26,6 +26,8 @@ export const getArticles = createAsyncThunk(
                 urlString = `${REACT_APP_API_URL}/api/v1/articles`
             }
             const response = await axios.get(urlString, config);
+            console.log("Response", response.data)
+            console.log("URL: ", urlString)
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
