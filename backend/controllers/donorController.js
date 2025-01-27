@@ -94,7 +94,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             }
             return null; // Default if not found
           })];
-        // console.log("data: ", data);
+        console.log("data: ", data);
         console.log("values: ", values);
 
         // res.status(200).json({
