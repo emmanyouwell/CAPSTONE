@@ -57,7 +57,8 @@ const Inventory = ({ route }) => {
     const renderCard = (inv) => {
         const isSelected = selectedItems.includes(inv._id);
         const details = fridge.fridgeType === 'Pasteurized' ? inv.pasteurizedDetails : inv.unpasteurizedDetails;
-         const temp = inv.temp
+        const temp = inv.temp
+        const quantity = details?.quantity || 1
 
         return (
             <TouchableOpacity
@@ -92,7 +93,7 @@ const Inventory = ({ route }) => {
                             <Text>Donor: {details.donor?.name?.last || 'Unknown'}</Text>
                             <Text>Express Date: {formatDate(details.expressDate)}</Text>
                             <Text>Collection Date: {formatDate(details.collectionDate)}</Text>
-                            <Text>Volume: {details.volume}</Text>
+                            <Text>Volume: {details.volume * quantity}</Text>
                         </>
                     )
                 ) : (

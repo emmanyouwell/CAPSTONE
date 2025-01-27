@@ -276,21 +276,7 @@ exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
 
 // Update donor => /api/v1/donor/:id
 exports.updateDonor = catchAsyncErrors(async (req, res, next) => {
-    const data = req.body;
-
-    const newdonorData = {
-        name: data.name,
-        address: data.address,
-        phone: data.phone,
-        age: data.age,
-        birthday: data.birthday,
-        civilStatus: data.civilStatus,
-        spouse: data.spouse,
-        children: data.children,
-        donation: data.donation
-    }
-
-    const donor = await Donor.findByIdAndUpdate(req.params.id, newdonorData, {
+    const donor = await Donor.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
         useFindAndModify: false,

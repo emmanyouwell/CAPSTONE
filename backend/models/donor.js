@@ -17,8 +17,18 @@ const donorSchema = new mongoose.Schema({
         }
     },
     home_address: {
-        type: String,
-        required: [true, 'Please enter address of the donor']
+        street: {
+            type: String,
+            required: [true, 'Enter Street']
+        },
+        brgy: {
+            type: String,
+            required: [true, 'Enter Baranggay']
+        },
+        city: {
+            type: String,
+            required: [true, 'Enter City']
+        }
     },
     phone: {
         type: String,
@@ -69,19 +79,10 @@ const donorSchema = new mongoose.Schema({
     ],
     donation: [
         {
-            date: {
-                type: Date,
-                required: [true, 'Please enter date of donation']
-            },
-            milkDonated: {
-                type: Number,
-                required: [true, 'Please enter amount of milk donated']
-            },
-            approvedBy: {
+            invId: {
                 type: ObjectId,
-                required: true,
-                ref: 'User'
-            },
+                ref: 'Inventory'
+            }
         }
     ],
     createdAt: {
