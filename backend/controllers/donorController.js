@@ -89,7 +89,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             // Find the question in the response object that matches the label
             for (const question in data) {
               if (data[question].label === key) {
-                return data[question].value === "Yes" || data[question].value === "None of the above" ? 1 : 0;
+                return data[question].value.includes("Yes") || data[question].value.includes("None of the above") ? 1 : 0;
               }
             }
             return null; // Default if not found
