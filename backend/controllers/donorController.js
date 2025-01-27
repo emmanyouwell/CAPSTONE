@@ -26,6 +26,7 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     try {
         // Find donors based on the query object
         const donors = await Donor.find(query)
+            .populate('donation.invId', 'unpasteurizedDetails')
             .skip(skip)
             .limit(pageSize);
 
@@ -304,3 +305,69 @@ exports.deleteDonor = catchAsyncErrors(async (req, res, next) => {
         message: "Donor Deleted"
     })
 })
+
+exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const donors = await Donor.find()
+            .populate('donation.invId', 'unpasteurizedDetails');
+
+        const stats = {};
+
+        // Loop through each donor
+        donors.forEach(donor => {
+            const isCommunity = donor.donorType === 'Community';
+            const isPrivate = ['Private', 'Employee', 'Network Office/Agency'].includes(donor.donorType);
+
+            // Skip if not Community or Private donor
+            if (!isCommunity && !isPrivate) return;
+
+            donor.donation.forEach(donation => {
+                const unpasteurizedDetails = donation.invId?.unpasteurizedDetails;
+
+                if (unpasteurizedDetails) {
+                    // Get month from collectionDate
+                    const month = new Date(unpasteurizedDetails.collectionDate).toLocaleString('default', {
+                        month: 'long',
+                    });
+
+                    // Multiply volume and quantity
+                    const totalVolume = unpasteurizedDetails.volume * unpasteurizedDetails.quantity;
+
+                    // Initialize month in stats if not already
+                    if (!stats[month]) {
+                        stats[month] = { Community: 0, Private: 0, Total: 0 };
+                    }
+
+                    // Add the volume to the correct donor type
+                    if (isCommunity) {
+                        stats[month].Community += totalVolume;
+                    } else if (isPrivate) {
+                        stats[month].Private += totalVolume;
+                    }
+
+                    // Add to the monthly total
+                    stats[month].Total += totalVolume;
+                }
+            });
+        });
+
+        // Calculate yearly totals
+        const yearlyTotals = { Community: 0, Private: 0, Total: 0 };
+        Object.values(stats).forEach(monthStats => {
+            yearlyTotals.Community += monthStats.Community;
+            yearlyTotals.Private += monthStats.Private;
+            yearlyTotals.Total += monthStats.Total;
+        });
+
+        // Add yearly total row
+        stats['Total'] = yearlyTotals;
+
+        // Respond with stats
+         res.status(200).json({
+            success: true,
+            stats
+        })
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
