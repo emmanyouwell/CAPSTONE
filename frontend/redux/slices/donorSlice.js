@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getDonors, updateDonor } from '../actions/donorActions';
+import { getDonors, getMilkPerMonth, updateDonor } from '../actions/donorActions';
 export const donorSlice = createSlice({
   name: 'donor',
   initialState: {
@@ -9,7 +9,8 @@ export const donorSlice = createSlice({
     pageSize: 0,
     totalDonors: 0,
     totalPages: 0,
-    isUpdated: false
+    isUpdated: false,
+    stats: {}
   },
   reducers: {
   },
@@ -41,6 +42,18 @@ export const donorSlice = createSlice({
       .addCase(updateDonor.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      .addCase(getMilkPerMonth.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getMilkPerMonth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.stats = action.payload.stats;
+      })
+      .addCase(getMilkPerMonth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
       })
       
   },

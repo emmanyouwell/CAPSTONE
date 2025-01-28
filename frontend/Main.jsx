@@ -54,6 +54,9 @@ import Articles from "./screens/Superadmin/Articles";
 import AddArticles from "./components/Superadmin/Articles/AddArticles";
 import EditRequest from "./components/Superadmin/Requests/EditRequest";
 
+//Charts Screens
+import MilkPerMonth from "./components/Superadmin/Metrics/MilkPerMonth";
+
 const CustomDrawerContent = (props) => {
 
   const [userDetails, setUserDetails] = useState(null);
@@ -201,6 +204,9 @@ const MainStack = () => {
       {/* {Request Staff Navigation} */}
         <Stack.Screen name="AddPatient" component={AddPatient}/>
         <Stack.Screen name="AddRequest" component={AddRequest}/>
+
+      {/* {Charts Navigation} */}
+        <Stack.Screen name="MilkPerMonth" component={MilkPerMonth}/>
 
       </Stack.Group>
     </Stack.Navigator>

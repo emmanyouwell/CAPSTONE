@@ -277,6 +277,7 @@ exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
 
 // Update donor => /api/v1/donor/:id
 exports.updateDonor = catchAsyncErrors(async (req, res, next) => {
+    console.log("Update Donor: ", req.body)
     const donor = await Donor.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
@@ -335,32 +336,32 @@ exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
 
                     // Initialize month in stats if not already
                     if (!stats[month]) {
-                        stats[month] = { Community: 0, Private: 0, Total: 0 };
+                        stats[month] = { community: 0, private: 0, total: 0 };
                     }
 
                     // Add the volume to the correct donor type
                     if (isCommunity) {
-                        stats[month].Community += totalVolume;
+                        stats[month].community += totalVolume;
                     } else if (isPrivate) {
-                        stats[month].Private += totalVolume;
+                        stats[month].private += totalVolume;
                     }
 
                     // Add to the monthly total
-                    stats[month].Total += totalVolume;
+                    stats[month].total += totalVolume;
                 }
             });
         });
 
         // Calculate yearly totals
-        const yearlyTotals = { Community: 0, Private: 0, Total: 0 };
+        const yearlyTotals = { community: 0, private: 0, total: 0 };
         Object.values(stats).forEach(monthStats => {
-            yearlyTotals.Community += monthStats.Community;
-            yearlyTotals.Private += monthStats.Private;
-            yearlyTotals.Total += monthStats.Total;
+            yearlyTotals.community += monthStats.community;
+            yearlyTotals.private += monthStats.private;
+            yearlyTotals.total += monthStats.total;
         });
 
         // Add yearly total row
-        stats['Total'] = yearlyTotals;
+        stats['total'] = yearlyTotals;
 
         // Respond with stats
          res.status(200).json({
