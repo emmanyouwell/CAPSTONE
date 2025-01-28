@@ -48,8 +48,9 @@ const AddMilkInventory = ({ route, navigation }) => {
 
     useEffect(() => {
         if (donors) {
-            const items = donors.map((donor) => ({
-                label: `${donor.name.first} ${donor.name.last} (${donor.home_address} | ${donor.phone} | ${donor.donorType})`,
+            const items = donors.map((donor) => (
+                {
+                label: `${donor.name.first} ${donor.name.last} (${donor.home_address.street}, ${donor.home_address.brgy}, ${donor.home_address.city} | ${donor.phone} | ${donor.donorType})`,
                 value: donor._id,
             }));
             setDonorItems(items);
