@@ -10,6 +10,7 @@ const {
     testDonors,
     predictEligibility,
     getDonationStats,
+    getDonorsPerMonth,
 } = require('../controllers/donorController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -25,8 +26,8 @@ router.route('/donor/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getDonorDetails)
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateDonor)
     .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), deleteDonor);
-router.route('/milkPerMonth')
-    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), getDonationStats)
+router.route('/milkPerMonth').get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), getDonationStats)
+router.route('/donorsPerMonth').get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), getDonorsPerMonth)
 
 
 module.exports = router;

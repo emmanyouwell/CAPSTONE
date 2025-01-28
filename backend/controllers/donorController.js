@@ -2,6 +2,7 @@ const Donor = require('../models/donor')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const axios = require('axios');
+
 // Get All Donors => /api/v1/donors
 exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     // Destructure search query parameters from the request
@@ -314,45 +315,37 @@ exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
 
         const stats = {};
 
-        // Loop through each donor
         donors.forEach(donor => {
             const isCommunity = donor.donorType === 'Community';
             const isPrivate = ['Private', 'Employee', 'Network Office/Agency'].includes(donor.donorType);
 
-            // Skip if not Community or Private donor
             if (!isCommunity && !isPrivate) return;
 
             donor.donation.forEach(donation => {
                 const unpasteurizedDetails = donation.invId?.unpasteurizedDetails;
 
                 if (unpasteurizedDetails) {
-                    // Get month from collectionDate
                     const month = new Date(unpasteurizedDetails.collectionDate).toLocaleString('default', {
                         month: 'long',
                     });
 
-                    // Multiply volume and quantity
                     const totalVolume = unpasteurizedDetails.volume * unpasteurizedDetails.quantity;
 
-                    // Initialize month in stats if not already
                     if (!stats[month]) {
                         stats[month] = { community: 0, private: 0, total: 0 };
                     }
 
-                    // Add the volume to the correct donor type
                     if (isCommunity) {
                         stats[month].community += totalVolume;
                     } else if (isPrivate) {
                         stats[month].private += totalVolume;
                     }
 
-                    // Add to the monthly total
                     stats[month].total += totalVolume;
                 }
             });
         });
 
-        // Calculate yearly totals
         const yearlyTotals = { community: 0, private: 0, total: 0 };
         Object.values(stats).forEach(monthStats => {
             yearlyTotals.community += monthStats.community;
@@ -360,11 +353,9 @@ exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
             yearlyTotals.total += monthStats.total;
         });
 
-        // Add yearly total row
         stats['total'] = yearlyTotals;
 
-        // Respond with stats
-         res.status(200).json({
+        res.status(200).json({
             success: true,
             stats
         })
@@ -372,3 +363,53 @@ exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+exports.getDonorsPerMonth = catchAsyncErrors(async (req, res, next) => {
+    try {
+
+        const donors = await Donor.find();
+        const monthlyData = {};
+
+        donors.forEach((donor) => {
+            const isCommunity = donor.donorType === 'Community';
+            const isPrivate = ['Private', 'Employee', 'Network Office/Agency'].includes(donor.donorType);
+
+            if (!isCommunity && !isPrivate) return;
+
+            const month = new Date(donor.createdAt).toLocaleString('default', {
+                month: 'long',
+            });
+
+            if (!monthlyData[month]) {
+                monthlyData[month] = { community: 0, private: 0, total: 0 };
+            }
+
+            if (isCommunity) {
+                monthlyData[month].community++;
+            } else if (isPrivate) {
+                monthlyData[month].private++;
+            }
+
+            monthlyData[month].total++;
+        });
+
+        const yearlyTotals = { community: 0, private: 0, total: 0 };
+        Object.values(monthlyData).forEach(monthStats => {
+            yearlyTotals.community += monthStats.community;
+            yearlyTotals.private += monthStats.private;
+            yearlyTotals.total += monthStats.total;
+        });
+
+        monthlyData['total'] = yearlyTotals;
+
+        const result = monthlyData
+
+       res.status(200).json({
+            success: true,
+            result
+        })
+    } catch (error) {
+        console.error('Error fetching donor counts:', error);
+        res.status(500).json({ message: 'Server error, please try again later.' });
+    }
+})
