@@ -4,7 +4,7 @@ import { View } from 'react-native'
 import { SuperAdmin, cardStyle, colors } from '../../../styles/Styles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 const Cards = ({ title, subtitle, icon }) => {
-    const RightContent = props => <Avatar.Icon {...props} icon={icon} color="#fff" size={30} style={{ backgroundColor: colors.color1_light }} />
+    const RightContent = props => <Avatar.Icon {...props} icon={icon} color="#fff" size={40} style={{ backgroundColor: colors.color1_light }} />
     return (
         <Card style={cardStyle.card}>
 
