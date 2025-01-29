@@ -156,7 +156,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
                     return match ? match.text : null;
                 }).filter(item => item !== null);
                 console.log("result: ", result);
-                data[field.label] = result;
+                data[field.label] = result[0];
             }
             else {
                 data[field.label] = field.value;
