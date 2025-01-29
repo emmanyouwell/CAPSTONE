@@ -135,7 +135,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
         let data = {};
         console.log("fields: ", fields);
         fields.forEach(field => {
-            if (field.type === "MULTIPLE_CHOICE") {
+            if (field.type === "MULTIPLE_CHOICE" && field.value !== null) {
                 const result = field.value.map(selected => {
                     const match = field.options.find(option => option.id === selected);
                     return match ? match.text : null;
