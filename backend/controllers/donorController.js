@@ -6,7 +6,7 @@ const axios = require('axios');
 // Get All Donors => /api/v1/donors
 exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     // Destructure search query parameters from the request
-    const { search } = req.query;
+    const { search, brgy, type } = req.query;
 
     // Create a query object to hold the search criteria
     const query = {};
@@ -18,6 +18,12 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
             { 'name.last': { $regex: search, $options: 'i' } }    // Search in last name
         ];
     }
+    if (brgy) {
+        query['home_address.brgy'] = brgy;
+    }
+    if (type) {
+        query['donorType'] = type;
+    }
 
     // Optional: Add pagination (e.g., limit results and skip for page number)
     const page = Number(req.query.page) || 1;
@@ -28,7 +34,7 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
         // Find donors based on the query object
         const donors = await Donor.find(query)
             .populate('donation.invId', 'unpasteurizedDetails')
-            .sort({'name.last': 1})
+            .sort({ 'name.first': 1 })
             .skip(skip)
             .limit(pageSize);
 
@@ -59,7 +65,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                     const match = field.options.find(option => option.id === selected);
                     return match ? match.text : null;
                 }).filter(item => item !== null);
-                data[field.label] = {label: field.label, value: result};
+                data[field.label] = { label: field.label, value: result };
             }
             else if (field.type === "CHECKBOXES" && field.key === "question_rBK1gL") {
                 const result = field.value.map(selected => {
@@ -67,10 +73,10 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                     return match ? match.text : null;
                 }).filter(item => item !== null);
                 console.log("result: ", result);
-                data[field.label] = {label: field.label, value: result};
+                data[field.label] = { label: field.label, value: result };
             }
             else {
-                data[field.label] = {label: field.label, value: field.value};
+                data[field.label] = { label: field.label, value: field.value };
             }
 
         })
@@ -91,13 +97,13 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
         const values = [relevantQuestions.map((key) => {
             // Find the question in the response object that matches the label
             for (const question in data) {
-              if (data[question].label === key) {
-                return data[question].value.includes("Yes") || data[question].value.includes("None of the above") ? 1 : 0;
-              }
+                if (data[question].label === key) {
+                    return data[question].value.includes("Yes") || data[question].value.includes("None of the above") ? 1 : 0;
+                }
             }
             return null; // Default if not found
-          })];
-        
+        })];
+
         console.log("values: ", values);
         const json = {
             data: values
@@ -105,12 +111,12 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
         const config = {
             headers: {
                 'Content-Type': 'application/json',
-                
+
             },
-            
+
         };
         const prediction = await axios.post("https://python-server-production-a72b.up.railway.app/predict/", json, config);
-        
+
         if (!prediction) {
             return res.status(500).json({
                 success: false,
@@ -150,7 +156,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
                 console.log("result: ", result);
                 data[field.label] = result;
             }
-            else if (field.type === "DROPDOWN"){
+            else if (field.type === "DROPDOWN") {
                 const result = field.value.map(selected => {
                     const match = field.options.find(option => option.id === selected);
                     return match ? match.text : null;
@@ -180,7 +186,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
         // Create donor in the database
         const donor = await Donor.create({
             name: name,
-            home_address:{
+            home_address: {
                 street: data.Street,
                 brgy: data.brgy,
                 city: 'Taguig City'
@@ -277,7 +283,19 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
 
 // Get specific donor details => /api/v1/donor/:id
 exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
-    const donor = await Donor.findById(req.params.id);
+    const donor = await Donor.findById(req.params.id)
+        .populate('donation.invId', 'unpasteurizedDetails')
+        .lean(); // Use lean() for performance if no further Mongoose methods are needed
+
+    // Ensure that donor data is valid
+    if (donor && donor.donation) {
+        // Sort donations by collectionDate in descending order (latest first)
+        donor.donation.sort((a, b) => {
+            const dateA = new Date(a.invId.unpasteurizedDetails.collectionDate);
+            const dateB = new Date(b.invId.unpasteurizedDetails.collectionDate);
+            return dateB - dateA; // Latest dates first (descending order)
+        });
+    }
 
     if (!donor) {
         return next(new ErrorHandler(`donor is not found with this id: ${req.params.id}`))
@@ -417,7 +435,7 @@ exports.getDonorsPerMonth = catchAsyncErrors(async (req, res, next) => {
 
         const result = monthlyData
 
-       res.status(200).json({
+        res.status(200).json({
             success: true,
             result
         })
