@@ -21,13 +21,14 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
 
     // Optional: Add pagination (e.g., limit results and skip for page number)
     const page = Number(req.query.page) || 1;
-    const pageSize = Number(req.query.pageSize) || 10; // Adjust page size as needed
+    const pageSize = Number(req.query.pageSize) || 12; // Adjust page size as needed
     const skip = (page - 1) * pageSize;
 
     try {
         // Find donors based on the query object
         const donors = await Donor.find(query)
             .populate('donation.invId', 'unpasteurizedDetails')
+            .sort({'name.last': 1})
             .skip(skip)
             .limit(pageSize);
 
@@ -134,7 +135,7 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
         let data = {};
         console.log("fields: ", fields);
         fields.forEach(field => {
-            if (field.type === "MULTIPLE_CHOICE") {
+            if (field.type === "MULTIPLE_CHOICE" && field.value !== null) {
                 const result = field.value.map(selected => {
                     const match = field.options.find(option => option.id === selected);
                     return match ? match.text : null;
@@ -148,6 +149,14 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
                 }).filter(item => item !== null);
                 console.log("result: ", result);
                 data[field.label] = result;
+            }
+            else if (field.type === "DROPDOWN"){
+                const result = field.value.map(selected => {
+                    const match = field.options.find(option => option.id === selected);
+                    return match ? match.text : null;
+                }).filter(item => item !== null);
+                console.log("result: ", result);
+                data[field.label] = result[0];
             }
             else {
                 data[field.label] = field.value;
@@ -171,7 +180,11 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
         // Create donor in the database
         const donor = await Donor.create({
             name: name,
-            home_address: data.home_address,
+            home_address:{
+                street: data.Street,
+                brgy: data.brgy,
+                city: 'Taguig City'
+            },
             phone: data.contact_number,
             age: data.age,
             birthday: data.birthday,
