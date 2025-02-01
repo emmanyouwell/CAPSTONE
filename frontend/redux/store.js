@@ -9,6 +9,7 @@ import fridgeReducer from './slices/fridgeSlice'
 import requestReducer from './slices/requestSlice'
 import equipmentReducer from './slices/equipmentSlice'
 import articleReducer from './slices/articleSlice'
+import notifReducer from './slices/notifSlice'
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
@@ -20,7 +21,8 @@ export const store = configureStore({
     fridges: fridgeReducer,
     requests: requestReducer,
     equipments: equipmentReducer,
-    articles: articleReducer
+    articles: articleReducer,
+    devices: notifReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
