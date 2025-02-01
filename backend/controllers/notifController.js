@@ -2,18 +2,15 @@ const Notification = require('../models/notification');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
-// Save Expo Push Token
-// exports.saveToken = async (req, res) => {
-//     try {
-//         const { token, user } = req.body;
-//         if (!token) return res.status(400).json({ error: 'Token is required' });
+exports.notifyUsers = catchAsyncErrors(async (req, res, next) => {
+    const userNotifs = await Notification.find()
+        .populate('user', 'role')
 
-//         await Notification.findOneAndUpdate({ token }, { token }, { upsert: true });
-//         res.json({ success: true, message: 'Token saved successfully!' });
-//     } catch (error) {
-//         res.status(500).json({ error: 'Server error' });
-//     }
-// };
+    res.status(200).json({
+        success: true,
+        userNotifs
+    })
+})
 
 exports.saveToken = catchAsyncErrors(async (req, res, next) => {
 console.log(req.body)
