@@ -22,7 +22,6 @@ import RecipientRecords from "./screens/Superadmin/RecipientRecords";
 import Schedule from "./screens/Superadmin/Schedule";
 import Metrics from "./screens/Superadmin/Metrics";
 
-import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "./utils/helper";
 import AccountManagement from "./screens/Superadmin/AccountManagement";
 import CreateAdmin from "./components/Superadmin/Accounts/CreateAdmin";
@@ -58,11 +57,12 @@ import EditRequest from "./components/Superadmin/Requests/EditRequest";
 import MilkPerMonth from "./components/Superadmin/Metrics/MilkPerMonth";
 import DonorsPerMonth from "./components/Superadmin/Metrics/DonorsPerMonth";
 
+import TestNotif from "./components/Superadmin/Metrics/TestNotif";
+
 const CustomDrawerContent = (props) => {
 
   const [userDetails, setUserDetails] = useState(null);
   useEffect(() => {
-    // Handle async operation with startTransition
     startTransition(() => {
       const fetchUserDetails = async () => {
         const user = await getUser();
@@ -209,6 +209,7 @@ const MainStack = () => {
       {/* {Charts Navigation} */}
         <Stack.Screen name="MilkPerMonth" component={MilkPerMonth}/>
         <Stack.Screen name="DonorsPerMonth" component={DonorsPerMonth}/>
+        <Stack.Screen name="TestNotif" component={TestNotif}/>
 
       </Stack.Group>
     </Stack.Navigator>
@@ -221,17 +222,16 @@ const Main = () => {
         <Drawer.Navigator
           initialRouteName="Home"
           drawerContent={(props) => <CustomDrawerContent {...props} />}
-          screenOptions={{
-            headerShown: false,
-          }}
+          screenOptions={{ headerShown: false }}
         >
           <Drawer.Screen name="Home" component={MainStack} options={{ swipeEnabled: false }} />
           <Drawer.Screen name="Dashboard" component={Dashboard} />
-
         </Drawer.Navigator>
       </SafeAreaView>
     </NavigationContainer>
   );
-}
+};
+
+
 
 export default Main

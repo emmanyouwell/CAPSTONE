@@ -87,7 +87,7 @@ export const getMilkPerMonth = createAsyncThunk(
         
         try {
             const response = await axios.get(`${REACT_APP_API_URL}/api/v1/milkPerMonth`, config)
-            
+            console.log("Response: ", response.data)
             return response.data;
 
         } catch (error) {
