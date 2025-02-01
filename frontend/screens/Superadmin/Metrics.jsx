@@ -5,23 +5,24 @@ import { SuperAdmin, metricsStyle, colors } from '../../styles/Styles'
 import Cards from '../../components/Superadmin/Metrics/Cards';
 import { logoutUser } from '../../redux/actions/userActions';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMilkPerMonth } from '../../redux/actions/donorActions';
+import { getMilkPerMonth, getDonorsPerMonth } from '../../redux/actions/donorActions';
 
 const Metrics = ({navigation}) => {
     const dispatch = useDispatch();
     const [refreshing, setRefreshing] = useState(false);
 
-    const { stats, loading, error } = useSelector((state) => state.donors);
+    const { stats, loading, error, monthlyDonors } = useSelector((state) => state.donors);
     
     useEffect(() => {
-            dispatch(getMilkPerMonth());
+        dispatch(getMilkPerMonth());
+        dispatch(getDonorsPerMonth())
     }, [dispatch]);
     
     const cardData = [
-        { id: '1', title: 'Revenue', subtitle: '100k', icon: 'cash-multiple', route: 'superadmin_donor_record' },
-        { id: '2', title: 'Collected Milk', subtitle: `${stats.total?.total / 1000} L`, icon: 'baby-bottle', route: 'MilkPerMonth' },
-        { id: '3', title: 'Recipient', subtitle: '7.4k', icon: 'account-heart', route: 'superadmin_donor_record' },
-        { id: '4', title: 'Stored Milk', subtitle: '100', icon: 'baby-bottle', route: 'superadmin_donor_record' },
+        { id: '1', title: 'Total Donors', subtitle: `${monthlyDonors.total?.total}`, icon: 'account-group', route: 'DonorsPerMonth' },
+        { id: '2', title: 'Total Milk Collected', subtitle: `${stats.total?.total / 1000} L`, icon: 'baby-bottle', route: 'MilkPerMonth' },
+        { id: '3', title: 'Total Recipient', subtitle: `7.4k`, icon: 'account-heart', route: 'superadmin_donor_record' },
+        { id: '4', title: 'Total Milk Released', subtitle: `100 L`, icon: 'baby-bottle', route: 'superadmin_donor_record' },
     ];
     const handleMenuClick = () => {
         navigation.openDrawer();

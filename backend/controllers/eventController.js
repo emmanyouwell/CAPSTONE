@@ -22,8 +22,11 @@ exports.createEvent= catchAsyncErrors( async (req, res, next) => {
 
     // const eventDetails = new Date(`${eventDate}T${eventTime}:00Z`)
     console.log('request: ', req.body);
-    const eventDetails = req.body.eventDetails;
-    const eventStatus = req.body.eventStatus.trim();
+    const eventDetails = {
+        start: req.body.start,
+        end: req.body.end
+    }
+    const eventStatus = req.body.status.trim();
 
     const event = await Event.create({
         title: req.body.title,

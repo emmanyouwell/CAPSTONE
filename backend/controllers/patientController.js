@@ -5,29 +5,33 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 // Get All Patients => /api/v1/patients
 exports.allPatients = catchAsyncErrors(async (req, res, next) => {
     // Destructure search query parameters from the request
-    const { search } = req.query;
+    const { search, type } = req.query;
 
     // Create a query object to hold the search criteria
     const query = {};
 
     if (search) {
         query.$or = [
-            { 'name': { $regex: search, $options: 'i' } },  // Search in first name
-            { 'patientType': { $regex: search, $options: 'i' } }, // Search in middle name
-            { 'hospital': { $regex: search, $options: 'i' } },    // Search in last name
-            { 'milkRequested': { $regex: search, $options: 'i' } }    // Search in last name
+            { 'name': { $regex: search, $options: 'i' } },  
+            { 'patientType': { $regex: search, $options: 'i' } }, 
+            { 'hospital': { $regex: search, $options: 'i' } },    
+            { 'milkRequested': { $regex: search, $options: 'i' } }
         ];
+    }
+    if (type){
+        query.patientType = type;
     }
 
     // Optional: Add pagination (e.g., limit results and skip for page number)
     const page = Number(req.query.page) || 1;
-    const pageSize = 10; // Adjust page size as needed
+    const pageSize = 12; // Adjust page size as needed
     const skip = (page - 1) * pageSize;
 
     try {
         // Find donors based on the query object
         const patients = await Patient.find(query)
             .populate('requested.reqId', 'date volume')
+            .sort({name: 1})
             .skip(skip)
             .limit(pageSize);
 
@@ -62,7 +66,8 @@ console.log(req.body)
 
 // Get specific Patient details => /api/v1/patient/:id
 exports.getPatientDetails = catchAsyncErrors(async (req, res, next) => {
-    const patient = await Patient.findById(req.params.id);
+    const patient = await Patient.findById(req.params.id)
+    .populate([{path:'requested.reqId'}, {path:'staff', select: 'name'}]);
 
     if (!patient) {
         return next(new ErrorHandler(`Patient is not found with this id: ${req.params.id}`))
