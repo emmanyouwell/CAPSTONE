@@ -6,9 +6,19 @@ const patientSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please enter name of the patient']
     },
-    address: {
-        type: String,
-        required: [true, 'Please enter address of the patient']
+    home_address: {
+        street: {
+            type: String,
+            required: [true, 'Enter Street']
+        },
+        brgy: {
+            type: String,
+            required: [true, 'Enter Baranggay']
+        },
+        city: {
+            type: String,
+            required: [true, 'Enter City']
+        }
     },
     phone: {
         type: String,
