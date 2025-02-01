@@ -36,6 +36,7 @@ const inventory = require('./routes/inventory');
 const request = require('./routes/request');
 const equipment = require('./routes/equipment');
 const article = require('./routes/article')
+const notification = require('./routes/notification');
 
 // API routes
 app.use('/api/v1', user);
@@ -47,6 +48,7 @@ app.use('/api/v1', inventory);
 app.use('/api/v1', request);
 app.use('/api/v1', equipment);
 app.use('/api/v1', article);
+app.use('/api/v1', notification);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
