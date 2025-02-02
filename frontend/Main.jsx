@@ -58,6 +58,8 @@ import MilkPerMonth from "./components/Superadmin/Metrics/MilkPerMonth";
 import DonorsPerMonth from "./components/Superadmin/Metrics/DonorsPerMonth";
 
 import TestNotif from "./components/Superadmin/Metrics/TestNotif";
+import EditEvent from "./components/Superadmin/Schedule/EditEvent";
+import AddEvent from "./components/Superadmin/Schedule/AddEvent";
 
 const CustomDrawerContent = (props) => {
 
@@ -175,6 +177,10 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_account_create_admin" component={CreateAdmin}/>
         <Stack.Screen name="superadmin_account_create_staff" component={CreateStaff}/>
         
+        {/* Schedule */}
+        <Stack.Screen name="editEvents" component={EditEvent}/>
+        <Stack.Screen name="addEvents" component={AddEvent}/>
+
         {/* Articles */}
         <Stack.Screen name="superadmin_articles"
         component={Articles}/>
