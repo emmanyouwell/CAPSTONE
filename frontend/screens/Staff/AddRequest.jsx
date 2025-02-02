@@ -135,7 +135,7 @@ const AddRequest = ({ navigation, route }) => {
                     
                     if (devices) {
                         for (const device of devices) {
-                            if (device.token && device.user.role === 'Admin' || device.user.role === 'SuperAdmin'){
+                            if (device.token && device.user.role === 'Admin'){
                                 const notifData = {
                                     token: device.token,
                                     title: "New Request for Milk",
