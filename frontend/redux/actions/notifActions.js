@@ -25,8 +25,6 @@ export const getDevices = createAsyncThunk(
             let urlString = `${REACT_APP_API_URL}/api/v1/notifications`
 
             const response = await axios.get(urlString, config);
-            console.log("Response", response.data)
-            console.log("URL: ", urlString)
 
             return response.data;
 
