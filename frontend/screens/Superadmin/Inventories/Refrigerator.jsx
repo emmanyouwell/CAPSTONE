@@ -125,12 +125,11 @@ const Refrigerator = ({ route }) => {
                     </View>
                     <View style={styles.section}>
                         <Text style={styles.requestTitleText}>Request to be completed...</Text>
-                        <Text style={styles.requestText}>Requested id: {request._id}</Text>
                         <Text style={styles.requestText}>Requested Date: {formatDate(request.date)}</Text>
                         <Text style={styles.requestText}>Patient Name: {request.patient.name}</Text>
                         <Text style={styles.requestText}>Reason: {request.reason}</Text>
                         <Text style={styles.requestText}>Diagnosis: {request.diagnosis}</Text>
-                        <Text style={styles.requestText}>Required Volume: {request.volume}</Text>
+                        <Text style={styles.requestText}>Required Volume: {request.volume} mL/day</Text>
                     </View>
                 </>
             ) : (

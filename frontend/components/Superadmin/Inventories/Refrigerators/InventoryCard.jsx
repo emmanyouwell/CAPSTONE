@@ -84,8 +84,8 @@ const Inventory = ({ route }) => {
                             <Text>Batch: {details.batch}</Text>
                             <Text>Pool: {details.pool}</Text>
                             {temp !== 0 ? (
-                                <Text>Remaining Volume: {temp}</Text>
-                            ) : ( <Text>Volume: {details.volume}</Text> )}
+                                <Text>Remaining Volume: {temp} mL</Text>
+                            ) : ( <Text>Volume: {details.volume} mL</Text> )}
                             <Text>Expiration: {formatDate(details.expiration)}</Text>
                         </>
                     ) : (
@@ -93,7 +93,7 @@ const Inventory = ({ route }) => {
                             <Text>Donor: {details.donor?.name?.last || 'Unknown'}</Text>
                             <Text>Express Date: {formatDate(details.expressDate)}</Text>
                             <Text>Collection Date: {formatDate(details.collectionDate)}</Text>
-                            <Text>Volume: {details.volume * quantity}</Text>
+                            <Text>Volume: {details.volume * quantity} mL</Text>
                         </>
                     )
                 ) : (
