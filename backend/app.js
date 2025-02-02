@@ -5,6 +5,7 @@ const app = express();
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
+const checkExpiringMilk = require('./notifications/expirationChecker')
 
 const errorMiddleware = require('./middlewares/errors');
 
@@ -52,5 +53,7 @@ app.use('/api/v1', notification);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
+
+checkExpiringMilk();
 
 module.exports = app;

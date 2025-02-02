@@ -23,7 +23,7 @@ app.get("/ping", (req, res) => {
 
 
 const SERVER_URL = "https://capstone-vpm5.onrender.com";
-const pingSelf = async () => {
+const pingSelf = async () => {``
     try {
         const response = await axios.get(`${SERVER_URL}/ping`);
         console.log(`🔄 Pinging server: ${response.status} ${response.statusText}`);
