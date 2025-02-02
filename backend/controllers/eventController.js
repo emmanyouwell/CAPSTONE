@@ -17,15 +17,13 @@ exports.allEvents = catchAsyncErrors( async (req, res, next) => {
 
 // Create Event => /api/v1/events
 exports.createEvent= catchAsyncErrors( async (req, res, next) => {
-    // const eventDate = req.body.eventDetails.date;
-    // const eventTime = req.body.eventDetails.time;
-
-    // const eventDetails = new Date(`${eventDate}T${eventTime}:00Z`)
+ 
     console.log('request: ', req.body);
+    console.log("start: ", req.body.start);
     const eventDetails = {
-        start: req.body.start,
-        end: req.body.end
-    }
+        start: new Date(req.body.start),  // This stores in UTC
+        end: new Date(req.body.end)       // This stores in UTC
+    };
     const eventStatus = req.body.status.trim();
 
     const event = await Event.create({
@@ -58,12 +56,12 @@ exports.getEventDetails = catchAsyncErrors( async (req, res, next) => {
 
 // Update event => /api/v1/event/:id
 exports.updateEvent = catchAsyncErrors( async (req, res, next) => {
-    // const eventDate = req.body.eventDetails.date;
-    // const eventTime = req.body.eventDetails.time;
-
-    // const eventDetails = new Date(`${eventDate}T${eventTime}:00Z`)
-    const eventDetails = req.body.eventDetails;
-    const eventStatus = req.body.eventStatus.trim();
+    const eventDetails = {
+        start: req.body.start,
+        end: req.body.end
+    }
+    
+    const eventStatus = req.body.status.trim();
     
     const newEventData = {
         title: req.body.title,
