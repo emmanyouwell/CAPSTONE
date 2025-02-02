@@ -9,6 +9,7 @@ export const eventSlice = createSlice({
     eventDetails: {},
     isUpdated: false,
     isDeleted: false,
+    success: false,
   },
   reducers: {
     resetUpdate: (state) => {
@@ -16,6 +17,9 @@ export const eventSlice = createSlice({
     },
     resetDelete: (state) => {
       state.isDeleted = false;
+    },
+    resetSuccess: (state) => {
+      state.success = false;
     }
   },
   extraReducers: (builder) => {
@@ -78,5 +82,5 @@ export const eventSlice = createSlice({
       });
   }
 });
-export const {resetUpdate, resetDelete} = eventSlice.actions;
+export const {resetUpdate, resetDelete, resetSuccess} = eventSlice.actions;
 export default eventSlice.reducer;
