@@ -21,7 +21,7 @@ const Metrics = ({navigation}) => {
     const cardData = [
         { id: '1', title: 'Total Donors', subtitle: `${monthlyDonors.total?.total}`, icon: 'account-group', route: 'DonorsPerMonth' },
         { id: '2', title: 'Total Milk Collected', subtitle: `${stats.total?.total / 1000} L`, icon: 'baby-bottle', route: 'MilkPerMonth' },
-        { id: '3', title: 'Total Recipient', subtitle: `7.4k`, icon: 'account-heart', route: 'TestNotif' },
+        // { id: '3', title: 'Total Recipient', subtitle: `7.4k`, icon: 'account-heart', route: 'TestNotif' },
         // { id: '4', title: 'Total Milk Released', subtitle: `100 L`, icon: 'baby-bottle', route: 'superadmin_donor_record' },
     ];
     const handleMenuClick = () => {
