@@ -13,7 +13,7 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 // Super Admin Routes
 router.route('/inventories')
-    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allInventories)
+    .get(isAuthenticatedUser, allInventories)
     .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), createInventory);
 router.route('/inventory/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getInventoryDetails)
