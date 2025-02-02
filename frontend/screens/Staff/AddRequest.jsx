@@ -135,11 +135,11 @@ const AddRequest = ({ navigation, route }) => {
                     
                     if (devices) {
                         for (const device of devices) {
-                            if (device.token && device.user.role === 'Admin'){
+                            if (device.token && device.user.role === 'Admin' || device.user.role === 'SuperAdmin'){
                                 const notifData = {
                                     token: device.token,
                                     title: "New Request for Milk",
-                                    body: `A nurse issued a new request for milk with the volume of ${res.payload.request.volume}. Open TCHMB Portal App to see more details`
+                                    body: `A nurse issued a new request for milk with the volume of ${res.payload.request.volume} mL. Open TCHMB Portal App to see more details`
                                 };
                                 dispatch(sendNotification(notifData))
                                     .then((response) => {console.log("Notification Status: ", response.payload.data.status)})

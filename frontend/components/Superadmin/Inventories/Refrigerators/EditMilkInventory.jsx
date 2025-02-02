@@ -226,7 +226,7 @@ const EditMilkInventory = ({ route, navigation }) => {
                             }
                         />
                     )}
-                    <Text style={styles.sectionTitle}>Volume</Text>
+                    <Text style={styles.sectionTitle}>Volume (mL)</Text>
                     <TextInput
                         style={styles.input}
                         placeholder="Volume"

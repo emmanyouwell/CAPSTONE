@@ -47,7 +47,7 @@ const MilkRequest = ({ route, navigation }) => {
                 onPress={() =>
                     Alert.alert(
                         "Complete Request",
-                        `Do you want to complete Request ${req._id}?`,
+                        `Do you want to complete Request?`,
                         [
                             { text: "Yes", onPress: () => handleUpdate(req) },
                             { text: "Cancel", style: "cancel" },

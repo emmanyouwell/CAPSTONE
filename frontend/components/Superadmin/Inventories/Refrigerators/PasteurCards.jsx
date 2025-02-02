@@ -134,8 +134,8 @@ const Inventory = ({ route }) => {
                             <Text>Batch: {details.batch}</Text>
                             <Text>Pool: {details.pool}</Text>
                             {temp !== 0 ? (
-                                <Text>Remaining Volume: {temp}</Text>
-                            ) : ( <Text>Volume: {details.volume}</Text> )}
+                                <Text>Remaining Volume: {temp} mL</Text>
+                            ) : ( <Text>Volume: {details.volume} mL</Text> )}
                             <Text>Expiration: {formatDate(details.expiration)}</Text>
                         </>
                     ) : (
@@ -208,8 +208,8 @@ const Inventory = ({ route }) => {
                 {request && (
                     <View style={styles.section}>
                         <Text style={styles.requestTitleText}>Select Milk for Request</Text>
-                        <Text style={styles.requestText}>Requested Volume: {request.volume}</Text>
-                        <Text style={styles.requestText}>Selected Volume: {selectedVolume}</Text>
+                        <Text style={styles.requestText}>Requested Volume: {request.volume} mL</Text>
+                        <Text style={styles.requestText}>Selected Volume: {selectedVolume} mL</Text>
                     </View>
                 )}
                 {selectionMode && (

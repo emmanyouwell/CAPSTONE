@@ -122,7 +122,7 @@ const ConfirmRequest = ({ route, navigation }) => {
                     <Text>Requested Date: {formatDate(request.date)}</Text>
                     <Text>Staff Name: {request.staffId.name}</Text>
                     <Text>Staff Email: {request.staffId.email}</Text>
-                    <Text style={styles.totalVolume}>Requested Volume: {request.volume}</Text>
+                    <Text style={styles.totalVolume}>Requested Volume: {request.volume} mL</Text>
                 </View>
 
                 {/* Inventory Details */}
