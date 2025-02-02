@@ -7,6 +7,7 @@ import {
     TouchableOpacity,
     Alert,
     FlatList,
+    ScrollView,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,12 +24,17 @@ const AddPatient = ({ navigation }) => {
 
     const [formData, setFormData] = useState({
         name: '',
-        address: '',
+        home_address: {
+            street: '',
+            brgy: '',
+            city: ''
+        },
         phone: '',
         motherName: '',
         patientType: 'Inpatient',
         hospital: 'Taguig-Pateros District Hospital',
     });
+    console.log("home_address: ", JSON.stringify(formData.home_address))
 
     useEffect(() => {
         startTransition(() => {
@@ -53,13 +59,26 @@ const AddPatient = ({ navigation }) => {
     };
 
     const handleChange = (key, value) => {
-        setFormData({ ...formData, [key]: value });
+        if (["street", "brgy", "city"].includes(key)) {
+            setFormData((prevState) => ({
+                ...prevState,
+                home_address: {
+                    ...prevState.home_address,
+                    [key]: value,
+                },
+            }));
+        } else {
+            setFormData((prevState) => ({
+                ...prevState,
+                [key]: value,
+            }));
+        }
     };
 
     const handleSubmit = () => {
-        const { name, address, phone, hospital, patientType, motherName } = formData;
+        const { name, home_address, phone, hospital, patientType, motherName } = formData;
 
-        if (!name || !address || !phone || !hospital || !patientType || !motherName) {
+        if (!name || !home_address || !phone || !hospital || !patientType || !motherName) {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
         }
@@ -102,36 +121,60 @@ const AddPatient = ({ navigation }) => {
             <FlatList
                 data={[{ key: 'form' }]}
                 renderItem={() => (
-                    <View style={styles.form}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Name of the patient"
-                            value={formData.name}
-                            onChangeText={(text) => handleChange('name', text)}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Mother's Name"
-                            value={formData.motherName}
-                            onChangeText={(text) => handleChange('motherName', text)}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Address"
-                            value={formData.address}
-                            onChangeText={(text) => handleChange('address', text)}
-                        />
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Phone"
-                            keyboardType="phone-pad"
-                            value={formData.phone}
-                            onChangeText={(text) => handleChange('phone', text)}
-                        />
+                    <ScrollView style={styles.form}>
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Patient Name</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Name of the patient"
+                                value={formData.name}
+                                onChangeText={(text) => handleChange('name', text)}
+                            />
+                        </View>
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Mother's Name</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Mother's Name"
+                                value={formData.motherName}
+                                onChangeText={(text) => handleChange('motherName', text)}
+                            />
+                        </View>
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Address</Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Street"
+                                value={formData.home_address.street}
+                                onChangeText={(text) => handleChange('street', text)}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Baranggay"
+                                value={formData.home_address.brgy}
+                                onChangeText={(text) => handleChange('brgy', text)}
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="City"
+                                value={formData.home_address.city}
+                                onChangeText={(text) => handleChange('city', text)}
+                            />
+                        </View>
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Phone</Text>
+                                <TextInput
+                                style={styles.input}
+                                placeholder="Phone"
+                                keyboardType="phone-pad"
+                                value={formData.phone}
+                                onChangeText={(text) => handleChange('phone', text)}
+                            />
+                        </View>
                         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                             <Text style={styles.submitButtonText}>Add Patient</Text>
                         </TouchableOpacity>
-                    </View>
+                    </ScrollView>
                 )}
                 keyExtractor={(item) => item.key}
             />
@@ -177,6 +220,19 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    section: {
+        marginBottom: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        backgroundColor: '#f9f9f9',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 8,
     },
 });
 

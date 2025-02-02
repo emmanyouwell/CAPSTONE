@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addDevice, getDevices } from '../actions/notifActions';
+import { addDevice, getDevices, sendNotification } from '../actions/notifActions';
 
 export const notifSlice = createSlice({
   name: 'notifications',
   initialState: {
     devices: [],
     loading: false, 
-    error: null, 
+    error: null,
+    status: "not ok" 
   },
   reducers: {
   },
@@ -33,6 +34,18 @@ export const notifSlice = createSlice({
         state.success = action.payload.success;
       })
       .addCase(addDevice.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(sendNotification.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(sendNotification.fulfilled, (state, action) => {
+        state.loading = false;
+        state.status = action.payload.data.status;
+      })
+      .addCase(sendNotification.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
