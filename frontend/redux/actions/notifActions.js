@@ -66,3 +66,34 @@ export const addDevice = createAsyncThunk(
         }
     }
 )
+
+// Send Notification
+export const sendNotification = createAsyncThunk(
+    'notification/sendNotification',
+    async (req, thunkAPI) => {
+        
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+        
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/send-notification`, req, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

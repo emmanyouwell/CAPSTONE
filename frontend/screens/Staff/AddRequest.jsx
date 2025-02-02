@@ -9,13 +9,15 @@ import {
     KeyboardAvoidingView,
     Platform,
     SafeAreaView,
+    ScrollView,
 } from 'react-native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Header from '../../components/Superadmin/Header';
 import { logoutUser } from '../../redux/actions/userActions';
 import { getRecipients, updatePatient } from '../../redux/actions/recipientActions';
 import { addRequest } from '../../redux/actions/requestActions';
+import { getDevices, sendNotification } from '../../redux/actions/notifActions';
 import { SuperAdmin } from '../../styles/Styles';
 import { getUser } from '../../utils/helper';
 import moment from 'moment'; 
@@ -36,13 +38,18 @@ const AddRequest = ({ navigation, route }) => {
     const [open, setOpen] = useState(false);
     const [patientItems, setPatientItems] = useState([]);
     const [patients, setPatients] = useState([]);
+    const { devices } = useSelector((state) => state.devices);
+
+    useEffect(() => {
+        dispatch(getDevices());
+    }, [dispatch]);
 
     useEffect(() => {
         if (!newPatient) {
             dispatch(getRecipients({ search: "", page: 1, pageSize: 100 }))
                 .then((response) => {
                     const patientList = response.payload?.patients?.map((patient) => ({
-                        label: patient.name,
+                        label: `${patient.name} (${patient.home_address.street}, ${patient.home_address.brgy}, ${patient.home_address.city} | ${patient.phone})`,
                         value: patient._id,
                     }));
                     setPatients(response.payload?.patients || []);
@@ -125,6 +132,24 @@ const AddRequest = ({ navigation, route }) => {
                             console.error('Error updating patient:', error);
                             Alert.alert('Error', 'Failed to update patient.');
                         });
+                    
+                    if (devices) {
+                        for (const device of devices) {
+                            if (device.token && device.user.role === 'Admin' || device.user.role === 'SuperAdmin'){
+                                const notifData = {
+                                    token: device.token,
+                                    title: "New Request for Milk",
+                                    body: `A nurse issued a new request for milk with the volume of ${res.payload.request.volume}. Open TCHMB Portal App to see more details`
+                                };
+                                dispatch(sendNotification(notifData))
+                                    .then((response) => {console.log("Notification Status: ", response.payload.data.status)})
+                                    .catch((error) => {
+                                        console.error('Error sending notification:', error);
+                                        Alert.alert('Error', 'Sending Notification');
+                                });
+                            }
+                        }
+                    }
                 } else {
                     Alert.alert('Error', 'Patient not found.');
                 }
@@ -141,63 +166,80 @@ const AddRequest = ({ navigation, route }) => {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
-
-            <Text style={styles.screenTitle}>Request Form</Text>
-
-            <SafeAreaView style={styles.form}>
-                <DropDownPicker
-                    open={open}
-                    value={formData.patient}
-                    items={patientItems}
-                    setOpen={setOpen}
-                    setValue={(callback) => {
-                        const newValue = callback(formData.patient);
-                        handleChange('patient', newValue);
-                    }}
-                    setItems={setPatientItems}
-                    placeholder="Select Patient"
-                    style={styles.dropdown}
-                    dropDownContainerStyle={styles.dropdownContainer}
-                    disabled={!!newPatient}
-                    searchable={true} // Enable the searchable functionality
-                    searchPlaceholder='Search for a patient...'
-                    
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Department"
-                    value={formData.location}
-                    onChangeText={(text) => handleChange('location', text)}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Diagnosis"
-                    value={formData.diagnosis}
-                    onChangeText={(text) => handleChange('diagnosis', text)}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Reason"
-                    value={formData.reason}
-                    onChangeText={(text) => handleChange('reason', text)}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Doctor"
-                    value={formData.doctor}
-                    onChangeText={(text) => handleChange('doctor', text)}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Volume of Milk Requested (mL/day)"
-                    keyboardType="numeric"
-                    value={formData.milkRequested}
-                    onChangeText={(text) => handleChange('milkRequested', text)}
-                />
-                <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                    <Text style={styles.submitButtonText}>Submit Request</Text>
-                </TouchableOpacity>
-            </SafeAreaView>
+            <Text style={styles.screenTitle}>Request Information</Text>
+            <ScrollView>
+                <SafeAreaView style={styles.form} keyboardShouldPersistTaps="handled">
+                    <View style={[styles.section, { zIndex: 100 }]}>
+                        <Text style={styles.sectionTitle}>Patient</Text>
+                        <DropDownPicker
+                            open={open}
+                            value={formData.patient}
+                            items={patientItems}
+                            setOpen={setOpen}
+                            setValue={(callback) => {
+                                const newValue = callback(formData.patient);
+                                handleChange('patient', newValue);
+                            }}
+                            setItems={setPatientItems}
+                            placeholder="Select Patient"
+                            style={styles.dropdown}
+                            dropDownContainerStyle={styles.dropdownContainer}
+                            disabled={!!newPatient}
+                            searchable={true} // Enable the searchable functionality
+                            searchPlaceholder='Search for a patient...'
+                        />
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Department</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Department"
+                            value={formData.location}
+                            onChangeText={(text) => handleChange('location', text)}
+                        />
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Diagnosis</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Diagnosis"
+                            value={formData.diagnosis}
+                            onChangeText={(text) => handleChange('diagnosis', text)}
+                        />
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Reason</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Reason"
+                            value={formData.reason}
+                            onChangeText={(text) => handleChange('reason', text)}
+                        />
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Doctor</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Doctor"
+                            value={formData.doctor}
+                            onChangeText={(text) => handleChange('doctor', text)}
+                        />
+                    </View>
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Requested Milk (mL/day)</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Volume of Milk Requested (mL/day)"
+                            keyboardType="numeric"
+                            value={formData.milkRequested}
+                            onChangeText={(text) => handleChange('milkRequested', text)}
+                        />
+                    </View>
+                    <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+                        <Text style={styles.submitButtonText}>Submit Request</Text>
+                    </TouchableOpacity>
+                </SafeAreaView>
+            </ScrollView>
         </KeyboardAvoidingView>
     );
 };
@@ -212,6 +254,7 @@ const styles = StyleSheet.create({
     form: {
         flex: 1,
         paddingHorizontal: 16,
+        zIndex: 1,
     },
     input: {
         borderWidth: 1,
@@ -225,11 +268,13 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 8,
         marginBottom: 12,
+        zIndex: 100,
     },
     dropdownContainer: {
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 8,
+        zIndex: 200,
     },
     submitButton: {
         backgroundColor: '#007AFF',
@@ -241,6 +286,20 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    section: {
+        marginBottom: 16,
+        padding: 16,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        borderRadius: 8,
+        backgroundColor: '#f9f9f9',
+        zIndex: 1,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 8,
     },
 });
 
