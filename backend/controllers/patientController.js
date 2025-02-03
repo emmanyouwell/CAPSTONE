@@ -5,7 +5,7 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 // Get All Patients => /api/v1/patients
 exports.allPatients = catchAsyncErrors(async (req, res, next) => {
     // Destructure search query parameters from the request
-    const { search, type } = req.query;
+    const { search, type, brgy } = req.query;
 
     // Create a query object to hold the search criteria
     const query = {};
@@ -20,6 +20,9 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
     }
     if (type){
         query.patientType = type;
+    }
+    if (brgy){
+        query['home_address.brgy'] = brgy;
     }
 
     // Optional: Add pagination (e.g., limit results and skip for page number)
