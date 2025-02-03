@@ -19,7 +19,6 @@ exports.allEquipments = catchAsyncErrors( async (req, res, next) => {
 // Create Equipment => /api/v1/Equipments
 exports.createEquipment = catchAsyncErrors(async (req, res, next) => {
     try {
-        console.log(req.body)
         let images = []
         if (typeof req.body.images === 'string') {
             images.push(req.body.images)
@@ -72,7 +71,6 @@ exports.getEquipmentDetails = catchAsyncErrors( async (req, res, next) => {
 
 // Update Equipment => /api/v1/Equipment/:id
 exports.updateEquipment = catchAsyncErrors(async (req, res, next) => {
-    console.log(req.body);
     try {
         let equipment = await Equipment.findById(req.params.id);
         if (!equipment) {

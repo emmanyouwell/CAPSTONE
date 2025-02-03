@@ -70,6 +70,16 @@ const requestSchema = new mongoose.Schema({
             type: Number,
         }
     },
+    images: [
+        {
+            public_id: {
+                type: String,
+            },
+            url: {
+                type: String,
+            },
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now
