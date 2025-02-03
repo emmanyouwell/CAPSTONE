@@ -1,6 +1,7 @@
 const Request = require('../models/request')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
+const cloudinary = require('cloudinary');
 
 // Get All requests => /api/v1/requests
 exports.allRequests = catchAsyncErrors(async (req, res, next) => {
@@ -21,13 +22,39 @@ exports.allRequests = catchAsyncErrors(async (req, res, next) => {
 
 // Create request => /api/v1/requests
 exports.createRequest = catchAsyncErrors(async (req, res, next) => {
+    try {
+        let images = []
+        if (typeof req.body.images === 'string') {
+            images.push(req.body.images)
+        } else {
+            images = req.body.images
+        }
+        
+        let imagesLinks = [];
+        
+        for (let i = 0; i < images.length; i++) {
+            const result = await cloudinary.v2.uploader.upload(images[i], {
+                folder: 'requests'
+            });      
+            imagesLinks.push({
+                public_id: result.public_id,
+                url: result.secure_url
+            });
+        }
+        
+        req.body.images = imagesLinks
 
-    const request = await Request.create(req.body);
+        const request = await Request.create(req.body);
 
-    res.status(201).json({
-        success: true,
-        request
-    });
+        res.status(201).json({
+            success: true,
+            request
+        });
+
+    } catch (error) {
+        console.log('Error: ', error.message);
+        next(error);
+    }
 })
 
 // Get specific request details => /api/v1/request/:id
@@ -48,24 +75,58 @@ exports.getRequestDetails = catchAsyncErrors(async (req, res, next) => {
 
 // Update request => /api/v1/request/:id
 exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
+    try {
+        let request = await Request.findById(req.params.id);
+        if (!request) {
+            return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`));
+        }
 
-    const request = await Request.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false,
-    }).populate('tchmb.approvedBy', 'name email role')
-        .populate('patient', 'name phone patientType')
-        .populate('staffId', 'name email role')
-        .populate('tchmb.ebm.inv', 'pasteurizedDetails');
+        let images = [];
+        if (Array.isArray(req.body.images)) {
+            images = req.body.images.map(image => 
+                typeof image === 'object' && image.url ? image.url : image
+            );
+        } else if (typeof req.body.images === 'string') {
+            images.push(req.body.images);
+        }
 
-    if (!request) {
-        return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`));
+        if (images.length > 0) {
+            for (let i = 0; i < request.images.length; i++) {
+                await cloudinary.v2.uploader.destroy(request.images[i].public_id);
+            }
+            let imagesLinks = [];
+            for (let i = 0; i < images.length; i++) {
+                const result = await cloudinary.v2.uploader.upload(images[i], {
+                    folder: 'requests',
+                });
+        
+                imagesLinks.push({
+                    public_id: result.public_id,
+                    url: result.secure_url,
+                });
+            }
+            req.body.images = imagesLinks;
+        }
+
+        request = await Request.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+            useFindAndModify: false,
+        }).populate('tchmb.approvedBy', 'name email role')
+            .populate('patient', 'name phone patientType')
+            .populate('staffId', 'name email role')
+            .populate('tchmb.ebm.inv', 'pasteurizedDetails');
+
+
+        res.status(200).json({
+            success: true,
+            request,
+        });
+
+    } catch (error) {
+        console.log('Error: ', error.message);
+        next(error);
     }
-
-    res.status(200).json({
-        success: true,
-        request,
-    });
 });
 
 // Delete request => /api/v1/request/:id
@@ -74,6 +135,10 @@ exports.deleteRequest = catchAsyncErrors(async (req, res, next) => {
 
     if (!request) {
         return next(new ErrorHandler(`request is not found with this id: ${req.params.id}`))
+    }
+
+    for (let i = 0; i < request.images.length; i++) {
+        const result = await cloudinary.v2.uploader.destroy(request.images[i].public_id)
     }
 
     await request.deleteOne();

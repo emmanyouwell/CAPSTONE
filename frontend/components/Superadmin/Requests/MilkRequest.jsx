@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Alert, RefreshControl, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity, Alert, RefreshControl, SafeAreaView, Image } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '../Header';
 import { logoutUser } from '../../../redux/actions/userActions';
@@ -40,6 +40,7 @@ const MilkRequest = ({ route, navigation }) => {
     };
 
     const renderCard = (req) => {
+        const { status, patient, volume, doctor, images} = req;
         return (
             <TouchableOpacity
                 key={req._id}
@@ -56,11 +57,18 @@ const MilkRequest = ({ route, navigation }) => {
                 }
             >
                 <Text style={styles.cardTitle}>Date: {formatDate(req.date)}</Text>
-                <Text>Status: {req.status}</Text>
-                <Text>Patient: {req.patient.name}</Text>
-                <Text>Type: {req.patient.patientType}</Text>
-                <Text>Requested Volume: {req.volume} mL</Text>
-                <Text>Prescribed By: {req.doctor}</Text>
+                <Text>Status: {status}</Text>
+                <Text>Patient: {patient.name}</Text>
+                <Text>Type: {patient.patientType}</Text>
+                <Text>Requested Volume: {volume} mL</Text>
+                <Text>Prescribed By: {doctor}</Text>
+                {images && images.length > 0 ? (
+                    <Image source={{ uri: images[0].url }} style={styles.image} />
+                ) : (
+                    <View style={styles.imagePlaceholder}>
+                        <Text style={styles.placeholderText}>No Image</Text>
+                    </View>
+                )}
             </TouchableOpacity>
         );
     };
@@ -136,6 +144,23 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 8,
+    },
+    image: {
+        width: 100,
+        height: 100,
+        borderTopLeftRadius: 10,
+        borderBottomLeftRadius: 10,
+    },
+    imagePlaceholder: {
+        width: 100,
+        height: 100,
+        backgroundColor: '#ddd',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    placeholderText: {
+        color: '#999',
+        fontSize: 14,
     },
 });
 

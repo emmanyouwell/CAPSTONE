@@ -31,8 +31,7 @@ export const getRequests = createAsyncThunk(
             }
             
             const response = await axios.get(urlString, config);
-            console.log("Response", response.data)
-            console.log("URL: ", urlString)
+            
             return response.data;
 
         } catch (error) {

@@ -10,8 +10,11 @@ import {
     Platform,
     SafeAreaView,
     ScrollView,
+    Image,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Header from '../../components/Superadmin/Header';
 import { logoutUser } from '../../redux/actions/userActions';
@@ -27,6 +30,7 @@ const AddRequest = ({ navigation, route }) => {
     const newPatient = route.params?.newPatient || null;
     const staff = route.params?.staff || '';
     const [userDetails, setUserDetails] = useState(null);
+    const [images, setImages] = useState([]);
     const [formData, setFormData] = useState({
         patient: newPatient?._id || null,
         location: '',
@@ -85,6 +89,32 @@ const AddRequest = ({ navigation, route }) => {
         setFormData({ ...formData, [key]: value });
     };
 
+    const handlePickImage = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission Denied', 'You need to grant camera roll permissions to upload images.');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsMultipleSelection: true,
+        });
+
+        if (!result.canceled) {
+            const base64Images = await Promise.all(
+                result.assets.map(async (asset) => {
+                    const base64 = await FileSystem.readAsStringAsync(asset.uri, {
+                        encoding: FileSystem.EncodingType.Base64,
+                    });
+                    return `data:image/jpeg;base64,${base64}`;
+                })
+            );
+
+            setImages((prevImages) => [...prevImages, ...base64Images]);
+        }
+    };
+
     const handleSubmit = () => {
         const { patient, location, diagnosis, reason, doctor, milkRequested } = formData;
 
@@ -104,7 +134,8 @@ const AddRequest = ({ navigation, route }) => {
             doctor,
             staffId,
             status: 'Pending',
-            volume: milkRequested
+            volume: milkRequested,
+            images
         };
 
         dispatch(addRequest(requestData))
@@ -235,6 +266,21 @@ const AddRequest = ({ navigation, route }) => {
                             onChangeText={(text) => handleChange('milkRequested', text)}
                         />
                     </View>
+                    
+                    <View style={styles.section}>
+                        <TouchableOpacity style={styles.imageButton} onPress={handlePickImage}>
+                            <Text style={styles.imageButtonText}>Upload Images</Text>
+                        </TouchableOpacity>
+                    
+                        {images.length > 0 && (
+                            <View style={styles.imagePreviewContainer}>
+                                {images.map((uri, index) => (
+                                    <Image key={index} source={{ uri }} style={styles.imagePreview} />
+                                ))}
+                            </View>
+                        )}
+                    </View>
+                    
                     <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
                         <Text style={styles.submitButtonText}>Submit Request</Text>
                     </TouchableOpacity>
@@ -300,6 +346,29 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 8,
+    },
+    imageButton: {
+        backgroundColor: '#007AFF',
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginVertical: 8,
+    },
+    imageButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    imagePreviewContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginVertical: 8,
+    },
+    imagePreview: {
+        width: 80,
+        height: 80,
+        borderRadius: 8,
+        margin: 4,
     },
 });
 
