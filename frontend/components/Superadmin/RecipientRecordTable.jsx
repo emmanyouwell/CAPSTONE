@@ -22,7 +22,7 @@ const RecipientRecordsTable = ({ recipients, totalDonors, totalPages, currentPag
   };
 
   const calculateTotalMilkRequested = (requested) => {
-    return requested.reduce((total, request) => total + request.milkRequested, 0);
+    return requested.reduce((total, request) => {return total + request.reqId?.volume || 0},0);
   };
 
   useEffect(() => {
@@ -78,7 +78,13 @@ const RecipientRecordsTable = ({ recipients, totalDonors, totalPages, currentPag
                   Name
                 </DataTable.Title>
                 <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
-                  Address
+                  Street
+                </DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
+                  Brgy
+                </DataTable.Title>
+                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
+                  City
                 </DataTable.Title>
                 <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>
                   Phone
@@ -109,7 +115,13 @@ const RecipientRecordsTable = ({ recipients, totalDonors, totalPages, currentPag
                       {row.name}
                     </DataTable.Cell>
                     <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>
-                      {row.address}
+                      {row.home_address.street}
+                    </DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>
+                      {row.home_address.brgy}
+                    </DataTable.Cell>
+                    <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>
+                      {row.home_address.city}
                     </DataTable.Cell>
                     <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>
                       {row.phone}
