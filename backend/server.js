@@ -35,5 +35,5 @@ const pingSelf = async () => {``
 app.listen(process.env.PORT, () => {
     console.log(`Server started on PORT : ${process.env.PORT} in ${process.env.NODE_ENV} mode`)
     // Ping itself every 60 seconds
-    setInterval(pingSelf, 60 * 1000);
+    // setInterval(pingSelf, 60 * 1000);
 }) 
