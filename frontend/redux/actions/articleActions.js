@@ -77,7 +77,7 @@ export const updateArticle = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/articles/${req.id}`, req, config);
+            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/article/${req.id}`, req, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
@@ -100,7 +100,7 @@ export const deleteArticle = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/articles/${id}`, config);
+            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/article/${id}`, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
@@ -123,7 +123,7 @@ export const getArticleDetails = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/articles/${id}`, config);
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/article/${id}`, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);

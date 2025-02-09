@@ -12,7 +12,15 @@ export const articleSlice = createSlice({
         isDeleted: false,
     },
     reducers: {
-
+        resetUpdate: (state) => {
+            state.isUpdated = false;
+        },
+        resetDelete: (state) => {
+            state.isDeleted = false;
+        },
+        resetError: (state) => {
+            state.error = null
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -73,5 +81,5 @@ export const articleSlice = createSlice({
             })
     }
 })
-
+export const {resetUpdate, resetDelete, resetError} = articleSlice.actions;
 export default articleSlice.reducer;

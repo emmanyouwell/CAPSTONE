@@ -1,17 +1,18 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux';
-
+import { deleteArticle } from '../../../redux/actions/articleActions';
+import { resetDelete, resetError } from '../../../redux/slices/articleSlice';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const ArticleList = ({ data }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    const { isDeleted } = useSelector((state) => state.articles);
+    const { isDeleted, error } = useSelector((state) => state.articles);
 
     const handleEdit = (item) => {
-        // navigation.navigate('',{item});
+        navigation.navigate('editArticle',{item});
     }
     const handleDelete = (id) => {
         Alert.alert(
@@ -23,9 +24,9 @@ const ArticleList = ({ data }) => {
                     text: "Delete",
                     style: "destructive",
                     onPress: () => {
-                        // dispatch(deleteEquipments(id))
-                        //     .then(Alert.alert("Deleted", "Equipment deleted successfully."))
-                        //     .catch((err) => Alert.alert('Error', err.message));;
+                        dispatch(deleteArticle(id))
+                            .then(Alert.alert("Deleted", "Article deleted successfully."))
+                            .catch((err) => Alert.alert('Error', err.message));;
                     },
                 },
             ]
@@ -69,14 +70,24 @@ const ArticleList = ({ data }) => {
                     <View style={styles.info}>
                         <Text style={styles.title}>{title}</Text>
                         <Text style={styles.details}>published: {formattedDate}</Text>
-                        <Text style={styles.details} numberOfLines={5} ellipsizeMode='tail'>description: {description}</Text>
+                        {/* <Text style={styles.details} numberOfLines={5} ellipsizeMode='tail'>description: {description}</Text> */}
 
                     </View>
                 </View>
             </Swipeable>
         );
     };
-
+    useEffect(()=>{
+        if(isDeleted){
+            dispatch(resetDelete());
+            
+            navigation.navigate('superadmin_articles')
+        }
+        if (error){
+            Alert.alert('Error', error);
+            dispatch(resetError());
+        }
+    },[dispatch, isDeleted, error])
     return (
         <FlatList
             data={data}

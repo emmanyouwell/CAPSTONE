@@ -60,6 +60,7 @@ import DonorsPerMonth from "./components/Superadmin/Metrics/DonorsPerMonth";
 import TestNotif from "./components/Superadmin/Metrics/TestNotif";
 import EditEvent from "./components/Superadmin/Schedule/EditEvent";
 import AddEvent from "./components/Superadmin/Schedule/AddEvent";
+import EditArticles from "./components/Superadmin/Articles/EditArticles";
 
 const CustomDrawerContent = (props) => {
 
@@ -185,6 +186,7 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_articles"
         component={Articles}/>
         <Stack.Screen name="add_articles" component={AddArticles}/>
+        <Stack.Screen name="editArticle" component={EditArticles}/>
 
 
       {/* {Fridge Inventory Navigation} */}
