@@ -97,11 +97,29 @@ exports.updateArticle = catchAsyncErrors(async (req, res, next) => {
             }
             req.body.images = imagesLinks
         }
-        article = await Article.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true,
-            useFindAndModify: false,
-        })
+
+        if (req.body.description === '') {
+            req.body.description = article.description;
+        }
+
+        if (req.body.images.length === 0){
+            article = await Article.findByIdAndUpdate(req.params.id, {
+                title: req.body.title,
+                description: req.body.description,
+            }, {
+                new: true,
+                runValidators: true,
+                useFindAndModify: false,
+            })
+        }
+        else {
+            article = await Article.findByIdAndUpdate(req.params.id, req.body, {
+                new: true,
+                runValidators: true,
+                useFindAndModify: false,
+            })
+        }
+       
 
         res.status(200).json({
             success: true,
