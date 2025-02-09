@@ -101,7 +101,7 @@ const AddArticles = ({ navigation }) => {
             if (fileType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
                 // Extract text from Word document
                 const binaryData = Buffer.from(fileData, 'base64');
-                const result = await Mammoth.extractRawText({ arrayBuffer: binaryData });
+                const result = await Mammoth.convertToHtml({ arrayBuffer: binaryData });
                 extractedText = result.value;
             }
 
