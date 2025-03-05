@@ -8,7 +8,7 @@ const cloudinary = require('cloudinary');
 
 
 //Register a user => /api/v1/register
-exports.registerUser = catchAsyncErrors( async (req, res, next) => {
+exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
     // const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
     //     folder: 'avatar',
@@ -18,55 +18,119 @@ exports.registerUser = catchAsyncErrors( async (req, res, next) => {
     //     console.log(err, res);
     // });
 
-    const {name, email, password, phone, role} = req.body;
+    const { firstName, lastName, email, phoneNumber, role } = req.body;
+    let user;
+    let password = `${firstName.replace(/\s+/g, "").toLowerCase()}${lastName.replace(/\s+/g, "").toLowerCase()}`;
 
-    const user = await User.create({
-        name,
-        email,
-        password,
-        phone,
-        role
-        // avatar: {
-        //     public_id: result.public_id,
-        //     url: result.secure_url
-        // }
-    })
+    console.log("password: ", password);
+    if (req.body.employeeID) {
+        user = await User.create({
+            firstName,
+            lastName,
+            email,
+            password,
+            phone: phoneNumber,
+            role,
+            employeeID: req.body.employeeID
+            // avatar: {
+            //     public_id: result.public_id,
+            //     url: result.secure_url
+            // }
+        })
+    }
+    else {
+        user = await User.create({
+            firstName,
+            lastName,
+            email,
+            password,
+            phone: phoneNumber,
+            role,
+
+            // avatar: {
+            //     public_id: result.public_id,
+            //     url: result.secure_url
+            // }
+        })
+    }
+
+
+    sendToken(user, 200, res);
+})
+
+exports.loginEmployee = catchAsyncErrors(async (req, res, next) => {
+    const { employeeID, password } = req.body;
+    console.log(req.body);
+    // Validation
+    if (!employeeID || !password) {
+        return next(new ErrorHandler('Please enter employeeID and password', 400));
+    }
+
+    // Finding User in database
+    const user = await User.findOne({ employeeID }).select('+password');
+
+    if (!user) {
+        return next(new ErrorHandler('Invalid employeeID or password', 401));
+    }
+
+    // Checks if password is correct or not
+    const isPasswordMatched = await user.comparePassword(password);
+
+    if (!isPasswordMatched) {
+        return next(new ErrorHandler('Invalid employeeID or password', 401));
+    }
 
     sendToken(user, 200, res);
 })
 
 // Login User => /api/v1/login
-exports.loginUser = catchAsyncErrors( async (req, res, next) => {
-    const {email, password} = req.body;
-    console.log(req.body);
+exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+    const { email, employeeID, password } = req.body;
+    const { emp } = req.query;
+    let user;
+    if (emp) {
+        // Validation
+        if (!employeeID || !password) {
+            return next(new ErrorHandler('Please enter employeeID and password', 400));
+        }
+
+        // Finding User in database
+        user = await User.findOne({ employeeID }).select('+password');
+
+        if (!user) {
+            return next(new ErrorHandler('Invalid employeeID or password', 401));
+        }
+    }
+    else {
         // Validation
         if (!email || !password) {
             return next(new ErrorHandler('Please enter email and password', 400));
         }
 
         // Finding User in database
-        const user = await User.findOne({email}).select('+password');
+        user = await User.findOne({ email }).select('+password');
 
         if (!user) {
             return next(new ErrorHandler('Invalid email or password', 401));
         }
+    }
 
-        // Checks if password is correct or not
-        const isPasswordMatched = await user.comparePassword(password);
+    // Checks if password is correct or not
+    const isPasswordMatched = await user.comparePassword(password);
 
-        if (!isPasswordMatched) {
-            return next(new ErrorHandler('Invalid email or password', 401));
-        }
+    if (!isPasswordMatched) {
+        return next(new ErrorHandler('Invalid email or password', 401));
+    }
 
-        sendToken(user, 200, res);
+    sendToken(user, 200, res);
 })
 
 // Forgot Password => /api/v1/password/forgot
-exports.forgotPassword = catchAsyncErrors( async (req, res, next) => {
+exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
-    const user = await User.findOne({email: req.body.email});
+    const user = await User.findOne({ email: req.body.email });
 
-    if (!user) { 
+    if (!user) {
         return next(new ErrorHandler('User not found with this email', 404));
     }
 
@@ -92,7 +156,7 @@ exports.forgotPassword = catchAsyncErrors( async (req, res, next) => {
             success: true,
             message: `Email sent to: ${user.email}`
         })
-        
+
     } catch (error) {
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
@@ -104,17 +168,17 @@ exports.forgotPassword = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Reset Password => /api/v1/password/reset/:token
-exports.resetPassword = catchAsyncErrors( async (req, res, next) => {
+exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     // Hash URL token
     const resetPasswordToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
     const user = await User.findOne({
         resetPasswordToken,
-        resetPasswordExpire: { $gt: Date.now()}
+        resetPasswordExpire: { $gt: Date.now() }
     })
 
-    if (!user) { 
+    if (!user) {
         return next(new ErrorHandler('Password reset token is invalid or has been expired', 400));
     }
 
@@ -129,12 +193,12 @@ exports.resetPassword = catchAsyncErrors( async (req, res, next) => {
 
     await user.save();
 
-    sendToken(user ,200 ,res);
+    sendToken(user, 200, res);
 
 })
 
 // Get current login user details => /api/v1/me
-exports.getUserProfile = catchAsyncErrors( async (req, res, next) => {
+exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(req.user.id);
 
     res.status(200).json({
@@ -144,7 +208,7 @@ exports.getUserProfile = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Update / Change password => /api/v1/password/update
-exports.updatePassword = catchAsyncErrors( async (req, res, next) => {
+exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(req.user.id).select('+password');
 
     // Check previous user password
@@ -158,12 +222,12 @@ exports.updatePassword = catchAsyncErrors( async (req, res, next) => {
     await user.save();
 
     sendToken(user, 200, res);
- 
+
 })
 
 // Update user profile => /api/v1/me/update
-exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
-    
+exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
+
     const newUserData = {
         name: req.body.name,
         email: req.body.email
@@ -194,7 +258,7 @@ exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false,
     })
-    
+
     res.status(200).json({
         user,
         success: true
@@ -203,7 +267,7 @@ exports.updateProfile = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Logout User => /api/v1/logout
-exports.logout = catchAsyncErrors( async (req, res, next) => {
+exports.logout = catchAsyncErrors(async (req, res, next) => {
 
     res.cookie('token', null, {
         expires: new Date(Date.now()),
@@ -219,20 +283,88 @@ exports.logout = catchAsyncErrors( async (req, res, next) => {
 
 // SUPER ADMIN ROUTES
 // Get all users => /api/v1/super/users
-exports.allUsers = catchAsyncErrors( async (req, res, next) => {
-    const users = await User.find();
+exports.allUsers = catchAsyncErrors(async (req, res, next) => {
+    const { search, sortBy, order = "asc", role } = req.query;
 
-    const count = await User.countDocuments();
+    // Create a query object to hold the search criteria
+    const query = {};
+    if (search) {
+        query.$or = [
+            { firstName: { $regex: search, $options: "i" } },  // Search in first name
+            { lastName: { $regex: search, $options: "i" } }    // Search in last name
+        ];
 
-    res.status(200).json({
-        success: true,
-        count,
-        users
-    })
+        // If the search input is a valid number, add an employeeID search
+        if (!isNaN(search)) {
+            query.$or.push({ employeeID: Number(search) });
+        }
+    }
+    if (role) {
+        query.role = role;
+    }
+
+    // Ensure sorting field is allowed; default to "employeeID"
+    const allowedSortFields = ["employeeID", "firstName", "lastName"];
+    const sortField = allowedSortFields.includes(sortBy) ? sortBy : "employeeID";
+
+    // Convert order to a valid MongoDB sorting value (1 for ascending, -1 for descending)
+    const sortOrder = order === "desc" ? -1 : 1;
+
+    // Pagination settings
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 12;
+    const skip = (page - 1) * pageSize;
+
+    try {
+        // Aggregation pipeline
+        const aggregationPipeline = [{ $match: query }];
+
+        // Convert `employeeID` to a number for proper sorting if sorting by `employeeID`
+        if (sortField === "employeeID") {
+            aggregationPipeline.push({
+                $addFields: { employeeIDNum: { $toInt: "$employeeID" } }
+            });
+        }
+
+        // Sorting (defaults to employeeID if no valid field is given)
+        aggregationPipeline.push({
+            $sort: { [sortField === "employeeID" ? "employeeIDNum" : sortField]: sortOrder }
+        });
+
+        // Pagination
+        aggregationPipeline.push(
+            { $skip: skip },
+            { $limit: pageSize }
+        );
+
+        // Fetch users
+        let users = await User.aggregate(aggregationPipeline);
+
+        // Ensure employeeID is always at least 3 digits
+        users = users.map(user => ({
+            ...user,
+            employeeID: user.employeeID.toString().padStart(3, "0")
+        }));
+
+        // Get total count of users
+        const totalUsers = await User.countDocuments(query);
+        const totalPages = Math.ceil(totalUsers / pageSize);
+
+        res.status(200).json({
+            success: true,
+            totalUsers,
+            totalPages,
+            pageSize,
+            users
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+
 })
 
 // Get specific user details => /api/v1/super/user/:id
-exports.getUserDetails = catchAsyncErrors( async (req, res, next) => {
+exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
@@ -246,8 +378,8 @@ exports.getUserDetails = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Update user profile => /api/v1/super/update/:id
-exports.updateUser = catchAsyncErrors( async (req, res, next) => {
-    
+exports.updateUser = catchAsyncErrors(async (req, res, next) => {
+
     const newUserData = {
         name: req.body.name,
         email: req.body.email,
@@ -259,7 +391,7 @@ exports.updateUser = catchAsyncErrors( async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false,
     })
-    
+
     res.status(200).json({
         success: true,
         user
@@ -268,7 +400,7 @@ exports.updateUser = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Delete User => /api/v1/super/user/:id
-exports.deleteUser = catchAsyncErrors( async (req, res, next) => {
+exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
@@ -289,10 +421,10 @@ exports.deleteUser = catchAsyncErrors( async (req, res, next) => {
 
 // ADMIN ROUTES
 // Get all staff => /api/v1/admin/users
-exports.allStaffs = catchAsyncErrors( async (req, res, next) => {
+exports.allStaffs = catchAsyncErrors(async (req, res, next) => {
     const users = await User.find({ role: 'Staff' });
 
-    const count = await User.countDocuments({role: 'Staff'});
+    const count = await User.countDocuments({ role: 'Staff' });
 
     res.status(200).json({
         success: true,
@@ -302,7 +434,7 @@ exports.allStaffs = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Get specific staff details => /api/v1/admin/user/:id
-exports.getStaffDetails = catchAsyncErrors( async (req, res, next) => {
+exports.getStaffDetails = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findOne({ _id: req.params.id, role: 'Staff' });
 
     if (!user) {
@@ -316,7 +448,7 @@ exports.getStaffDetails = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Update staff profile => /api/v1/admin/update/:id
-exports.updateStaff = catchAsyncErrors( async (req, res, next) => {
+exports.updateStaff = catchAsyncErrors(async (req, res, next) => {
     const staff = await User.findOne({ _id: req.params.id, role: 'Staff' });
 
     if (!staff) {
@@ -334,7 +466,7 @@ exports.updateStaff = catchAsyncErrors( async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false,
     })
-    
+
     res.status(200).json({
         success: true,
         user
@@ -343,7 +475,7 @@ exports.updateStaff = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Delete staff => /api/v1/admin/user/:id
-exports.deleteStaff = catchAsyncErrors( async (req, res, next) => {
+exports.deleteStaff = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findOne({ _id: req.params.id, role: 'Staff' });
 
     if (!user) {
