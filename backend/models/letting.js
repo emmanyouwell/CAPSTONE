@@ -27,18 +27,24 @@ const lettingSchema = mongoose.Schema({
                 type: String,
                 enum: ['New Donor', 'Past Donor'],
                 default: 'New Donor',
-                required: true
             },
             donor: {
                 type: ObjectId,
-                required: true,
                 ref: 'Donor'
+            },
+            volume: {
+                type: Number,
             },
             lastDonation: {
                 type: Date,
             }
         },
     ],
+    admin: {
+        type: ObjectId,
+        required: true,
+        ref: 'User'
+    },
     createdAt: {
         type: Date,
         default: Date.now
