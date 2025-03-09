@@ -40,6 +40,7 @@ const equipment = require('./routes/equipment');
 const article = require('./routes/article')
 const notification = require('./routes/notification');
 const schedule = require('./routes/schedule');
+const letting = require('./routes/letting');
 
 // API routes
 app.use('/api/v1', user);
@@ -53,6 +54,7 @@ app.use('/api/v1', equipment);
 app.use('/api/v1', article);
 app.use('/api/v1', notification);
 app.use('/api/v1', schedule);
+app.use('/api/v1', letting);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
