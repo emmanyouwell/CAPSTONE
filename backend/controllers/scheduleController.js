@@ -19,12 +19,10 @@ exports.allSchedules = catchAsyncErrors( async (req, res, next) => {
 exports.createSchedule= catchAsyncErrors( async (req, res, next) => {
  
     const schedDate = new Date(req.body.dates)
-    const schedStatus = req.body.status.trim();
 
     const schedule = await Schedule.create({
         ...req.body,
-        dates: schedDate,
-        status: schedStatus
+        dates: schedDate
     });
 
     res.status(201).json({
@@ -51,12 +49,10 @@ exports.getScheduleDetails = catchAsyncErrors( async (req, res, next) => {
 exports.updateSchedule = catchAsyncErrors( async (req, res, next) => {
 
     const schedDate = new Date(req.body.dates)
-    const schedStatus = req.body.status.trim();
     
     const newScheduleData = {
         ...req.body,
-        dates: schedDate,
-        status: schedStatus
+        dates: schedDate
     }
 
     const schedule = await Schedule.findByIdAndUpdate(req.params.id, newScheduleData, {

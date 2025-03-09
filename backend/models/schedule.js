@@ -11,21 +11,28 @@ const scheduleSchema = mongoose.Schema({
         type: String,
         default: 'Donors Home',
     },
-    donorId: {
-        type: ObjectId,
-        required: true,
-        ref: 'Donor'
+    donorDetails: {
+        donorId: {
+            type: ObjectId,
+            required: true,
+            ref: 'Donor'
+        },
+        milkDetails: [
+            {
+                volume: {
+                    type: Number,
+                    required: true,
+                },
+                quantity: {
+                    type: Number,
+                    required: true,
+                },
+            }
+        ]
     },
-    status: {
-        type: String,
-        enum: ['Not-Due', 'On-Going', 'Done'],
-        default: 'Not-Due',
-        required: true
-    },
-    admin: {
+    approvedBy: {
         type: ObjectId,
         ref: 'User',
-        required: [true, 'Admin is needed to complete inventory'],
     },
     createdAt: {
         type: Date,
