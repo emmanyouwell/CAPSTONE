@@ -41,6 +41,7 @@ const article = require('./routes/article')
 const notification = require('./routes/notification');
 const schedule = require('./routes/schedule');
 const letting = require('./routes/letting');
+const collection = require('./routes/collection');
 
 // API routes
 app.use('/api/v1', user);
@@ -55,6 +56,7 @@ app.use('/api/v1', article);
 app.use('/api/v1', notification);
 app.use('/api/v1', schedule);
 app.use('/api/v1', letting);
+app.use('/api/v1', collection);
 
 // Middleware to handle errors
 app.use(errorMiddleware);
