@@ -183,11 +183,12 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
             birth_weight: data.birth_weight,
             aog: data.aog
         }];
-
+        let password = `${data.first_name.replace(/\s+/g, "").toLowerCase()}${data.last_name.replace(/\s+/g, "").toLowerCase()}`;
         const user = await User.create({
             name: name,
             email: data.email,
             phone: data.contact_number,
+            password: password,
             role: 'User',
         });
         // Create donor in the database
