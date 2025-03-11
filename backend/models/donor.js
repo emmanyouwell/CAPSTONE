@@ -2,19 +2,9 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema.Types;
 
 const donorSchema = new mongoose.Schema({
-    name: {
-        last: {
-            type: String,
-            required: [true, 'Please enter last name']
-        },
-        first: {
-            type: String,
-            required: [true, 'Please enter first name']
-        },
-        middle: {
-            type: String,
-            required: [true, 'Please enter middle name']
-        }
+    user: {
+        type: ObjectId,
+        ref: 'User'
     },
     home_address: {
         street: {
@@ -29,10 +19,6 @@ const donorSchema = new mongoose.Schema({
             type: String,
             required: [true, 'Enter City']
         }
-    },
-    phone: {
-        type: String,
-        required: [true, 'Please enter contact number of the donor']
     },
     age: {
         type: Number,

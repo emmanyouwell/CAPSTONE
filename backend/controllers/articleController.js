@@ -4,7 +4,7 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const cloudinary = require('cloudinary');
 
 exports.allArticles = catchAsyncErrors(async (req, res, next) => {
-    const articles = await Article.find();
+    const articles = await Article.find().sort({ createdAt: -1 });
 
     const count = await Article.countDocuments();
 
@@ -15,6 +15,57 @@ exports.allArticles = catchAsyncErrors(async (req, res, next) => {
     })
 
 })
+
+exports.createHTMLArticle = catchAsyncErrors(async (req, res, next) => {
+    try {
+        let { content, title, description } = req.body;
+        let images = [];
+        // Ensure content is a valid string before processing
+        content = String(content)
+        if (typeof content !== "string") {
+            console.error("Error: content is not a string or is undefined.");
+            return;
+        }
+        // Extract base64 images from content
+        const base64Images = content.match(/<img[^>]+src="data:image\/[^">]+"/g);
+
+        if (base64Images) {
+            for (let imgTag of base64Images) {
+                const base64Data = imgTag.match(/src="(data:image\/[^"]+)"/)[1];
+
+                // Upload image to Cloudinary
+                const result = await cloudinary.uploader.upload(base64Data, {
+                    folder: "articles",
+                });
+
+                images.push({
+                    public_id: result.public_id,
+                    url: result.secure_url
+                });
+
+                // Replace base64 image with Cloudinary URL in the content
+                content = content.replace(base64Data, result.secure_url);
+            }
+        }
+
+        // Save article with updated content
+        const article = await Article.create({
+            title,
+            description,
+            content,
+            // images,
+        });
+
+        res.status(201).json({
+            success: true,
+            article,
+        });
+    } catch (error) {
+        console.log("Error: ", error.message);
+        next(error);
+    }
+})
+
 
 exports.createArticle = catchAsyncErrors(async (req, res, next) => {
     try {
@@ -66,6 +117,41 @@ exports.getArticleDetails = catchAsyncErrors(async (req, res, next) => {
     })
 })
 
+exports.updateHTMLArticle = catchAsyncErrors(async (req, res, next) => {
+
+    try {
+        let article = await Article.findById(req.params.id);
+        if (!article) {
+            return next(new ErrorHandler('Article not found', 404));
+        }
+        if (req.body.title === '') {
+            req.body.title = article.title;
+        }
+
+        if (req.body.description === '') {
+            req.body.description = article.description;
+        }
+
+
+        article = await Article.findByIdAndUpdate(req.params.id, req.body, {
+            new: true,
+            runValidators: true,
+            useFindAndModify: false,
+        })
+
+        res.status(200).json({
+            success: true,
+            article
+        })
+    } catch (error) {
+        console.log('Error: ', error.message);
+        next(error);
+    }
+})
+
+
+
+
 exports.updateArticle = catchAsyncErrors(async (req, res, next) => {
     console.log(req.body);
     try {
@@ -102,7 +188,7 @@ exports.updateArticle = catchAsyncErrors(async (req, res, next) => {
             req.body.description = article.description;
         }
 
-        if (req.body.images.length === 0){
+        if (req.body.images.length === 0) {
             article = await Article.findByIdAndUpdate(req.params.id, {
                 title: req.body.title,
                 description: req.body.description,
@@ -119,7 +205,7 @@ exports.updateArticle = catchAsyncErrors(async (req, res, next) => {
                 useFindAndModify: false,
             })
         }
-       
+
 
         res.status(200).json({
             success: true,

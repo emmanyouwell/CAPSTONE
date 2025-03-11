@@ -2,7 +2,7 @@ const Donor = require('../models/donor')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const axios = require('axios');
-
+const User = require('../models/user')
 // Get All Donors => /api/v1/donors
 exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     // Destructure search query parameters from the request
@@ -115,7 +115,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             },
 
         };
-        const prediction = await axios.post("https://python-server-production-a72b.up.railway.app/predict/", json, config);
+        const prediction = await axios.post("https://python-server-production-83ee.up.railway.app/predict/", json, config);
 
         if (!prediction) {
             return res.status(500).json({
@@ -183,15 +183,21 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
             birth_weight: data.birth_weight,
             aog: data.aog
         }];
+
+        const user = await User.create({
+            name: name,
+            email: data.email,
+            phone: data.contact_number,
+            role: 'User',
+        });
         // Create donor in the database
         const donor = await Donor.create({
-            name: name,
+            user: user._id,
             home_address: {
                 street: data.Street,
                 brgy: data.brgy,
-                city: 'Taguig City'
+                city: data.city || 'Taguig City'
             },
-            phone: data.contact_number,
             age: data.age,
             birthday: data.birthday,
             children: children,

@@ -9,15 +9,15 @@ const screenWidth = Dimensions.get('window').width;
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, logout } from '../redux/actions/userActions';
 import { viewAsyncStorage } from '../utils/helper';
-const Login = ({ navigation }) => {
+const EmployeeLogin = ({ navigation }) => {
     const dispatch = useDispatch();
-    const [email, setEmail] = useState('');
+    const [employeeID, setEmployeeID] = useState('');
     const [password, setPassword] = useState('');
     const { isLoggedIn, userDetails, loading, error } = useSelector((state) => state.users);
     const handleFormSubmit = () => {
         // Handle form submission logic here
-        console.log('Form submitted:', { email, password });
-        dispatch(loginUser({ email, password }));
+        console.log('Form submitted:', { employeeID, password });
+        dispatch(loginUser({ employeeID, password, isEmp: true }));
     };
     useEffect(()=>{
         console.log(viewAsyncStorage());
@@ -25,7 +25,7 @@ const Login = ({ navigation }) => {
 
     useEffect(()=>{
         if (isLoggedIn) {
-            navigation.navigate('userHome');
+            navigation.navigate('superadmin_dashboard');
         }
     },[isLoggedIn])
     return (
@@ -53,11 +53,11 @@ const Login = ({ navigation }) => {
 
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Email"
+                                    placeholder="Employee ID"
                                     placeholderTextColor="#000"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    keyboardType="email-address"
+                                    value={employeeID}
+                                    onChangeText={setEmployeeID}
+                                    keyboardType="number-pad"
                                     autoCapitalize="none"
                                 />
                                 <TextInput
@@ -72,10 +72,10 @@ const Login = ({ navigation }) => {
                             </View>
                             <View style={divider.dividerContainer}>
                                 <View style={divider.divider} />
-                                <Text style={divider.dividerText}>Employee Sign in</Text>
+                                <Text style={divider.dividerText}>User Sign in</Text>
                                 <View style={divider.divider} />
                             </View>
-                            <Button title="Sign in with ID" onPress={() => navigation.navigate('employee_login')} />
+                            <Button title="Sign in with email" onPress={() => navigation.navigate('login')} />
 
                         </LinearGradient>
                     </ScrollView>
@@ -85,4 +85,4 @@ const Login = ({ navigation }) => {
     )
 }
 const styles = loginStyle;
-export default Login
+export default EmployeeLogin
