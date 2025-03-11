@@ -1,4 +1,4 @@
-import React, {useState, useEffect, startTransition } from "react";
+import React, { useState, useEffect, startTransition } from "react";
 import { View, Image, Text, StatusBar } from "react-native";
 import {
   DrawerContentScrollView,
@@ -61,6 +61,7 @@ import TestNotif from "./components/Superadmin/Metrics/TestNotif";
 import EditEvent from "./components/Superadmin/Schedule/EditEvent";
 import AddEvent from "./components/Superadmin/Schedule/AddEvent";
 import EditArticles from "./components/Superadmin/Articles/EditArticles";
+import EmployeeLogin from "./screens/EmployeeLogin";
 
 const CustomDrawerContent = (props) => {
 
@@ -83,8 +84,8 @@ const CustomDrawerContent = (props) => {
           style={drawerStyle.profilePic}
         /> */}
         <Text style={drawerStyle.profileName}>{userDetails
-            ? `Logged in as, ${userDetails.name}`
-            : "Logged in as, Superadmin"}</Text>
+          ? `Logged in as, ${userDetails.name}`
+          : "Logged in as, Superadmin"}</Text>
       </View>
 
       <View style={divider.divider} />
@@ -167,57 +168,61 @@ const MainStack = () => {
       }}
     >
       <Stack.Group>
+        {/* User Navigations */}
+        <Stack.Screen name="userHome" component={Home} />
+
+
+
         {/* Superadmin navigations */}
         <Stack.Screen name="login" component={Login} />
+        <Stack.Screen name="employee_login" component={EmployeeLogin} />
         <Stack.Screen name="superadmin_dashboard" component={Dashboard} />
-        <Stack.Screen name="superadmin_donor_record" component={DonorRecords}/>
-        <Stack.Screen name="superadmin_recipient_record" component={RecipientRecords}/>
-        <Stack.Screen name="superadmin_schedules" component={Schedule}/>
-        <Stack.Screen name="superadmin_metrics" component={Metrics}/>
-        <Stack.Screen name="superadmin_account_management" component={AccountManagement}/>
-        <Stack.Screen name="superadmin_account_create_admin" component={CreateAdmin}/>
-        <Stack.Screen name="superadmin_account_create_staff" component={CreateStaff}/>
-        
+        <Stack.Screen name="superadmin_donor_record" component={DonorRecords} />
+        <Stack.Screen name="superadmin_recipient_record" component={RecipientRecords} />
+        <Stack.Screen name="superadmin_schedules" component={Schedule} />
+        <Stack.Screen name="superadmin_metrics" component={Metrics} />
+        <Stack.Screen name="superadmin_account_management" component={AccountManagement} />
+        <Stack.Screen name="superadmin_account_create_admin" component={CreateAdmin} />
+        <Stack.Screen name="superadmin_account_create_staff" component={CreateStaff} />
+
         {/* Schedule */}
-        <Stack.Screen name="editEvents" component={EditEvent}/>
-        <Stack.Screen name="addEvents" component={AddEvent}/>
+        <Stack.Screen name="editEvents" component={EditEvent} />
+        <Stack.Screen name="addEvents" component={AddEvent} />
 
         {/* Articles */}
         <Stack.Screen name="superadmin_articles"
-        component={Articles}/>
-        <Stack.Screen name="add_articles" component={AddArticles}/>
-        <Stack.Screen name="editArticle" component={EditArticles}/>
+          component={Articles} />
+        <Stack.Screen name="add_articles" component={AddArticles} />
+        <Stack.Screen name="editArticle" component={EditArticles} />
 
 
-      {/* {Fridge Inventory Navigation} */}
-        <Stack.Screen name="superadmin_inventories" component={Inventory}/>
-        <Stack.Screen name="superadmin_fridges" component={Fridges}/>
-        <Stack.Screen name="InventoryCards" component={InventoryCards}/>
-        <Stack.Screen name="PasteurCards" component={PasteurCards}/>
-        <Stack.Screen name="FridgeDetails" component={FridgeDetails}/>
-        <Stack.Screen name="AddFridge" component={AddFridge}/>
-        <Stack.Screen name="EditFridge" component={EditFridge}/>
-        <Stack.Screen name="AddMilkInventory" component={AddMilkInventory}/>
-        <Stack.Screen name="EditMilkInventory" component={EditMilkInventory}/>
-        
-        <Stack.Screen name="superadmin_milkLetting" component={MilkLetting}/>
+        {/* {Fridge Inventory Navigation} */}
+        <Stack.Screen name="superadmin_inventories" component={Inventory} />
+        <Stack.Screen name="superadmin_fridges" component={Fridges} />
+        <Stack.Screen name="InventoryCards" component={InventoryCards} />
+        <Stack.Screen name="PasteurCards" component={PasteurCards} />
+        <Stack.Screen name="FridgeDetails" component={FridgeDetails} />
+        <Stack.Screen name="AddFridge" component={AddFridge} />
+        <Stack.Screen name="EditFridge" component={EditFridge} />
+        <Stack.Screen name="AddMilkInventory" component={AddMilkInventory} />
+        <Stack.Screen name="EditMilkInventory" component={EditMilkInventory} />
+        <Stack.Screen name="superadmin_milkLetting" component={MilkLetting} />
 
-        <Stack.Screen name="superadmin_equipment" component={Equipment}/>
-        <Stack.Screen name="AddEquipment" component={AddEquipment}/>
-        <Stack.Screen name="EditEquipment" component={EditEquipment}/>
+        <Stack.Screen name="superadmin_equipment" component={Equipment} />
+        <Stack.Screen name="AddEquipment" component={AddEquipment} />
+        <Stack.Screen name="EditEquipment" component={EditEquipment} />
+        {/* {Request Admins Navigation} */}
+        <Stack.Screen name="MilkRequest" component={MilkRequest} />
+        <Stack.Screen name="ConfirmRequest" component={ConfirmRequest} />
+        <Stack.Screen name="EditRequest" component={EditRequest} />
+        {/* {Request Staff Navigation} */}
+        <Stack.Screen name="AddPatient" component={AddPatient} />
+        <Stack.Screen name="AddRequest" component={AddRequest} />
 
-      {/* {Request Admins Navigation} */}
-        <Stack.Screen name="MilkRequest" component={MilkRequest}/>
-        <Stack.Screen name="ConfirmRequest" component={ConfirmRequest}/>
-        <Stack.Screen name="EditRequest" component={EditRequest}/>
-      {/* {Request Staff Navigation} */}
-        <Stack.Screen name="AddPatient" component={AddPatient}/>
-        <Stack.Screen name="AddRequest" component={AddRequest}/>
-
-      {/* {Charts Navigation} */}
-        <Stack.Screen name="MilkPerMonth" component={MilkPerMonth}/>
-        <Stack.Screen name="DonorsPerMonth" component={DonorsPerMonth}/>
-        <Stack.Screen name="TestNotif" component={TestNotif}/>
+        {/* {Charts Navigation} */}
+        <Stack.Screen name="MilkPerMonth" component={MilkPerMonth} />
+        <Stack.Screen name="DonorsPerMonth" component={DonorsPerMonth} />
+        <Stack.Screen name="TestNotif" component={TestNotif} />
 
       </Stack.Group>
     </Stack.Navigator>

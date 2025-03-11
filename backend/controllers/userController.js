@@ -18,15 +18,18 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     //     console.log(err, res);
     // });
 
-    const { firstName, lastName, email, phoneNumber, role } = req.body;
+    const { firstName, lastName, middleName, email, phoneNumber, role } = req.body;
     let user;
     let password = `${firstName.replace(/\s+/g, "").toLowerCase()}${lastName.replace(/\s+/g, "").toLowerCase()}`;
 
     console.log("password: ", password);
     if (req.body.employeeID) {
         user = await User.create({
-            firstName,
-            lastName,
+            name: {
+                first: firstName,
+                middle: middleName || "",
+                last: lastName,
+            },
             email,
             password,
             phone: phoneNumber,
@@ -40,8 +43,11 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     }
     else {
         user = await User.create({
-            firstName,
-            lastName,
+            name: {
+                first: firstName,
+                middle: middleName || "",
+                last: lastName,
+            },
             email,
             password,
             phone: phoneNumber,
@@ -317,14 +323,24 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
 
     try {
         // Aggregation pipeline
-        const aggregationPipeline = [{ $match: query }];
+        const aggregationPipeline = [{ $match: { ...query, role: { $nin: ["SuperAdmin", "User"] } } }];
 
         // Convert `employeeID` to a number for proper sorting if sorting by `employeeID`
         if (sortField === "employeeID") {
             aggregationPipeline.push({
-                $addFields: { employeeIDNum: { $toInt: "$employeeID" } }
+                $addFields: {
+                    employeeIDNum: {
+                        $convert: {
+                            input: "$employeeID",
+                            to: "long",
+                            onError: null, // Avoid crashing if conversion fails
+                            onNull: null
+                        }
+                    }
+                }
             });
         }
+
 
         // Sorting (defaults to employeeID if no valid field is given)
         aggregationPipeline.push({

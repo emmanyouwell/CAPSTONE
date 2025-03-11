@@ -3,21 +3,39 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
 // Get All Events => /api/v1/events
-exports.allEvents = catchAsyncErrors( async (req, res, next) => {
-    const events = await Event.find();
+exports.allEvents = catchAsyncErrors(async (req, res, next) => {
+    const { upcoming } = req.query;
 
-    const count = await Event.countDocuments();
+    if (upcoming) {
+        const events = await Event.find({
+            'eventDetails.start': {
+                $gte: new Date()
+            }
+        }).sort('eventDetails.start');
 
-    res.status(200).json({
-        success: true,
-        count,
-        events
-    })
+        return res.status(200).json({
+            success: true,
+            count: events.length,
+            events
+        })
+    }
+    else {
+        const events = await Event.find();
+
+        const count = await Event.countDocuments();
+
+        res.status(200).json({
+            success: true,
+            count,
+            events
+        })
+    }
+
 })
 
 // Create Event => /api/v1/events
-exports.createEvent= catchAsyncErrors( async (req, res, next) => {
- 
+exports.createEvent = catchAsyncErrors(async (req, res, next) => {
+
     console.log('request: ', req.body);
     console.log("start: ", req.body.start);
     const eventDetails = {
@@ -31,6 +49,7 @@ exports.createEvent= catchAsyncErrors( async (req, res, next) => {
         description: req.body.description,
         eventDetails,
         eventStatus,
+        eventType: req.body.type,
         user: req.body.user
     });
 
@@ -41,7 +60,7 @@ exports.createEvent= catchAsyncErrors( async (req, res, next) => {
 })
 
 // Get specific event details => /api/v1/event/:id
-exports.getEventDetails = catchAsyncErrors( async (req, res, next) => {
+exports.getEventDetails = catchAsyncErrors(async (req, res, next) => {
     const event = await Event.findById(req.params.id);
 
     if (!event) {
@@ -55,19 +74,20 @@ exports.getEventDetails = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Update event => /api/v1/event/:id
-exports.updateEvent = catchAsyncErrors( async (req, res, next) => {
+exports.updateEvent = catchAsyncErrors(async (req, res, next) => {
     const eventDetails = {
         start: req.body.start,
         end: req.body.end
     }
-    
+
     const eventStatus = req.body.status.trim();
-    
+
     const newEventData = {
         title: req.body.title,
         description: req.body.description,
         eventDetails: eventDetails,
         eventStatus: eventStatus,
+        eventType: req.body.type,
         user: req.body.user
     }
 
@@ -76,7 +96,7 @@ exports.updateEvent = catchAsyncErrors( async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false,
     })
-    
+
     res.status(200).json({
         success: true,
         event
@@ -85,7 +105,7 @@ exports.updateEvent = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Delete event => /api/v1/event/:id
-exports.deleteEvent = catchAsyncErrors( async (req, res, next) => {
+exports.deleteEvent = catchAsyncErrors(async (req, res, next) => {
     const event = await Event.findById(req.params.id);
 
     if (!event) {

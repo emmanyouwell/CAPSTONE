@@ -42,6 +42,7 @@ const notification = require('./routes/notification');
 const schedule = require('./routes/schedule');
 const letting = require('./routes/letting');
 const collection = require('./routes/collection');
+const checkEvents = require('./schedule/eventChecker');
 
 // API routes
 app.use('/api/v1', user);
@@ -64,5 +65,6 @@ app.use(errorMiddleware);
 // Notifications
 checkExpiringMilk();
 newDonor();
+checkEvents();
 
 module.exports = app;

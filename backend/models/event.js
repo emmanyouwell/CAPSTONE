@@ -28,6 +28,12 @@ const eventSchema = mongoose.Schema({
         default: 'Not-Due',
         required: true
     },
+    eventType: {
+        type: String,
+        enum: ['Grand Milk Letting', 'Regular Milk Letting', 'Other'],
+        default: 'Other',
+        required: true
+    },
     user: {
         type: ObjectId,
         required: true,

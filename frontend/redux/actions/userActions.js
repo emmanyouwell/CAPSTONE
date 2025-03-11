@@ -7,7 +7,7 @@ import { REACT_APP_API_URL } from '@env';
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async (credentials, thunkAPI) => {
-    const { email, password } = credentials;
+    const { isEmp } = credentials;
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -16,7 +16,11 @@ export const loginUser = createAsyncThunk(
     };
     try {
       console.log(`${REACT_APP_API_URL}/api/v1/login`);
-      const response = await axios.post(`${REACT_APP_API_URL}/api/v1/login`, { email, password }, config);
+      let url = `${REACT_APP_API_URL}/api/v1/login`;
+      if (isEmp) {
+        url = `${REACT_APP_API_URL}/api/v1/login/?emp=true`;
+      }
+      const response = await axios.post(url, credentials, config);
 
       await authenticate(response.data, () => { });
       return response;
