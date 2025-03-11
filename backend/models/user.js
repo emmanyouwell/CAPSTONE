@@ -27,7 +27,8 @@ const userSchema = new mongoose.Schema({
     },
     employeeID: {
         type: Number,
-        unique: true
+        unique: true,
+        sparse: true,
     },
     password: {
         type: String,
