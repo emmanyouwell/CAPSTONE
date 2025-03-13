@@ -7,6 +7,7 @@ const Donor = require('../models/donor');
 const User = require('../models/user');
 exports.createBag = catchAsyncErrors(async (req, res, next) => {
     const {userID, volume, expressDate} = req.body;
+    console.log("body: ",req.body)
     const donor = await Donor.find({user: userID});
     if (!donor) {
         return next(new ErrorHandler('Donor not found', 404));
