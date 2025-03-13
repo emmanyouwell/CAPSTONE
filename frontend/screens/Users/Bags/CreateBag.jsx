@@ -44,7 +44,7 @@ const CreateBag = ({ navigation }) => {
                         const data = {
                             volume: values.volume,
                             expressDate: values.expressDate,
-                            donor: userDetails._id
+                            userID: userDetails._id
                         }
                         dispatch(createBag(data)).then(() => { navigation.navigate('userHome') });
 
