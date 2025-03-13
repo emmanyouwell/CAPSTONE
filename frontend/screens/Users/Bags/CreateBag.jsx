@@ -46,8 +46,8 @@ const CreateBag = ({ navigation }) => {
                             expressDate: values.expressDate,
                             donor: userDetails._id
                         }
-                        dispatch(createBag(data));
-                        Alert.alert("Form Submitted", JSON.stringify(values, null, 2));
+                        dispatch(createBag(data)).then(()=>{navigation.navigate('home')});
+                        
                     }}
                 >
                     {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
