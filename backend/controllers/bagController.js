@@ -49,3 +49,44 @@ exports.getDonorBags = catchAsyncErrors(async (req, res, next) => {
         totalVolume
     });
 })
+
+exports.getSingleBag = catchAsyncErrors(async (req, res, next) => {
+    const {id} = req.params;
+    const bag = await Bag.findById(id);
+    if (!bag) {
+        return next(new ErrorHandler('Bag not found', 404));
+    }
+    res.status(200).json({
+        success: true,
+        bag
+    });
+})
+
+exports.updateBag = catchAsyncErrors(async (req, res, next) => {
+    const { id } = req.params;
+    let bag = await Bag.findByIdAndUpdate(id, req.body, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false
+    });
+    if (!bag) {
+        return next(new ErrorHandler('Bag not found', 404));
+    }
+    res.status(200).json({
+        success: true,
+        bag
+    });
+    
+})
+
+exports.deleteBag = catchAsyncErrors(async (req, res, next) => {
+    const {id} = req.params;
+    const bag = await Bag.findByIdAndDelete(id);
+    if (!bag) {
+        return next(new ErrorHandler('Bag not found', 404));
+    }
+    res.status(200).json({
+        success: true,
+        message: 'Bag deleted successfully'
+    });
+})
