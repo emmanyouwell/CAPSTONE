@@ -28,7 +28,7 @@ exports.getDonorBags = catchAsyncErrors(async (req, res, next) => {
     if (!donor) {
         return next(new ErrorHandler('Donor not found', 404));
     }
-    const bags = await Bag.find({donor: donor._id, status: 'Expressed'});
+    const bags = await Bag.find({donor: donor[0]._id, status: 'Expressed'});
     res.status(200).json({
         success: true,
         count: bags.length,
