@@ -12,8 +12,9 @@ exports.createBag = catchAsyncErrors(async (req, res, next) => {
     if (!donor) {
         return next(new ErrorHandler('Donor not found', 404));
     }
-    console.log('donor id: ', donor._id);
-    const bags = await Bag.create({donor: donor._id, volume, expressDate});
+    
+    console.log('donor: ', donor[0]._id);
+    const bags = await Bag.create({donor: donor[0]._id, volume, expressDate});
     res.status(201).json({
         success: true,
         bags,
