@@ -46,7 +46,7 @@ const CreateBag = ({ navigation }) => {
                             expressDate: values.expressDate,
                             donor: userDetails._id
                         }
-                        dispatch(createBag(data)).then(()=>{navigation.navigate('home')});
+                        dispatch(createBag(data)).then(()=>{navigation.navigate('userHome')});
                         
                     }}
                 >
