@@ -33,6 +33,7 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     try {
         // Find donors based on the query object
         const donors = await Donor.find(query)
+            .populate('user')
             .populate('donation.invId', 'unpasteurizedDetails')
             .sort({ 'name.first': 1 })
             .skip(skip)
@@ -170,11 +171,6 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
 
         })
         console.log("data: ", data);
-        const name = {
-            first: data.first_name || "",
-            middle: data.middle_name || "",
-            last: data.last_name || "",
-        };
 
         // Prepare children array with one child object
         const children = [{
@@ -184,6 +180,25 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
             aog: data.aog
         }];
         let password = `${data.first_name.replace(/\s+/g, "").toLowerCase()}${data.last_name.replace(/\s+/g, "").toLowerCase()}`;
+
+        const name = {
+            first: data.first_name || "",
+            middle: data.middle_name || "",
+            last: data.last_name || "",
+        };
+
+        const userExist = await User.findOne({
+            name,
+            email: data.email
+        });
+
+        if (userExist) {
+            return res.status(400).json({
+                success: false,
+                message: "User already exists"
+            });
+        }
+
         const user = await User.create({
             name: name,
             email: data.email,
@@ -291,6 +306,7 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
 // Get specific donor details => /api/v1/donor/:id
 exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
     const donor = await Donor.findById(req.params.id)
+        .populate('user')
         .populate('donation.invId', 'unpasteurizedDetails')
         .lean(); // Use lean() for performance if no further Mongoose methods are needed
 
