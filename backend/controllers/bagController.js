@@ -6,12 +6,12 @@ const ErrorHandler = require('../utils/errorHandler');
 const Donor = require('../models/donor');
 const User = require('../models/user');
 exports.createBag = catchAsyncErrors(async (req, res, next) => {
-    const {donorId, volume, expressDate} = req.body;
-    const donor = await Donor.find({user: donorId});
-    if (!donor) {
+    const {donor, volume, expressDate} = req.body;
+    const donorId = await Donor.find({user: donorId});
+    if (!donorId) {
         return next(new ErrorHandler('Donor not found', 404));
     }
-    const bags = await Bag.create({donor: donorId, volume, expressDate});
+    const bags = await Bag.create({donor: donor, volume, expressDate});
     res.status(201).json({
         success: true,
         bags,
