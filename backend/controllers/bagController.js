@@ -6,15 +6,15 @@ const ErrorHandler = require('../utils/errorHandler');
 const Donor = require('../models/donor');
 const User = require('../models/user');
 exports.createBag = catchAsyncErrors(async (req, res, next) => {
-    const {userID, volume, expressDate} = req.body;
-    console.log("body: ",req.body)
-    const donor = await Donor.find({user: userID});
+    const { userID, volume, expressDate } = req.body;
+    console.log("body: ", req.body)
+    const donor = await Donor.find({ user: userID });
     if (!donor) {
         return next(new ErrorHandler('Donor not found', 404));
     }
-    
+
     console.log('donor: ', donor[0]._id);
-    const bags = await Bag.create({donor: donor[0]._id, volume, expressDate});
+    const bags = await Bag.create({ donor: donor[0]._id, volume, expressDate });
     res.status(201).json({
         success: true,
         bags,
@@ -23,12 +23,13 @@ exports.createBag = catchAsyncErrors(async (req, res, next) => {
 
 
 exports.getDonorBags = catchAsyncErrors(async (req, res, next) => {
-    const {id} = req.params;
-    const donor = await Donor.find({user: id});
+    const { id } = req.params;
+    const donor = await Donor.find({ user: id });
     if (!donor) {
         return next(new ErrorHandler('Donor not found', 404));
     }
-    const bags = await Bag.find({donor: donor[0]._id, status: 'Expressed'});
+    const bags = await Bag.find({ donor: donor[0]._id, status: 'Expressed' })
+        .sort({ expressDate: 1 });
     res.status(200).json({
         success: true,
         count: bags.length,
