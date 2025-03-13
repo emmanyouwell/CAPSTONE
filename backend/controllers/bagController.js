@@ -28,11 +28,24 @@ exports.getDonorBags = catchAsyncErrors(async (req, res, next) => {
     if (!donor) {
         return next(new ErrorHandler('Donor not found', 404));
     }
-    const bags = await Bag.find({ donor: donor[0]._id, status: 'Expressed' })
-        .sort({ expressDate: 1 });
+    const result = await Bag.aggregate([
+        { $match: { donor: donor[0]._id, status: "Expressed" } }, // Filter by donor & status
+        { $sort: { expressDate: 1 } }, // Sort by expressDate (oldest first)
+        {
+            $group: {
+                _id: null,
+                totalVolume: { $sum: "$volume" }, // Calculate total volume
+                bags: { $push: "$$ROOT" } // Push all bag documents into an array
+            }
+        }
+    ]);
+
+    const totalVolume = result.length > 0 ? result[0].totalVolume : 0;
+    const bags = result.length > 0 ? result[0].bags : [];
     res.status(200).json({
         success: true,
         count: bags.length,
         bags,
+        totalVolume
     });
 })
