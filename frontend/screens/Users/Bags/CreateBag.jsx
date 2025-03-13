@@ -11,10 +11,10 @@ import { getUserDetails } from "../../../redux/actions/userActions";
 
 const CreateBag = ({ navigation }) => {
     const [open, setOpen] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(null);
     const dispatch = useDispatch();
     const { bags } = useSelector((state) => state.bags);
-    const {userDetails} = useSelector((state) => state.users);
+    const { userDetails } = useSelector((state) => state.users);
     const onMenuPress = () => {
         navigation.openDrawer();
     }
@@ -30,9 +30,9 @@ const CreateBag = ({ navigation }) => {
         expressDate: Yup.date()
             .required("Express date is required")
     });
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(getUserDetails())
-    },[dispatch])
+    }, [dispatch])
     return (
         <>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
@@ -46,8 +46,8 @@ const CreateBag = ({ navigation }) => {
                             expressDate: values.expressDate,
                             donor: userDetails._id
                         }
-                        dispatch(createBag(data)).then(()=>{navigation.navigate('userHome')});
-                        
+                        dispatch(createBag(data)).then(() => { navigation.navigate('userHome') });
+
                     }}
                 >
                     {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
@@ -84,14 +84,16 @@ const CreateBag = ({ navigation }) => {
                                     backgroundColor: "#f0f0f0"
                                 }}
                             >
-                                <Text>{selectedDate.toLocaleString()}</Text>
+                                <Text>
+                                    {selectedDate ? selectedDate.toLocaleString() : "Select Express Date"}
+                                </Text>
                             </TouchableOpacity>
 
                             {/* Modal Date Picker */}
                             <DatePicker
                                 modal
                                 open={open}
-                                date={selectedDate}
+                                date={selectedDate || new Date()}
                                 mode="datetime"
                                 onConfirm={(date) => {
                                     setOpen(false);
