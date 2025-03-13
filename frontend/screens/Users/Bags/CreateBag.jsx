@@ -33,6 +33,7 @@ const CreateBag = ({ navigation }) => {
     useEffect(() => {
         dispatch(getUserDetails())
     }, [dispatch])
+
     return (
         <>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
@@ -41,6 +42,7 @@ const CreateBag = ({ navigation }) => {
                     initialValues={{ volume: "", expressDate: "" }}
                     validationSchema={validationSchema}
                     onSubmit={(values) => {
+                        console.log('user id: ', userDetails._id);
                         const data = {
                             volume: values.volume,
                             expressDate: values.expressDate,
