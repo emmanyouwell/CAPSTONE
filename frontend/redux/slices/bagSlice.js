@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { getDonors, getMilkPerMonth, updateDonor, getDonorsPerMonth, } from '../actions/donorActions';
-import { createbag } from '../actions/bagActions';
+import { createBag, deleteBag, getBags, getSingleBag, updateBag } from '../actions/bagActions';
 export const bagSlice = createSlice({
     name: 'donor',
     initialState: {
         bags: [],
         loading: false,
         error: null,
-        pageSize: 0,
+        totalVolume: 0,
         totalBags: 0,
         totalPages: 0,
         isUpdated: false,
@@ -17,14 +17,61 @@ export const bagSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(createbag.pending, (state) => {
+            .addCase(createBag.pending, (state) => {
                 state.loading = true;
             })
-            .addCase(createbag.fulfilled, (state, action) => {
+            .addCase(createBag.fulfilled, (state, action) => {
                 state.loading = false;
                 state.bags = action.payload.bags
             })
-            .addCase(createbag.rejected, (state, action) => {
+            .addCase(createBag.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(getBags.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getBags.fulfilled, (state, action) => {
+                state.loading = false;
+                state.bags = action.payload.bags
+                state.totalBags = action.payload.count
+                state.totalVolume = action.payload.totalVolume
+            })
+            .addCase(getBags.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(getSingleBag.pending, (state, action) => {
+                state.loading = true;
+            })
+            .addCase(getSingleBag.fulfilled, (state, action) => {
+                state.loading = false;
+                state.bagDetails = action.payload.bag
+                state.bags = []
+            })
+            .addCase(getSingleBag.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(updateBag.pending, (state, action) => {
+                state.loading = true;
+            })
+            .addCase(updateBag.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isUpdated = action.payload.success
+            })
+            .addCase(updateBag.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(deleteBag.pending, (state, action) => {
+                state.loading = true;
+            })
+            .addCase(deleteBag.fulfilled, (state, action) => {
+                state.loading = false;
+                state.isDeleted = action.payload.success
+            })
+            .addCase(deleteBag.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
