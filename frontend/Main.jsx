@@ -11,7 +11,7 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Home from "./components/Home";
+import Home from "./screens/Users/Home";
 import Login from "./screens/Login";
 import Dashboard from "./screens/Superadmin/Dashboard";
 const Stack = createNativeStackNavigator();
@@ -62,6 +62,7 @@ import EditEvent from "./components/Superadmin/Schedule/EditEvent";
 import AddEvent from "./components/Superadmin/Schedule/AddEvent";
 import EditArticles from "./components/Superadmin/Articles/EditArticles";
 import EmployeeLogin from "./screens/EmployeeLogin";
+import CreateBag from "./screens/Users/Bags/CreateBag";
 
 const CustomDrawerContent = (props) => {
 
@@ -83,9 +84,11 @@ const CustomDrawerContent = (props) => {
           source={{ uri: defaultImg }} // Replace with your profile picture URL
           style={drawerStyle.profilePic}
         /> */}
+        <Text style={drawerStyle.profileName}>Logged in as,</Text>
         <Text style={drawerStyle.profileName}>{userDetails
-          ? `Logged in as, ${userDetails.name}`
-          : "Logged in as, Superadmin"}</Text>
+          ? `${userDetails.name.first} ${userDetails.name.middle} ${userDetails.name.last}`
+          : "Logged in as, Superadmin"}
+        </Text>
       </View>
 
       <View style={divider.divider} />
@@ -168,10 +171,6 @@ const MainStack = () => {
       }}
     >
       <Stack.Group>
-        {/* User Navigations */}
-        <Stack.Screen name="userHome" component={Home} />
-
-
 
         {/* Superadmin navigations */}
         <Stack.Screen name="login" component={Login} />
@@ -184,6 +183,11 @@ const MainStack = () => {
         <Stack.Screen name="superadmin_account_management" component={AccountManagement} />
         <Stack.Screen name="superadmin_account_create_admin" component={CreateAdmin} />
         <Stack.Screen name="superadmin_account_create_staff" component={CreateStaff} />
+
+
+        {/* User Navigations */}
+        <Stack.Screen name="userHome" component={Home} />
+        <Stack.Screen name="createBag" component={CreateBag} />
 
         {/* Schedule */}
         <Stack.Screen name="editEvents" component={EditEvent} />

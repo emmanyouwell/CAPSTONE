@@ -67,7 +67,7 @@ const donorSchema = new mongoose.Schema({
         {
             invId: {
                 type: ObjectId,
-                ref: 'Inventory'
+                ref: 'Inventory2'
             }
         }
     ],

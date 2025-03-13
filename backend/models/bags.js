@@ -1,0 +1,33 @@
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Schema.Types;
+
+const bagSchema = new mongoose.Schema({
+    expressDate: {
+        type: Date,
+        default: Date.now,
+    },
+    donor: {
+        type: ObjectId,
+        ref: 'Donor',
+        required: [true, 'User is needed to complete inventory'],
+    },
+    status: {
+        type: String,
+        enum: ['Expressed','Collected','Pasteurized'],
+        default: 'Expressed',
+        required: true
+    },
+    volume: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+    
+});
+
+
+module.exports = mongoose.model('Bags', bagSchema);

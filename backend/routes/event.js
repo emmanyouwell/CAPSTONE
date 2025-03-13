@@ -13,7 +13,7 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 // Super Admin Routes
 router.route('/events')
-    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), allEvents)
+    .get(isAuthenticatedUser, allEvents)
     .post(isAuthenticatedUser, authorizeRoles('SuperAdmin'), createEvent);
 router.route('/event/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), getEventDetails)
