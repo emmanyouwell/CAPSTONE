@@ -8,7 +8,7 @@ import Header from '../../../components/Superadmin/Header'
 import { colors } from '../../../styles/Styles'
 import { createBag } from '../../../redux/actions/bagActions'
 import { getUserDetails } from "../../../redux/actions/userActions";
-
+import { logoutUser } from "../../../redux/actions/userActions";
 const CreateBag = ({ navigation }) => {
     const [open, setOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -87,7 +87,14 @@ const CreateBag = ({ navigation }) => {
                                 }}
                             >
                                 <Text>
-                                    {selectedDate ? selectedDate.toLocaleString() : "Select Express Date"}
+                                    {selectedDate ? selectedDate.toLocaleString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                        hour12: true, // Ensures AM/PM format
+                                    }) : "Select Express Date"}
                                 </Text>
                             </TouchableOpacity>
 
@@ -95,7 +102,7 @@ const CreateBag = ({ navigation }) => {
                             <DatePicker
                                 modal
                                 open={open}
-                                date={selectedDate || new Date()}
+                                date={selectedDate ? selectedDate : new Date()}
                                 mode="datetime"
                                 onConfirm={(date) => {
                                     setOpen(false);
