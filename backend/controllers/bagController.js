@@ -30,7 +30,7 @@ exports.getDonorBags = catchAsyncErrors(async (req, res, next) => {
     }
     const result = await Bag.aggregate([
         { $match: { donor: donor[0]._id, status: "Expressed" } }, // Filter by donor & status
-        { $sort: { expressDate: 1 } }, // Sort by expressDate (oldest first)
+        { $sort: { expressDate: -1 } }, // Sort by expressDate (oldest first)
         {
             $group: {
                 _id: null,
