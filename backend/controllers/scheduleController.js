@@ -1,4 +1,5 @@
 const Schedule = require('../models/schedule')
+const Collection = require('../models/collection');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
@@ -83,3 +84,52 @@ exports.deleteSchedule = catchAsyncErrors( async (req, res, next) => {
         message: "schedule Deleted"
     })
 })
+
+// Request a Pickup Schedule
+exports.requestSchedule = catchAsyncErrors(async (req, res) => {
+    const { donorId, dates, milkDetails, venue } = req.body;
+
+    try {
+        const totalVolume = milkDetails.reduce((total, item) => {
+            return total + (item.volume * item.quantity);
+        }, 0);
+        
+        const newSchedule = await Schedule.create({
+            venue,
+            dates,
+            donorDetails: { donorId, milkDetails },
+            totalVolume
+        });
+
+        res.status(201).json({ message: 'Schedule requested successfully', newSchedule });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to request schedule', details: error.message });
+    }
+});
+
+// Approve or Modify a Pickup Schedule
+exports.approveSchedule = catchAsyncErrors(async (req, res) => {
+    const { scheduleId, newDate, adminId, venue } = req.body;
+
+    try {
+        const schedule = await Schedule.findById(scheduleId);
+        if (!schedule) return res.status(404).json({ error: 'Schedule not found' });
+
+        if (newDate) schedule.dates = newDate;
+        schedule.venue = venue
+        schedule.status = 'Approved'
+        schedule.approvedBy = adminId;
+        await schedule.save();
+
+        const newCollection = await Collection.create({
+            collectionType: 'Private',
+            collectionDate: schedule.dates,
+            user: adminId,
+            privDetails: scheduleId,
+        });
+
+        res.status(200).json({ message: 'Schedule approved successfully', newCollection });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to approve schedule', details: error.message });
+    }
+});

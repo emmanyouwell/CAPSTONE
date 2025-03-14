@@ -34,7 +34,6 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
         // Find donors based on the query object
         const donors = await Donor.find(query)
             .populate('user')
-            .populate('donation.invId', 'unpasteurizedDetails')
             .sort({ 'name.first': 1 })
             .skip(skip)
             .limit(pageSize);

@@ -6,7 +6,7 @@ const collectionSchema = new mongoose.Schema({
         type: String,
         enum: ['Public', 'Private'],
         default: 'Public',
-        required: [true, 'Must specify collection type'],
+        required: [true, 'Must specify collection type']
     },
     collectionDate: {
         type: Date,
@@ -15,44 +15,19 @@ const collectionSchema = new mongoose.Schema({
     user: {
         type: ObjectId,
         ref: 'User',
-        required: [true, 'Admin user is needed to complete inventory'],
-    },
-    status: {
-        type: String,
-        enum: ['Not-Due', 'On-Going', 'Done'],
-        default: 'Not-Due',
-        required: true
+        required: [true, 'Admin user is needed to complete the collection']
     },
     pubDetails: {
-        totalVol: {
-            type: Number,
-            required: function () {
-                return this.collectionType === 'Public';
-            },
-        },
-        milkLetting: {
-            type: ObjectId,
-            required: function () {
-                return this.collectionType === 'Public';
-            },
-            ref: 'Letting'
-        },
+        type: ObjectId,
+        ref: 'Letting'
     },
     privDetails: {
-        totalVol: {
-            type: Number,
-            required: function () {
-                return this.collectionType === 'Private';
-            },
-        },
-        scheduled: {
-            type: ObjectId,
-            required: function () {
-                return this.collectionType === 'Private';
-            },
-            ref: 'Schedule'
-        },
+        type: ObjectId,
+        ref: 'Schedule'
     },
+    notes: {
+        type: String 
+    }
 });
 
 module.exports = mongoose.model('Collection', collectionSchema);

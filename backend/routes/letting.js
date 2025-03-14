@@ -7,6 +7,9 @@ const {
     getLettingDetails,
     updateLetting,
     deleteletting,
+    createEvent,
+    markAttendance,
+    finalizeSession,
 } = require('../controllers/lettingController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -19,5 +22,16 @@ router.route('/letting/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateLetting)
     .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), deleteletting);
 
+// Route to create a new Milk Letting Event
+router.route('/create-letting')
+    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), createEvent);
+
+// Route to mark attendance for donors
+router.route('/mark-attendance')
+    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), markAttendance);
+
+// Route to finalize the Milk Letting Session
+router.route('/finalize-session')
+    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), finalizeSession);
 
 module.exports = router;

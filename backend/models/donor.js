@@ -63,11 +63,17 @@ const donorSchema = new mongoose.Schema({
 
         }
     ],
-    donation: [
+    donations: [
         {
-            invId: {
+            donationType: {
+                type: String,
+                enum: ['Public', 'Private'],
+                required: true
+            },
+            volume: { type: Number },
+            milkLettingEvent: {
                 type: ObjectId,
-                ref: 'Inventory2'
+                ref: 'Letting',
             }
         }
     ],

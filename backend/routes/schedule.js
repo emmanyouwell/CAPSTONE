@@ -6,7 +6,9 @@ const {
     createSchedule,
     getScheduleDetails,
     updateSchedule,
-    deleteSchedule
+    deleteSchedule,
+    requestSchedule,
+    approveSchedule
 } = require('../controllers/scheduleController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -18,6 +20,14 @@ router.route('/schedule/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getScheduleDetails)
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateSchedule)
     .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), deleteSchedule);
+
+// Route to request a pickup schedule
+router.route('/request-schedule')
+    .post(requestSchedule);
+
+// Route to approve or modify a pickup schedule
+router.route('/approve-schedule')
+    .post(isAuthenticatedUser,  authorizeRoles('SuperAdmin', 'Admin'), approveSchedule);
 
 
 module.exports = router;
