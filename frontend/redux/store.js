@@ -11,6 +11,8 @@ import equipmentReducer from './slices/equipmentSlice'
 import articleReducer from './slices/articleSlice'
 import notifReducer from './slices/notifSlice'
 import bagReducer from './slices/bagSlice'
+import lettingReducer from './slices/lettingSlice'
+import scheduleReducer from './slices/scheduleSlice'
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
@@ -24,8 +26,9 @@ export const store = configureStore({
     equipments: equipmentReducer,
     articles: articleReducer,
     devices: notifReducer,
-    bags: bagReducer
-
+    bags: bagReducer,
+    lettings: lettingReducer,
+    schedules: scheduleReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
