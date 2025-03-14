@@ -8,9 +8,9 @@ import {
     ScrollView,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import Header from '../../../components/Superadmin/Header';
-import { logoutUser } from '../../../redux/actions/userActions';
-import { SuperAdmin } from '../../../styles/Styles';
+import Header from '../../components/Superadmin/Header';
+import { logoutUser } from '../../redux/actions/userActions';
+import { SuperAdmin } from '../../styles/Styles';
 
 const InventoryScreen = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -33,6 +33,13 @@ const InventoryScreen = ({ navigation }) => {
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
 
             <Text style={styles.screenTitle}>Milk Letting Management</Text>
+            <View style={styles.navButtons}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('AddMilkLetting') }>
+                <Text style={styles.buttonText}>Add Milk Letting Event</Text>
+                </TouchableOpacity>
+            </View>
 
         </View>
     );
@@ -47,12 +54,11 @@ const styles = StyleSheet.create({
     },
     navButtons: {
         flex: 1,
-        justifyContent: 'center', 
-        alignItems: 'center',
+        alignItems: 'center', 
         paddingHorizontal: 16,
     },
     button: {
-        backgroundColor: '#007AFF',
+        backgroundColor: '#E53777',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
