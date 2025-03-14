@@ -30,11 +30,12 @@ exports.getDonorBags = catchAsyncErrors(async (req, res, next) => {
     }
     const result = await Bag.aggregate([
         { $match: { donor: donor[0]._id, status: "Expressed" } }, // Filter by donor & status
-        { $sort: { expressDate: -1 } }, // Sort by expressDate (oldest first)
         {
             $group: {
                 _id: null,
                 totalVolume: { $sum: "$volume" }, // Calculate total volume
+                oldestExpressDate: { $min: "$expressDate" }, // Get the earliest expressDate
+                latestExpressDate: { $max: "$expressDate" }, // Get the latest expressDate
                 bags: { $push: "$$ROOT" } // Push all bag documents into an array
             }
         }
@@ -42,16 +43,21 @@ exports.getDonorBags = catchAsyncErrors(async (req, res, next) => {
 
     const totalVolume = result.length > 0 ? result[0].totalVolume : 0;
     const bags = result.length > 0 ? result[0].bags : [];
+    const oldestExpressDate = result.length > 0 ? result[0].oldestExpressDate : null;
+    const latestExpressDate = result.length > 0 ? result[0].latestExpressDate : null;
+
     res.status(200).json({
         success: true,
         count: bags.length,
         bags,
-        totalVolume
+        totalVolume,
+        oldestExpressDate,
+        latestExpressDate
     });
 })
 
 exports.getSingleBag = catchAsyncErrors(async (req, res, next) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const bag = await Bag.findById(id);
     if (!bag) {
         return next(new ErrorHandler('Bag not found', 404));
@@ -76,11 +82,11 @@ exports.updateBag = catchAsyncErrors(async (req, res, next) => {
         success: true,
         bag
     });
-    
+
 })
 
 exports.deleteBag = catchAsyncErrors(async (req, res, next) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const bag = await Bag.findByIdAndDelete(id);
     if (!bag) {
         return next(new ErrorHandler('Bag not found', 404));
