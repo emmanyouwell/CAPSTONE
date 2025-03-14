@@ -21,25 +21,36 @@ const lettingSchema = mongoose.Schema({
             required: true
         }
     },
+    status: {
+        type: String,
+        enum: ['Not-Due', 'On-Going', 'Done'],
+        default: 'Not-Due'
+    },
     attendance: [
         {
+            donor: {
+                type: ObjectId,
+                ref: 'Donor',
+                required: true
+            },
             donorType: {
                 type: String,
                 enum: ['New Donor', 'Past Donor'],
-                default: 'New Donor',
-            },
-            donor: {
-                type: ObjectId,
-                ref: 'Donor'
+                default: 'New Donor'
             },
             volume: {
                 type: Number,
+                required: true
             },
             lastDonation: {
-                type: Date,
+                type: Date
             }
         },
     ],
+    totalVolume: {
+        type: Number,
+        default: 0
+    },
     admin: {
         type: ObjectId,
         required: true,
@@ -49,6 +60,6 @@ const lettingSchema = mongoose.Schema({
         type: Date,
         default: Date.now
     }
-})
+});
 
-module.exports = mongoose.model('Letting', lettingSchema)
+module.exports = mongoose.model('Letting', lettingSchema);

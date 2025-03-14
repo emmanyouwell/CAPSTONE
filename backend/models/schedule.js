@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
-const {ObjectId} = mongoose.Schema.Types;
+const { ObjectId } = mongoose.Schema.Types;
 
 const scheduleSchema = mongoose.Schema({
-    dates:{
+    dates: {
         type: Date,
         required: true
     },
@@ -17,27 +16,36 @@ const scheduleSchema = mongoose.Schema({
             required: true,
             ref: 'Donor'
         },
-        milkDetails: [
+        milkDetails: [   
             {
                 volume: {
                     type: Number,
-                    required: true,
-                },
+                    required: true
+                    },
                 quantity: {
                     type: Number,
-                    required: true,
-                },
+                    required: true
+                }
             }
         ]
     },
+    totalVolume: {
+        type: Number,
+        default: 0 
+    },
+    status: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Completed'],
+        default: 'Pending'
+    },
     approvedBy: {
         type: ObjectId,
-        ref: 'User',
+        ref: 'User'
     },
     createdAt: {
         type: Date,
         default: Date.now
     }
-})
+});
 
-module.exports = mongoose.model('Schedule', scheduleSchema)
+module.exports = mongoose.model('Schedule', scheduleSchema);
