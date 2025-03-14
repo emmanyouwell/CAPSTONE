@@ -32,13 +32,11 @@ export const createBag = createAsyncThunk(
         }
     }
 );
-
-// Update donor
-export const updateDonor = createAsyncThunk(
-    'donor/updateDonor',
+export const getBags = createAsyncThunk(
+    'bag/getBags',
     async (req, thunkAPI) => {
-
         const token = await getToken();
+        console.log('Token Retrieved:', token);
 
         if (!token) {
             throw new Error('No token available');
@@ -50,26 +48,25 @@ export const updateDonor = createAsyncThunk(
                 Authorization: `Bearer ${token}`
             },
             withCredentials: true
-        }
-        
+        };
+
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/donor/${req.id}`, req, config)
+            let urlString = `${REACT_APP_API_URL}/api/v1/bag/donor/${req}`;
+           
+
+            const response = await axios.get(urlString, config);
 
             return response.data;
-
         } catch (error) {
-
             return thunkAPI.rejectWithValue(error.message);
         }
     }
-)
-
-
-export const getMilkPerMonth = createAsyncThunk(
-    'milkPerMonth/getMilkPerMonth',
-    async (thunkAPI) => {
-
+);
+export const getSingleBag = createAsyncThunk(
+    'bag/getSingleBag',
+    async (req, thunkAPI) => {
         const token = await getToken();
+        console.log('Token Retrieved:', token);
 
         if (!token) {
             throw new Error('No token available');
@@ -81,25 +78,26 @@ export const getMilkPerMonth = createAsyncThunk(
                 Authorization: `Bearer ${token}`
             },
             withCredentials: true
-        }
-        
+        };
+
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/milkPerMonth`, config)
-            console.log("Response: ", response.data)
+            let urlString = `${REACT_APP_API_URL}/api/v1/bag/${req}`;
+           
+
+            const response = await axios.get(urlString, config);
+
             return response.data;
-
         } catch (error) {
-
             return thunkAPI.rejectWithValue(error.message);
         }
     }
-)
+);
 
-export const getDonorsPerMonth = createAsyncThunk(
-    'donorsPerMonth/getDonorsPerMonth',
-    async (thunkAPI) => {
-
+export const updateBag = createAsyncThunk(
+    'bag/updateBag',
+    async (req, thunkAPI) => {
         const token = await getToken();
+        console.log('Token Retrieved:', token);
 
         if (!token) {
             throw new Error('No token available');
@@ -111,16 +109,51 @@ export const getDonorsPerMonth = createAsyncThunk(
                 Authorization: `Bearer ${token}`
             },
             withCredentials: true
-        }
-        
+        };
+
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/donorsPerMonth`, config)
-            
+            let urlString = `${REACT_APP_API_URL}/api/v1/bag/${req.id}`;
+           
+
+            const response = await axios.put(urlString, req, config);
+
             return response.data;
-
         } catch (error) {
-
             return thunkAPI.rejectWithValue(error.message);
         }
     }
-)
+);
+
+export const deleteBag = createAsyncThunk(
+    'bag/deleteBag',
+    async (req, thunkAPI) => {
+        const token = await getToken();
+        console.log('Token Retrieved:', token);
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        };
+
+        try {
+            let urlString = `${REACT_APP_API_URL}/api/v1/bag/${req}`;
+           
+
+            const response = await axios.delete(urlString, config);
+
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+);
+
+
+

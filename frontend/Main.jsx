@@ -63,6 +63,7 @@ import AddEvent from "./components/Superadmin/Schedule/AddEvent";
 import EditArticles from "./components/Superadmin/Articles/EditArticles";
 import EmployeeLogin from "./screens/EmployeeLogin";
 import CreateBag from "./screens/Users/Bags/CreateBag";
+import EditBag from "./screens/Users/Bags/EditBag";
 
 const CustomDrawerContent = (props) => {
 
@@ -188,7 +189,7 @@ const MainStack = () => {
         {/* User Navigations */}
         <Stack.Screen name="userHome" component={Home} />
         <Stack.Screen name="createBag" component={CreateBag} />
-
+        <Stack.Screen name="bagDetails" component={EditBag} />
         {/* Schedule */}
         <Stack.Screen name="editEvents" component={EditEvent} />
         <Stack.Screen name="addEvents" component={AddEvent} />
