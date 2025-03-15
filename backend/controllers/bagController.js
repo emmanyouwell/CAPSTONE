@@ -6,7 +6,7 @@ const ErrorHandler = require('../utils/errorHandler');
 const Donor = require('../models/donor');
 const User = require('../models/user');
 exports.createBag = catchAsyncErrors(async (req, res, next) => {
-    const { userID, volume, expressDate } = req.body;
+    const { userID, volume, expressDate, type } = req.body;
     console.log("body: ", req.body)
     const donor = await Donor.find({ user: userID });
     if (!donor) {
@@ -14,7 +14,7 @@ exports.createBag = catchAsyncErrors(async (req, res, next) => {
     }
 
     console.log('donor: ', donor[0]._id);
-    const bags = await Bag.create({ donor: donor[0]._id, volume, expressDate });
+    const bags = await Bag.create({ donor: donor[0]._id, volume, expressDate, collectionType: type });
     res.status(201).json({
         success: true,
         bags,
