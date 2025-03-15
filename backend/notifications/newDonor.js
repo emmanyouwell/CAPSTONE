@@ -9,7 +9,7 @@ const newDonor = async () => {
   try {
     const now = new Date();
 
-    const newDonors = await Donor.find({ createdAt: { $gte: lastChecked } });
+    const newDonors = await Donor.find({ createdAt: { $gte: lastChecked } }).populate('user');
     if (newDonors.length > 0) {
       const adminDevices = await Notification.find().populate("user", "role");
       const filteredDevices = adminDevices.filter((dev) => dev.user.role === "Admin");
@@ -19,7 +19,7 @@ const newDonor = async () => {
           const notificationData = {
             token: device.token,
             title: "New Donor Applied",
-            body: `A new donor (${donor.name.first} ${donor.name.last}) has been added. Check the portal for details.`,
+            body: `A new donor (${donor.user.name.first} ${donor.user.name.last}) has been added. Check the portal for details.`,
           };
 
           console.log("Sending Notification:", notificationData);
