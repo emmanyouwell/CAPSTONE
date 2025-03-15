@@ -41,6 +41,7 @@ import EditMilkInventory from "./components/Superadmin/Inventories/Refrigerators
 // Milk Letting Screens
 import MilkLetting from "./screens/Superadmin/MilkLetting";
 import AddMilkLetting from "./components/Superadmin/MilkLetting/AddMilkLetting";
+import Attendance from "./components/Superadmin/MilkLetting/Attendance";
 
 import Equipment from "./screens/Superadmin/Inventories/Equipment";
 import AddEquipment from "./components/Superadmin/Inventories/Equipment/AddEquipment";
@@ -233,6 +234,7 @@ const MainStack = () => {
         {/* Milk Letting Navigation*/}
         <Stack.Screen name="superadmin_milkLetting" component={MilkLetting} />
         <Stack.Screen name="AddMilkLetting" component={AddMilkLetting} />
+        <Stack.Screen name="Attendance" component={Attendance} />
 
       </Stack.Group>
     </Stack.Navigator>
