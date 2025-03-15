@@ -23,7 +23,7 @@ export const createLetting = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.8:4000/api/v1/create-letting`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/create-letting`, req, config)
             console.log("Create Letting: ", response.data)
             return response.data;
 
@@ -54,7 +54,7 @@ export const markAttendance = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.8:4000/api/v1/mark-attendance`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/mark-attendance`, req, config)
             console.log("Mark Attendance: ", response.data)
             return response.data;
 
@@ -85,13 +85,52 @@ export const finalizeSession = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.8:4000/api/v1/finalize-session`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/finalize-session`, req, config)
             console.log("Finalize Session: ", response.data)
             return response.data;
 
         } catch (error) {
 
             return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Get all Milk Letting Event
+export const getLettings = createAsyncThunk(
+    'letting/getLettings',
+    async (query, thunkAPI) => {
+        
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        console.log("Config: ", config)
+        try {
+            let urlString = ''
+            if (query){
+                urlString = `http://192.168.1.24:4000/api/v1/lettings?search=${query}`
+            }
+            else {
+                urlString = `http://192.168.1.24:4000/api/v1/lettings`
+            }
+            console.log("URL: ", urlString)
+            const response = await axios.get(urlString, config);
+            console.log("Response Lettings: ", response.data)
+            return response.data;
+
+        } catch (error) {
+            // return thunkAPI.rejectWithValue(error.message);
+            console.log("Errpr: ", error)
         }
     }
 )

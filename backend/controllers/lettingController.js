@@ -8,10 +8,10 @@ exports.allLettings = catchAsyncErrors(async (req, res, next) => {
     const lettings = await Letting.find()
         .populate({
             path: 'attendance.donor',
-            select: 'name home_address donation',
+            select: 'user home_address donations',
             populate: {
-                path: 'donation.invId',
-                select: 'unpasteurizedDetails'
+                path: 'user',
+                select: 'name'
             }
         });
 
@@ -48,10 +48,10 @@ exports.getLettingDetails = catchAsyncErrors( async (req, res, next) => {
     const letting = await Letting.findById(req.params.id)
         .populate({
             path: 'attendance.donor',
-            select: 'name home_address donation',
+            select: 'user home_address donation',
             populate: {
-                path: 'donation.invId',
-                select: 'unpasteurizedDetails'
+                path: 'user',
+                select: 'name'
             }
         });
 

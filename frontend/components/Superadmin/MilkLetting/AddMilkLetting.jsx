@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { createLetting } from '../../../redux/actions/lettingActions'
 
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet } from 'react-native'
-import Header from '../../../components/Superadmin/Header'
+import Header from '../Header'
 import { logoutUser, getUserDetails} from '../../../redux/actions/userActions'
 import { Formik } from "formik";
 import * as Yup from "yup";
