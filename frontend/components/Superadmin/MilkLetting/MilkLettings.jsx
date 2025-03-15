@@ -12,7 +12,8 @@ const MilkLettings = ({ data }) => {
     // const { isDeleted } = useSelector((state) => state.equipments);
 
     const handleEdit = (item) => {
-        navigation.navigate('EditEquipment', { item });
+        // navigation.navigate('EditEquipment', { item });
+        console.log("Edit Milk Letting Event: ", item)
     };
 
     // const handleDelete = (id) => {
@@ -51,11 +52,25 @@ const MilkLettings = ({ data }) => {
         </View>
     );
 
+    const renderLeftActions = (item) => (
+        <View style={styles.actionsContainer}>
+            <TouchableOpacity
+                style={[styles.actionButton, styles.attendButton]}
+                onPress={() => navigation.navigate('Attendance', { item })}
+            >
+                <MaterialIcons name="group-add" size={30} color="white" /> 
+            </TouchableOpacity>
+        </View>
+    );
+
     const renderEquipment = ({ item }) => {
         const { activity, venue, status, actDetails} = item;
 
         return (
-            <Swipeable renderRightActions={() => renderRightActions(item)}>
+            <Swipeable 
+                renderRightActions={() => renderRightActions(item)} 
+                renderLeftActions={() => renderLeftActions(item)}
+            >
                 <View style={styles.card}>
 
                     <View style={styles.info}>
@@ -149,6 +164,9 @@ const styles = StyleSheet.create({
     },
     deleteButton: {
         backgroundColor: '#F44336',
+    },
+    attendButton: {
+        backgroundColor: '#E53777',
     },
     actionText: {
         color: '#fff',
