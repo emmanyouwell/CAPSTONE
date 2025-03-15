@@ -3,9 +3,9 @@ import axios from 'axios';
 import { getToken } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
 
-// Request Milk schedule
-export const requestSchedule = createAsyncThunk(
-    'schedule/requestSchedule',
+// Record Record Public Collection
+export const recordPublicRecord = createAsyncThunk(
+    'collection/recordPublicRecord',
     async (req, thunkAPI) => {
 
         const token = await getToken();
@@ -23,8 +23,8 @@ export const requestSchedule = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.8:4000/api/v1/request-schedule`, req, config)
-            console.log("request schedule: ", response.data)
+            const response = await axios.post(`http://192.168.1.8:4000/api/v1/record-public`, req, config)
+            console.log("record public: ", response.data)
             return response.data;
 
         } catch (error) {
@@ -35,8 +35,8 @@ export const requestSchedule = createAsyncThunk(
 )
 
 // Mark Attendance of donors
-export const approveSchedule = createAsyncThunk(
-    'schedule/approveSchedule',
+export const recordPrivateRecord = createAsyncThunk(
+    'collection/recordPrivateRecord',
     async (req, thunkAPI) => {
 
         const token = await getToken();
@@ -54,8 +54,8 @@ export const approveSchedule = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/approve-schedule`, req, config)
-            console.log("approve schedule: ", response.data)
+            const response = await axios.post(`http://192.168.1.8:4000/api/v1/record-private`, req, config)
+            console.log("record private: ", response.data)
             return response.data;
 
         } catch (error) {
