@@ -40,7 +40,7 @@ import EditMilkInventory from "./components/Superadmin/Inventories/Refrigerators
 
 // Milk Letting Screens
 import MilkLetting from "./screens/Superadmin/MilkLetting";
-import AddMilkLetting from "./screens/Superadmin/MilkLetting/AddMilkLetting";
+import AddMilkLetting from "./components/Superadmin/MilkLetting/AddMilkLetting";
 
 import Equipment from "./screens/Superadmin/Inventories/Equipment";
 import AddEquipment from "./components/Superadmin/Inventories/Equipment/AddEquipment";

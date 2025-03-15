@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createLetting, finalizeSession, markAttendance } from '../actions/lettingActions';
+import { createLetting, finalizeSession, getLettings, markAttendance } from '../actions/lettingActions';
 
 export const lettingSlice = createSlice({
   name: 'letting',
   initialState: {
+    lettings: [],
     message: '',
     loading: false,
     error: null, 
@@ -53,6 +54,18 @@ export const lettingSlice = createSlice({
       .addCase(finalizeSession.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      .addCase(getLettings.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getLettings.fulfilled, (state, action) => {
+        state.loading = false;
+        state.lettings = action.payload.lettings;
+      })
+      .addCase(getLettings.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
       })
 
   },

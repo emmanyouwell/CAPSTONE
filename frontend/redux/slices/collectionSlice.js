@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { recordPublicRecord } from '../actions/collectionActions';
+import { recordPrivateRecord, recordPublicRecord } from '../actions/collectionActions';
 
 export const collectionSlice = createSlice({
   name: 'collection',
@@ -26,15 +26,15 @@ export const collectionSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(approveSchedule.pending, (state, action) => {
+      .addCase(recordPrivateRecord.pending, (state, action) => {
         state.loading = true;
       })
-      .addCase(approveSchedule.fulfilled, (state, action) => {
+      .addCase(recordPrivateRecord.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
         state.message = action.payload.message;
       })
-      .addCase(approveSchedule.rejected, (state, action) => {
+      .addCase(recordPrivateRecord.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
