@@ -6,9 +6,9 @@ const scheduleSchema = mongoose.Schema({
         type: Date,
         required: true
     },
-    venue: {
+    address: {
         type: String,
-        default: 'Donors Home',
+        required: true
     },
     donorDetails: {
         donorId: {
@@ -16,16 +16,11 @@ const scheduleSchema = mongoose.Schema({
             required: true,
             ref: 'Donor'
         },
-        milkDetails: [   
+        bags: [   
             {
-                volume: {
-                    type: Number,
-                    required: true
-                    },
-                quantity: {
-                    type: Number,
-                    required: true
-                }
+                type: ObjectId,
+                ref: 'Bags',
+                required: true
             }
         ]
     },

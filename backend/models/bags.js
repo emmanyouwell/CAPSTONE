@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema.Types;
 
 const bagSchema = new mongoose.Schema({
+    collectionType: {
+        type: String,
+        enum: ['Public','Private'],
+        required: true
+    },
     expressDate: {
         type: Date,
         default: Date.now,
