@@ -1,5 +1,7 @@
 const Letting = require('../models/letting');
 const Collection = require('../models/collection')
+const User = require('../models/user')
+const Donor = require('../models/donor')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
@@ -173,3 +175,72 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
         res.status(500).json({ error: 'Failed to finalize session', details: error.message });
     }
 });
+
+
+exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const formData = req.body.formData;
+
+        // Prepare children array with one child object
+        const children = [{
+            name: formData.child_name,
+            age: formData.child_age,
+            birth_weight: formData.birth_weight,
+            aog: formData.aog
+        }];
+        let password = `${formData.first_name.replace(/\s+/g, "").toLowerCase()}${formData.last_name.replace(/\s+/g, "").toLowerCase()}`;
+
+        const name = {
+            first: formData.first_name || "",
+            middle: formData.middle_name || "",
+            last: formData.last_name || "",
+        };
+
+        const userExist = await User.findOne({
+            name,
+            email: formData.email
+        });
+
+        if (userExist) {
+            return res.status(400).json({
+                success: false,
+                message: "User already exists"
+            });
+        }
+
+        const user = await User.create({
+            name: name,
+            email: formData.email,
+            phone: formData.contact_number,
+            password: password,
+            role: 'User',
+        });
+
+        // Create donor 
+        const donor = await Donor.create({
+            user: user._id,
+            home_address: {
+                street: formData.street,
+                brgy: formData.brgy,
+                city: formData.city || 'Taguig City'
+            },
+            age: formData.age,
+            birthday: formData.birthday,
+            children: children,
+            office_address: formData.office_address,
+            contact_number: formData.contact_number_2,
+            donorType: formData.donor_type,
+            occupation: formData.occupation
+        });
+        
+        res.status(200).json({
+            success: true,
+            user,
+            donor
+        });
+    }
+    catch (error) {
+        console.error("Error in createDonor:", error);
+        res.status(500).json({ error: error.message });
+    }
+})
