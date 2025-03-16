@@ -9,30 +9,45 @@ exports.recordPublicDonation = catchAsyncErrors(async (req, res, next) => {
     const { lettingId } = req.body;
 
     try {
-        const milkLetting = await Letting.findById(lettingId);
-        if (!milkLetting) return next(new ErrorHandler(`Milk Letting is not found with this id: ${lettingId}`));
-
-        for (let att of milkLetting.attendance) {
-            const donor = await Donor.findById(att.donor);
-            if (!donor) return next(new ErrorHandler(`Donor is not found with this id: ${att.donor}`));
-
-            donor.donations.push({
-                donationType: 'Public',
-                volume: att.volume,
-                milkLettingEvent: lettingId
-            });
-            await donor.save();
+        const milkLetting = await Letting.findById(lettingId).populate('attendance.donor');
+        if (!milkLetting) {
+            return next(new ErrorHandler(`Milk Letting Event not found with ID: ${lettingId}`));
         }
 
-        res.status(200).json({ message: 'Donation recorded successfully' });
+        const donorIds = milkLetting.attendance.map(att => att.donor);
+
+        const result = await Donor.updateMany(
+            { _id: { $in: donorIds } },
+            {
+                $push: {
+                    donations: {
+                        donationType: 'Public',
+                        milkLettingEvent: lettingId
+                    }
+                }
+            }
+        );
+
+        if (result.matchedCount === 0) {
+            return next(new ErrorHandler('No matching donors found for this event.'));
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            message: 'Donation recorded successfully',
+            updatedDonors: result.modifiedCount
+        });
     } catch (error) {
-        res.status(500).json({ error });
+        res.status(500).json({ 
+            error: 'Failed to record donation', 
+            details: error.message 
+        });
     }
 });
 
 // Record Private Donation after Schedule Approval
 exports.recordPrivateDonation = catchAsyncErrors(async (req, res, next) => {
-    const { donorId, volume, scheduleId } = req.body;
+    const { donorId, scheduleId } = req.body;
 
     try {
         const donor = await Donor.findById(donorId);
@@ -43,9 +58,8 @@ exports.recordPrivateDonation = catchAsyncErrors(async (req, res, next) => {
 
         donor.donations.push({
             donationType: 'Private',
-            volume,
             date: new Date(),
-            relatedRecord: scheduleId
+            schedule: scheduleId
         });
 
         schedule.status = 'Completed'
