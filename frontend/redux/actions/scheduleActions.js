@@ -64,3 +64,34 @@ export const approveSchedule = createAsyncThunk(
         }
     }
 )
+
+
+export const getDonorSchedules = createAsyncThunk(
+    'schedule/getDonorSchedules',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/me/schedules/${req}`, config)
+            console.log("get donor schedules: ", response.data)
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

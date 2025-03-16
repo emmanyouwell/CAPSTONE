@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { approveSchedule, requestSchedule } from '../actions/scheduleActions';
+import { approveSchedule, getDonorSchedules, requestSchedule } from '../actions/scheduleActions';
 
 export const lettingSlice = createSlice({
   name: 'schedule',
@@ -8,6 +8,8 @@ export const lettingSlice = createSlice({
     loading: false,
     error: null, 
     success: false,
+    schedules : [],
+    count: 0,
   },
   reducers: {
   },
@@ -35,6 +37,18 @@ export const lettingSlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(approveSchedule.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getDonorSchedules.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getDonorSchedules.fulfilled, (state, action) => {
+        state.loading = false;
+        state.schedules = action.payload.schedules;
+        state.count = action.payload.count;
+      })
+      .addCase(getDonorSchedules.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
