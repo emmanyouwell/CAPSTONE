@@ -136,10 +136,10 @@ exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
     const donor = await Donor.findOne({ user: id });
     if (!donor) return res.status(404).json({ error: 'Donor not found' });
     
-    const sched = await Schedule.findOne({ "donorDetails.donorId": donor._id, status: 'Pending' });
+    const sched = await Schedule.find({ "donorDetails.donorId": donor._id, status: 'Pending' });
     
     if (!sched) return res.status(404).json({ error: 'No pending schedule found' });
-
+    console.log(sched.length)
     res.status(200).json({
         success: true,
         count: sched.length,
