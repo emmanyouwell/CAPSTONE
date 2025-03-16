@@ -82,17 +82,29 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
         })
 
         const relevantQuestions = [
-            "Have you for any reason been deferred as a milk donor? (Ikaw ba ay natangihan na magbigay ng iyong gata / breastmilk?)",
+            "Have you donated breast milk before? (Nakapagbigay ka na ba ng iyong gatas dati?)",
+            "Will you be allowed by your husband to donate your breast milk to the Taguig City Human Milk Bank? (Papayagan ka ba ng iyong asawa na magbigay ng iyong gatas sa Taguig City Human Milk Bank?)",
+            "Have you for any reason been deferred as a milk donor? (Ikaw ba ay natangihan na magbigay ng iyong gatas / breastmilk?)",
+            "Did you have a normal pregnancy and delivery for your most recent pregnancy? (Normal ba ang panganganak mo sa huli mong anak?)",
             "Do you have any acute or chronic infection, systemic disorders, tuberculosis or history of hepatitis? (Mayroon ka bang kahit anong impeksyon o sakit? Nagkaroon ng sakit sa atay dati?)",
             "Have you received any blood transfusion or other blood products within the last 12 months? (Ikaw ba ay nasalinan ng dugo o kahit anong produkto mula sa dugo nitong nakaraang 12 buwan?)",
             "Have you received any organ or tissue transplant within the last 12 months? (Ikaw ba ay nakatanggap ng parte ng katawan mula sa ibang tao nitong nakaraang 12 buwan?)",
             "Within the last 24 hours, have you had intake of any hard liquor or alcohol? (Nakainom ka ba ng alak nitong nakaraang 24 oras?)",
             "Do you regularly use over-the-counter medications or systemic preparations such as replacement hormones and some birth control hormones? (Regular ka bang gumagamit ng mga gamot gaya ng mga hormones o pills?)",
+            "Do you use megadose vitamins or pharmacologically active herbal preparations? (Gumagamit ka ba ng mga “megadose vitamins” o mga “herbal drugs”?)",
+            "Are you a total vegetarian/vegan? (Ikaw ba ay hindi kumakain ng karne o isang vegetarian?)",
+            "Have you had breast augmentation surgery, using silicone breast implants? (Ikaw ba ay naoperahan na sa suso at nalagyan ng “silicone” o artipisyal na breast implants?)",
             "Do you use illicit drugs? (Gumagamit ka ba ng ipinagbabawal na gamot?)",
             "Do you smoke? (Ikaw ba ay naninigarilyo?)",
             "Have you had syphilis, HIV, herpes, or any sexually-transmitted disease? (Nagkakaroon ka ba ng sakit na nakukuha sa pakikipagtalik /sex?)",
             "Do you have multiple sex partners? (Nagkaroon ka ba ng karanasang makipagtalik sa hindi lang iisang lalaki?)",
-            "Have you had a sexual partner from any of the following? (Nagkaroon ka ba ng partner mula sa mga sumusunod?)"
+            "Have you had a sexual partner from any of the following? (Nagkaroon ka ba ng partner mula sa mga sumusunod?)",
+            "Have you had a tattoo applied or have had accidental needlestick or contact with someone else’s blood? (Nagpalagay ka na ba ng tattoo, naturukan ng karayom nang hindi sinasadya o nadikit sa dugo ng ibang tao?)",
+            "Is your child healthy? (Malusog ba ang iyong anak?)",
+            "Was your child delivered full term? (Ipinanganak ba ang anak mo na husto sa buwan?)",
+            "Are you exclusively breastfeeding your child? (Purong gatas mo ba ang binibigay mo sa anak mo at walang halong ibang formula / gatas?)",
+            "Is/Was your youngest child jaundiced? (Madilaw/nanilaw ba ang bunso mong anak?)",
+            "Has your child ever received milk from another mother? (Nakatanggap na ba ang iyong anak ng gatas / breast milk mula sa ibang ina?"
         ];
         const values = [relevantQuestions.map((key) => {
             // Find the question in the response object that matches the label
@@ -115,7 +127,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             },
 
         };
-        const prediction = await axios.post("https://python-server-production-83ee.up.railway.app/predict/", json, config);
+        const prediction = await axios.post("https://python-server-production-2ecf.up.railway.app/predict/", json, config);
 
         if (!prediction) {
             return res.status(500).json({
