@@ -95,7 +95,7 @@ exports.requestSchedule = catchAsyncErrors(async (req, res) => {
         const donor = await Donor.findOne({ user: userId });
         if (!donor) return res.status(404).json({ error: 'Donor not found' });
 
-        const sched = await Schedule.findOne({ "donorDetails.donorId": donor._id , status: 'Pending' });
+        const sched = await Schedule.findOne({ "donorDetails.donorId": donor._id, status: 'Pending' });
         if (sched) return res.status(400).json({ error: 'You already have a pending schedule' });
 
 
@@ -135,9 +135,17 @@ exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
 
     const donor = await Donor.findOne({ user: id });
     if (!donor) return res.status(404).json({ error: 'Donor not found' });
-    
-    const sched = await Schedule.find({ "donorDetails.donorId": donor._id, status: 'Pending' });
-    
+
+
+    const statusOrder = { Pending: 1, Approved: 2, Completed: 3 };
+
+
+    const sched = await Schedule.find({ "donorDetails.donorId": donor._id })
+        .sort({
+            status: (a, b) => statusOrder[a.status] - statusOrder[b.status], // Custom order
+            date: -1,  // Sort by date in ascending order (oldest first), use -1 for newest first
+        });;
+
     if (!sched) return res.status(404).json({ error: 'No pending schedule found' });
     console.log(sched.length)
     res.status(200).json({
