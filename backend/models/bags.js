@@ -18,7 +18,7 @@ const bagSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Expressed','Collected','Pasteurized'],
+        enum: ['Expressed','Scheduled','Collected','Pasteurized'],
         default: 'Expressed',
         required: true
     },

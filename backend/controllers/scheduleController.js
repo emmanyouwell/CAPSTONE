@@ -120,6 +120,12 @@ exports.requestSchedule = catchAsyncErrors(async (req, res) => {
             totalVolume
         });
 
+        await Bag.updateMany(
+            {donor: donor._id, status: 'Expressed', collectionType: 'Private'},
+            {$set: {status: 'Scheduled'}}
+        );
+
+
         res.status(201).json({ message: 'Schedule requested successfully', newSchedule });
     } catch (error) {
         res.status(500).json({ error: 'Failed to request schedule', details: error.message });
