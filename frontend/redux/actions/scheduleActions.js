@@ -23,7 +23,7 @@ export const requestSchedule = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.24:4000/api/v1/request-schedule`, req, config)
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/request-schedule`, req, config)
             console.log("request schedule: ", response.data)
             return response.data;
 

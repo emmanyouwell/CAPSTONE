@@ -23,7 +23,7 @@ export const recordPublicRecord = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.24:4000/api/v1/record-public`, req, config)
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/record-public`, req, config)
             console.log("record public: ", response.data)
             return response.data;
 
@@ -54,7 +54,7 @@ export const recordPrivateRecord = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.24:4000/api/v1/record-private`, req, config)
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/record-private`, req, config)
             console.log("record private: ", response.data)
             return response.data;
 

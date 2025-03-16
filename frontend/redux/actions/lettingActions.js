@@ -23,7 +23,7 @@ export const createLetting = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.24:4000/api/v1/create-letting`, req, config)
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/create-letting`, req, config)
             console.log("Create Letting: ", response.data)
             return response.data;
 
@@ -54,7 +54,7 @@ export const markAttendance = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.24:4000/api/v1/mark-attendance`, req, config)
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/mark-attendance`, req, config)
             console.log("Mark Attendance: ", response.data)
             return response.data;
 
@@ -85,7 +85,7 @@ export const finalizeSession = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.24:4000/api/v1/finalize-session`, req, config)
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/finalize-session`, req, config)
             console.log("Finalize Session: ", response.data)
             return response.data;
 
@@ -118,10 +118,10 @@ export const getLettings = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `http://192.168.1.24:4000/api/v1/lettings?search=${query}`
+                urlString = `${REACT_APP_API_URL}/api/v1/lettings?search=${query}`
             }
             else {
-                urlString = `http://192.168.1.24:4000/api/v1/lettings`
+                urlString = `${REACT_APP_API_URL}/api/v1/lettings`
             }
             console.log("URL: ", urlString)
             const response = await axios.get(urlString, config);
