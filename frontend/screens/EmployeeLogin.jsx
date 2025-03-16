@@ -25,7 +25,7 @@ const EmployeeLogin = ({ navigation }) => {
 
     useEffect(()=>{
         if (isLoggedIn) {
-            navigation.navigate('superadmin_dashboard');
+            navigation.replace('superadmin_dashboard');
         }
     },[isLoggedIn])
     return (
