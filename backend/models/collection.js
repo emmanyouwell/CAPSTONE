@@ -12,11 +12,14 @@ const collectionSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    user: {
-        type: ObjectId,
-        ref: 'User',
-        required: [true, 'Admin user is needed to complete the collection']
-    },
+    user: [
+        {
+            type: ObjectId,
+            required: [true, 'Admin user is needed to complete the collection'],
+            unique: true,
+            ref: 'User'
+        }
+    ],
     pubDetails: {
         type: ObjectId,
         ref: 'Letting'
