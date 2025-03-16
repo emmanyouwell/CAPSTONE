@@ -7,8 +7,8 @@ import { loginStyle } from '../styles/Styles';
 import { divider } from '../styles/Styles';
 const screenWidth = Dimensions.get('window').width;
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, logout } from '../redux/actions/userActions';
-import { viewAsyncStorage } from '../utils/helper';
+import { loginUser, logout} from '../redux/actions/userActions';
+import { viewAsyncStorage , getUser} from '../utils/helper';
 const Login = ({ navigation }) => {
     const dispatch = useDispatch();
     const [email, setEmail] = useState('');
@@ -19,15 +19,41 @@ const Login = ({ navigation }) => {
         console.log('Form submitted:', { email, password });
         dispatch(loginUser({ email, password }));
     };
+
+    useEffect(()=>{
+        const checkUser = async () => {
+            const user = await getUser();
+            if (user) {
+                if (user.role === 'User') {
+                    navigation.replace('userHome');
+                }
+                else {
+                    navigation.replace('superadmin_dashboard');
+                }
+            }
+        }
+
+        checkUser();
+    },[])
+
+
+
     useEffect(()=>{
         console.log(viewAsyncStorage());
     }, []);
 
     useEffect(()=>{
-        if (isLoggedIn) {
-            navigation.replace('userHome');
+        if (isLoggedIn){
+            if (userDetails && userDetails.role === 'User') {
+
+                navigation.replace('userHome');
+            }
+            else {
+                console.log('wala userdetails')
+                navigation.replace('superadmin_dashboard');
+            }
         }
-    },[isLoggedIn])
+    },[isLoggedIn, userDetails])
     return (
         <ImageBackground source={require('../assets/image/milk-letting-event-1.jpg')} imageStyle={styles.backgroundImageStyle} style={styles.backgroundImage}>
             <LinearGradient
@@ -75,7 +101,7 @@ const Login = ({ navigation }) => {
                                 <Text style={divider.dividerText}>Employee Sign in</Text>
                                 <View style={divider.divider} />
                             </View>
-                            <Button title="Sign in with ID" onPress={() => navigation.navigate('employee_login')} />
+                            <Button title="Sign in with ID" onPress={() => navigation.replace('employee_login')} />
 
                         </LinearGradient>
                     </ScrollView>
