@@ -1,7 +1,8 @@
 const Letting = require('../models/letting');
-const Collection = require('../models/collection')
-const User = require('../models/user')
-const Donor = require('../models/donor')
+const Collection = require('../models/collection');
+const User = require('../models/user');
+const Donor = require('../models/donor');
+const Bag = require('../models/bags');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
@@ -126,32 +127,57 @@ exports.createEvent = catchAsyncErrors(async (req, res) => {
 });
 
 // Mark Attendance for Donors
-exports.markAttendance = catchAsyncErrors(async (req, res) => {
-    const { lettingId, donorId, donorType, volume, lastDonation } = req.body;
+exports.markAttendance = catchAsyncErrors(async (req, res, next) => {
+    const { lettingId, donorId, donorType, bags, lastDonation } = req.body;
 
     try {
         const event = await Letting.findById(lettingId);
         if (!event) return res.status(404).json({ error: 'Event not found' });
+
+        const eventBags = [];
         let total = Number(event.totalVolume) || 0;
-        const numericVolume = Number(volume) || 0; 
+
+        const newBags = bags.flatMap(bag => {
+            if (bag.quantity === 0) throw new ErrorHandler('Bag quantity cannot be zero');
+
+            const numericVolume = Number(bag.volume) || 0;
+            total += numericVolume * bag.quantity;
+
+            return Array.from({ length: bag.quantity }, () => ({
+                collectionType: 'Public',
+                donor: donorId,
+                status: 'Collected',
+                volume: bag.volume
+            }));
+        });
+
+        const createdBags = await Bag.insertMany(newBags);
+        const bagIds = createdBags.map(bag => bag._id);
 
         const attendanceEntry = {
             donor: donorId,
             donorType,
-            volume: numericVolume,
-            lastDonation
+            bags: bagIds,
+            ...(lastDonation && { lastDonation })  // Conditionally add `lastDonation`
         };
 
         event.attendance.push(attendanceEntry);
-        total += numericVolume;
         event.totalVolume = total;
         await event.save();
 
-        res.status(200).json({ success: true, message: 'Attendance recorded successfully', event });
+        res.status(200).json({ 
+            success: true, 
+            message: 'Attendance recorded successfully', 
+            event 
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to mark attendance', details: error.message });
+        res.status(500).json({ 
+            error: 'Failed to mark attendance', 
+            details: error.message 
+        });
     }
 });
+
 
 // Finalize the Milk Letting Session
 exports.finalizeSession = catchAsyncErrors(async (req, res) => {
@@ -160,23 +186,42 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
     try {
         const event = await Letting.findById(lettingId);
         if (!event) return res.status(404).json({ error: 'Event not found' });
-        event.status = 'Done';
-        await event.save();
 
-        const newCollection = await Collection.create({
-            collectionType: 'Public',
-            collectionDate: new Date(),
-            user: adminId,
-            pubDetails: lettingId
+        let collection = await Collection.findOne({ pubDetails: lettingId });
+
+        if (!collection) {
+            if (event.status !== 'Done') {
+                event.status = 'Done';
+                await event.save();
+
+                collection = await Collection.create({
+                    collectionType: 'Public',
+                    collectionDate: new Date(),
+                    pubDetails: lettingId,
+                    user: [adminId] 
+                });
+            } else {
+                return res.status(400).json({ error: 'Session already finalized, no new data created.' });
+            }
+        } else {
+            if (!collection.user.includes(adminId)) {
+                collection.user.push(adminId);
+                await collection.save();
+            }
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Session finalized successfully',
+            collection
         });
 
-        res.status(200).json({ success: true, message: 'Session finalized successfully', newCollection });
     } catch (error) {
         res.status(500).json({ error: 'Failed to finalize session', details: error.message });
     }
 });
 
-
+// New Public Donor
 exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
     try {
         const formData = req.body.formData;
