@@ -25,7 +25,7 @@ const Login = ({ navigation }) => {
 
     useEffect(()=>{
         if (isLoggedIn) {
-            navigation.navigate('userHome');
+            navigation.replace('userHome');
         }
     },[isLoggedIn])
     return (
