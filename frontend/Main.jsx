@@ -69,58 +69,56 @@ import CreateBag from "./screens/Users/Bags/CreateBag";
 import EditBag from "./screens/Users/Bags/EditBag";
 import { useDispatch, useSelector } from 'react-redux';
 import { getDonorSchedules } from "./redux/actions/scheduleActions";
+import PickUpSchedules from "./screens/Users/Schedule/PickUpSchedules";
+import { getUserDetails } from "./redux/actions/userActions";
 const CustomDrawerContent = (props) => {
   const dispatch = useDispatch();
   const { schedules, count, loading, error } = useSelector((state) => state.schedules);
+  const currentRoute = props.state?.routes[props.state.index]?.name;
 
-  const [userDetails, setUserDetails] = useState(null);
+  const { userDetails } = useSelector((state) => state.users);
+
+
   useEffect(() => {
-    startTransition(() => {
-      const fetchUserDetails = async () => {
-        const user = await getUser();
-        setUserDetails(user);
-      };
-      fetchUserDetails();
-    });
-  }, []);
+    dispatch(getUserDetails())
+  }, [dispatch])
   useEffect(() => {
     if (userDetails) {
       dispatch(getDonorSchedules(userDetails._id));
+      console.log('User Details:', userDetails);
     }
 
   }, [dispatch, userDetails]);
   return (
     <DrawerContentScrollView {...props}>
       <View style={drawerStyle.profileContainer}>
-        {/* <Image
-          source={{ uri: defaultImg }} // Replace with your profile picture URL
-          style={drawerStyle.profilePic}
-        /> */}
+
         <Text style={drawerStyle.profileName}>Logged in as,</Text>
-        <Text style={drawerStyle.profileName}>{userDetails
+        <Text style={drawerStyle.profileName}>{userDetails && userDetails.name
           ? `${userDetails.name.first} ${userDetails.name.middle} ${userDetails.name.last}`
-          : "Logged in as, Superadmin"}
+          : "No name"}
         </Text>
       </View>
 
       <View style={divider.divider} />
-      {/* <DrawerItem
-        label="Home"
-        icon={({ focused, color, size }) => (
-          <Icon name="home" color={focused ? 'white' : colors.color2} size={26} />
-        )}
-        focused={props.state.index === 0}
-        activeTintColor="white"
-        inactiveTintColor="black"
-        activeBackgroundColor={colors.color1}
-        onPress={() => props.navigation.navigate('home')} /> */}
+
       {userDetails && userDetails.role === 'User' ? <>
+        <DrawerItem
+          label="Home"
+          icon={({ focused, color, size }) => (
+            <Icon name="home" color={currentRoute === 'userHome' ? 'white' : colors.color2} size={26} />
+          )}
+          focused={currentRoute === 'userHome'}
+          activeTintColor="white"
+          inactiveTintColor="black"
+          activeBackgroundColor={colors.color1}
+          onPress={() => props.navigation.navigate('userHome')} />
         <DrawerItem
           label="Profile"
           icon={({ focused, color, size }) => (
-            <Icon name="account-circle" color={focused ? 'white' : colors.color2} size={26} />
+            <Icon name="account-circle" color={currentRoute === 'Dashboard' ? 'white' : colors.color2} size={26} />
           )}
-          focused={props.state.index === 1}
+          focused={currentRoute === 'Dashboard'}
           activeTintColor="white"
           inactiveTintColor="black"
           activeBackgroundColor={colors.color1}
@@ -129,17 +127,17 @@ const CustomDrawerContent = (props) => {
           <DrawerItem
             label="Schedule"
             icon={({ focused, color, size }) => (
-              <Icon name="calendar" color={focused ? 'white' : colors.color2} size={26} />
+              <Icon name="calendar" color={currentRoute === 'schedule_user' ? 'white' : colors.color2} size={26} />
             )}
-            focused={props.state.index === 1}
+            focused={currentRoute === 'schedule_user'}
             activeTintColor="white"
             inactiveTintColor="black"
             activeBackgroundColor={colors.color1}
-            onPress={() => props.navigation.navigate('Dashboard')} />
+            onPress={() => props.navigation.navigate('schedule_user', { schedules })} />
           {/* Badge */}
 
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{count && count}</Text>
+          <View style={currentRoute === 'schedule_user' ? [styles.badge, {backgroundColor: 'white'}]: styles.badge}>
+            <Text style={currentRoute === 'schedule_user' ? [styles.badgeText, {color: 'red'}] : styles.badgeText}>{count && count}</Text>
           </View>
 
 
@@ -235,7 +233,7 @@ const MainStack = () => {
         {/* Schedule */}
         <Stack.Screen name="editEvents" component={EditEvent} />
         <Stack.Screen name="addEvents" component={AddEvent} />
-
+        <Stack.Screen name="schedule_user" component={PickUpSchedules} />
         {/* Articles */}
         <Stack.Screen name="superadmin_articles"
           component={Articles} />
@@ -290,6 +288,8 @@ const Main = () => {
         >
           <Drawer.Screen name="Home" component={MainStack} options={{ swipeEnabled: false }} />
           <Drawer.Screen name="Dashboard" component={Dashboard} />
+          <Drawer.Screen name="userHome" component={Home} />
+          <Drawer.Screen name="schedule_user" component={PickUpSchedules} />
         </Drawer.Navigator>
       </SafeAreaView>
     </NavigationContainer>
