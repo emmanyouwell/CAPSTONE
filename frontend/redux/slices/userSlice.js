@@ -24,6 +24,7 @@ export const userSlice = createSlice({
       })
       // Fulfilled: When the async action succeeds
       .addCase(loginUser.fulfilled, (state, action) => {
+        
         state.loading = false;
         state.isLoggedIn = true;
         state.userDetails = action.payload.user;
