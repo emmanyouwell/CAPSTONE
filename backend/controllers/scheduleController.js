@@ -92,37 +92,34 @@ exports.requestSchedule = catchAsyncErrors(async (req, res) => {
     const { date, userId } = req.body;
 
     try {
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-
         const donor = await Donor.findOne({ user: userId });
         if (!donor) return res.status(404).json({ error: 'Donor not found' });
 
-        const sched = await Schedule.findOne({donorDetails: {donorId: donor._id}, status: 'Pending'}); 
+        const sched = await Schedule.findOne({ "donorDetails.donorId": donor._id , status: 'Pending' });
         if (sched) return res.status(400).json({ error: 'You already have a pending schedule' });
 
 
 
 
-        const bags = await Bag.find({donor: donor._id, status: 'Expressed', collectionType: 'Private'});
+        const bags = await Bag.find({ donor: donor._id, status: 'Expressed', collectionType: 'Private' });
         if (bags.length === 0) return res.status(404).json({ error: 'No bags found for this donor' });
 
         const address = donor.home_address.street + ', ' + donor.home_address.brgy + ', ' + donor.home_address.city;
 
         const totalVolume = bags.reduce((total, item) => {
             return total + item.volume;
-        },0);   
+        }, 0);
 
         const newSchedule = await Schedule.create({
             address,
-            dates:date,
+            dates: date,
             donorDetails: { donorId: donor._id, bags },
             totalVolume
         });
 
         await Bag.updateMany(
-            {donor: donor._id, status: 'Expressed', collectionType: 'Private'},
-            {$set: {status: 'Scheduled'}}
+            { donor: donor._id, status: 'Expressed', collectionType: 'Private' },
+            { $set: { status: 'Scheduled' } }
         );
 
 
@@ -130,6 +127,24 @@ exports.requestSchedule = catchAsyncErrors(async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Failed to request schedule', details: error.message });
     }
+});
+
+
+exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
+    const { id } = req.params;
+
+    const donor = await Donor.findOne({ user: id });
+    if (!donor) return res.status(404).json({ error: 'Donor not found' });
+    
+    const sched = await Schedule.findOne({ "donorDetails.donorId": donor._id, status: 'Pending' });
+    
+    if (!sched) return res.status(404).json({ error: 'No pending schedule found' });
+
+    res.status(200).json({
+        success: true,
+        count: sched.length,
+        schedules: sched
+    })
 });
 
 // Approve or Modify a Pickup Schedule
