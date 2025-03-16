@@ -1,5 +1,5 @@
 import React, { useState, useEffect, startTransition } from "react";
-import { View, Image, Text, StatusBar } from "react-native";
+import { View, Image, Text, StatusBar, StyleSheet } from "react-native";
 import {
   DrawerContentScrollView,
   DrawerItemList,
@@ -67,8 +67,11 @@ import EditArticles from "./components/Superadmin/Articles/EditArticles";
 import EmployeeLogin from "./screens/EmployeeLogin";
 import CreateBag from "./screens/Users/Bags/CreateBag";
 import EditBag from "./screens/Users/Bags/EditBag";
-
+import { useDispatch, useSelector } from 'react-redux';
+import { getDonorSchedules } from "./redux/actions/scheduleActions";
 const CustomDrawerContent = (props) => {
+  const dispatch = useDispatch();
+  const { schedules, count, loading, error } = useSelector((state) => state.schedules);
 
   const [userDetails, setUserDetails] = useState(null);
   useEffect(() => {
@@ -80,7 +83,12 @@ const CustomDrawerContent = (props) => {
       fetchUserDetails();
     });
   }, []);
+  useEffect(() => {
+    if (userDetails) {
+      dispatch(getDonorSchedules(userDetails._id));
+    }
 
+  }, [dispatch, userDetails]);
   return (
     <DrawerContentScrollView {...props}>
       <View style={drawerStyle.profileContainer}>
@@ -106,50 +114,81 @@ const CustomDrawerContent = (props) => {
         inactiveTintColor="black"
         activeBackgroundColor={colors.color1}
         onPress={() => props.navigation.navigate('home')} /> */}
+      {userDetails && userDetails.role === 'User' ? <>
+        <DrawerItem
+          label="Profile"
+          icon={({ focused, color, size }) => (
+            <Icon name="account-circle" color={focused ? 'white' : colors.color2} size={26} />
+          )}
+          focused={props.state.index === 1}
+          activeTintColor="white"
+          inactiveTintColor="black"
+          activeBackgroundColor={colors.color1}
+          onPress={() => props.navigation.navigate('Dashboard')} />
+        <View style={styles.container}>
+          <DrawerItem
+            label="Schedule"
+            icon={({ focused, color, size }) => (
+              <Icon name="calendar" color={focused ? 'white' : colors.color2} size={26} />
+            )}
+            focused={props.state.index === 1}
+            activeTintColor="white"
+            inactiveTintColor="black"
+            activeBackgroundColor={colors.color1}
+            onPress={() => props.navigation.navigate('Dashboard')} />
+          {/* Badge */}
 
-      <DrawerItem
-        label="Dashboard"
-        icon={({ focused, color, size }) => (
-          <Icon name="account-circle" color={focused ? 'white' : colors.color2} size={26} />
-        )}
-        focused={props.state.index === 1}
-        activeTintColor="white"
-        inactiveTintColor="black"
-        activeBackgroundColor={colors.color1}
-        onPress={() => props.navigation.navigate('Dashboard')} />
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{count && count}</Text>
+          </View>
 
-      <DrawerItem
-        label="Settings"
-        icon={({ focused, color, size }) => (
-          <Icon name="cog" color={focused ? 'white' : colors.color2} size={26} />
-        )}
-        focused={props.state.index === 2}
-        activeTintColor="white"
-        inactiveTintColor="black"
-        activeBackgroundColor={colors.color1}
-        onPress={() => props.navigation.navigate('My Profile')} />
 
-      <DrawerItem
-        label="Help & Support"
-        icon={({ focused, color, size }) => (
-          <Icon name="phone" color={focused ? 'white' : colors.color2} size={26} />
-        )}
-        focused={props.state.index === 3}
-        activeTintColor="white"
-        inactiveTintColor="black"
-        activeBackgroundColor={colors.color1}
-        onPress={() => props.navigation.navigate('My Profile')} />
+        </View>
+      </> : <>
+        <DrawerItem
+          label="Dashboard"
+          icon={({ focused, color, size }) => (
+            <Icon name="account-circle" color={focused ? 'white' : colors.color2} size={26} />
+          )}
+          focused={props.state.index === 1}
+          activeTintColor="white"
+          inactiveTintColor="black"
+          activeBackgroundColor={colors.color1}
+          onPress={() => props.navigation.navigate('Dashboard')} />
 
-      <DrawerItem
-        label="About Us"
-        icon={({ focused, color, size }) => (
-          <Icon name="information" color={focused ? 'white' : colors.color2} size={26} />
-        )}
-        focused={props.state.index === 4}
-        activeTintColor="white"
-        inactiveTintColor="black"
-        activeBackgroundColor={colors.color1}
-        onPress={() => props.navigation.navigate('My Profile')} />
+        <DrawerItem
+          label="Settings"
+          icon={({ focused, color, size }) => (
+            <Icon name="cog" color={focused ? 'white' : colors.color2} size={26} />
+          )}
+          focused={props.state.index === 2}
+          activeTintColor="white"
+          inactiveTintColor="black"
+          activeBackgroundColor={colors.color1}
+          onPress={() => props.navigation.navigate('My Profile')} />
+
+        <DrawerItem
+          label="Help & Support"
+          icon={({ focused, color, size }) => (
+            <Icon name="phone" color={focused ? 'white' : colors.color2} size={26} />
+          )}
+          focused={props.state.index === 3}
+          activeTintColor="white"
+          inactiveTintColor="black"
+          activeBackgroundColor={colors.color1}
+          onPress={() => props.navigation.navigate('My Profile')} />
+
+        <DrawerItem
+          label="About Us"
+          icon={({ focused, color, size }) => (
+            <Icon name="information" color={focused ? 'white' : colors.color2} size={26} />
+          )}
+          focused={props.state.index === 4}
+          activeTintColor="white"
+          inactiveTintColor="black"
+          activeBackgroundColor={colors.color1}
+          onPress={() => props.navigation.navigate('My Profile')} /></>}
+
       {/* <DrawerItemList {...props} /> */}
     </DrawerContentScrollView>
   );
@@ -257,6 +296,28 @@ const Main = () => {
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+    justifyContent: 'center',
 
+  },
+  badge: {
+    position: 'absolute',
+    right: 20, // Adjust position to align with icon
+    top: 15,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+})
 
 export default Main

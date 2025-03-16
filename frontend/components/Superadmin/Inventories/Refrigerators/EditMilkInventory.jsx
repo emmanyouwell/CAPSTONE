@@ -103,7 +103,7 @@ const EditMilkInventory = ({ route, navigation }) => {
     const onLogoutPress = () => {
         dispatch(logoutUser())
             .then(() => {
-                navigation.navigate('login');
+                navigation.replace('login');
             })
             .catch((err) => console.log(err));
     };
@@ -326,7 +326,7 @@ const EditMilkInventory = ({ route, navigation }) => {
 
     return (
         <ScrollView>
-            <Header title="Edit Milk Inventory" onMenuPress={onMenuPress} />
+            <Header title="Edit Milk Inventory" onMenuPress={onMenuPress} onLogoutPress={onLogoutPress} />
             <Text style={styles.screenTitle}>Update Inventory</Text>
             <View style={styles.container}>
                 {renderFormFields()}
