@@ -86,7 +86,7 @@ export const getDonorSchedules = createAsyncThunk(
         try {
 
             const response = await axios.get(`${REACT_APP_API_URL}/api/v1/me/schedules/${req}`, config)
-            console.log("get donor schedules: ", response.data)
+            
             return response.data;
 
         } catch (error) {
