@@ -36,7 +36,7 @@ const Attendance = ({route, navigation}) => {
     const onLogoutPress = () => {
         dispatch(logoutUser())
             .then(() => {
-                navigation.navigate('login');
+                navigation.replace('login');
             })
             .catch((err) => console.log(err));
     };
