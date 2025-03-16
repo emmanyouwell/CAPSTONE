@@ -2,9 +2,11 @@ const Schedule = require('../models/schedule')
 const Collection = require('../models/collection');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
-
+const User = require('../models/user');
+const Bag = require('../models/bags');
+const Donor = require('../models/donor');
 // Get All schedules => /api/v1/schedules
-exports.allSchedules = catchAsyncErrors( async (req, res, next) => {
+exports.allSchedules = catchAsyncErrors(async (req, res, next) => {
     const schedules = await Schedule.find();
 
     const count = await Schedule.countDocuments();
@@ -17,8 +19,8 @@ exports.allSchedules = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Create schedule => /api/v1/schedules
-exports.createSchedule= catchAsyncErrors( async (req, res, next) => {
- 
+exports.createSchedule = catchAsyncErrors(async (req, res, next) => {
+
     const schedDate = new Date(req.body.dates)
 
     const schedule = await Schedule.create({
@@ -33,7 +35,7 @@ exports.createSchedule= catchAsyncErrors( async (req, res, next) => {
 })
 
 // Get specific schedule details => /api/v1/schedule/:id
-exports.getScheduleDetails = catchAsyncErrors( async (req, res, next) => {
+exports.getScheduleDetails = catchAsyncErrors(async (req, res, next) => {
     const schedule = await Schedule.findById(req.params.id);
 
     if (!schedule) {
@@ -47,10 +49,10 @@ exports.getScheduleDetails = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Update schedule => /api/v1/schedule/:id
-exports.updateSchedule = catchAsyncErrors( async (req, res, next) => {
+exports.updateSchedule = catchAsyncErrors(async (req, res, next) => {
 
     const schedDate = new Date(req.body.dates)
-    
+
     const newScheduleData = {
         ...req.body,
         dates: schedDate
@@ -61,7 +63,7 @@ exports.updateSchedule = catchAsyncErrors( async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false,
     })
-    
+
     res.status(200).json({
         success: true,
         schedule
@@ -70,7 +72,7 @@ exports.updateSchedule = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Delete schedule => /api/v1/schedule/:id
-exports.deleteSchedule = catchAsyncErrors( async (req, res, next) => {
+exports.deleteSchedule = catchAsyncErrors(async (req, res, next) => {
     const schedule = await Schedule.findById(req.params.id);
 
     if (!schedule) {
@@ -87,17 +89,34 @@ exports.deleteSchedule = catchAsyncErrors( async (req, res, next) => {
 
 // Request a Pickup Schedule
 exports.requestSchedule = catchAsyncErrors(async (req, res) => {
-    const { donorId, dates, milkDetails, venue } = req.body;
+    const { date, userId } = req.body;
 
     try {
-        const totalVolume = milkDetails.reduce((total, item) => {
-            return total + (item.volume * item.quantity);
-        }, 0);
-        
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        const donor = await Donor.findOne({ user: userId });
+        if (!donor) return res.status(404).json({ error: 'Donor not found' });
+
+        const sched = await Schedule.findOne({donorDetails: {donorId: donor._id}, status: 'Pending'}); 
+        if (sched) return res.status(400).json({ error: 'You already have a pending schedule' });
+
+
+
+
+        const bags = await Bag.find({donor: donor._id, status: 'Expressed', collectionType: 'Private'});
+        if (bags.length === 0) return res.status(404).json({ error: 'No bags found for this donor' });
+
+        const address = donor.home_address.street + ', ' + donor.home_address.brgy + ', ' + donor.home_address.city;
+
+        const totalVolume = bags.reduce((total, item) => {
+            return total + item.volume;
+        },0);   
+
         const newSchedule = await Schedule.create({
-            venue,
-            dates,
-            donorDetails: { donorId, milkDetails },
+            address,
+            dates:date,
+            donorDetails: { donorId: donor._id, bags },
             totalVolume
         });
 
