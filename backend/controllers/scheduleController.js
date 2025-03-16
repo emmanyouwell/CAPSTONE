@@ -140,11 +140,25 @@ exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
     const statusOrder = { Pending: 1, Approved: 2, Completed: 3 };
 
 
-    const sched = await Schedule.find({ "donorDetails.donorId": donor._id })
-        .sort({
-            status: (a, b) => statusOrder[a.status] - statusOrder[b.status], // Custom order
-            date: -1,  // Sort by date in ascending order (oldest first), use -1 for newest first
-        });;
+    const sched = await Schedule.aggregate([
+        { $match: { "donorDetails.donorId": donor._id } },
+        {
+            $addFields: {
+                statusOrder: {
+                    $switch: {
+                        branches: [
+                            { case: { $eq: ["$status", "Pending"] }, then: 1 },
+                            { case: { $eq: ["$status", "Approved"] }, then: 2 },
+                            { case: { $eq: ["$status", "Completed"] }, then: 3 }
+                        ],
+                        default: 4 // Default to lowest priority
+                    }
+                }
+            }
+        },
+        { $sort: { statusOrder: 1, date: -1 } }, // Sort by status first, then by date (newest first)
+        { $project: { statusOrder: 0 } } // Remove the temporary sorting field
+    ]);
 
     if (!sched) return res.status(404).json({ error: 'No pending schedule found' });
     console.log(sched.length)
