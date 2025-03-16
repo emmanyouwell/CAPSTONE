@@ -57,97 +57,97 @@ const EditBag = ({ navigation }) => {
                             volume: bagDetails?.volume ? String(bagDetails.volume) : "",
                             expressDate: bagDetails?.expressDate ? new Date(bagDetails.expressDate) : "", // Convert to Date
                         }}
-                        validationSchema={validationSchema}
-                        enableReinitialize={true}  // 👈 Ensures Formik updates with bagDetails
-                        onSubmit={(values) => {
+                validationSchema={validationSchema}
+                enableReinitialize={true}  // 👈 Ensures Formik updates with bagDetails
+                onSubmit={(values) => {
 
-                            const data = {
-                                volume: values.volume,
-                                expressDate: values.expressDate,
-                                id: id
-                            }
-                            dispatch(updateBag(data)).then(() => { navigation.navigate('userHome') });
+                    const data = {
+                        volume: values.volume,
+                        expressDate: values.expressDate,
+                        id: id
+                    }
+                    dispatch(updateBag(data)).then(() => { navigation.navigate('userHome') });
 
-                        }}
+                }}
                     >
-                        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) =>
-                        (
-                            <View style={{ padding: 20 }}>
-                                {/* Volume Input */}
-                                <Text>Volume (ml):</Text>
-                                <TextInput
-                                    style={{
-                                        borderWidth: 1,
-                                        borderColor: "#ccc",
-                                        padding: 10,
-                                        borderRadius: 5,
-                                        marginBottom: 10
-                                    }}
-                                    keyboardType="numeric"
-                                    onChangeText={handleChange("volume")}
-                                    onBlur={handleBlur("volume")}
-                                    value={values.volume}
-                                />
-                                {touched.volume && errors.volume && (
-                                    <Text style={{ color: "red" }}>{errors.volume}</Text>
-                                )}
-
-                                {/* Express Date Picker */}
-                                <Text>Express Date:</Text>
-                                <TouchableOpacity
-                                    onPress={() => setOpen(true)}
-                                    style={{
-                                        borderWidth: 1,
-                                        borderColor: "#ccc",
-                                        padding: 10,
-                                        borderRadius: 5,
-                                        marginBottom: 10,
-                                        backgroundColor: "#f0f0f0"
-                                    }}
-                                >
-                                    <Text>
-                                        {selectedDate ? selectedDate.toLocaleString("en-US", {
-                                            year: "numeric",
-                                            month: "long",
-                                            day: "numeric",
-                                            hour: "numeric",
-                                            minute: "2-digit",
-                                            hour12: true, // Ensures AM/PM format
-                                        }) : "Select Express Date"}
-                                    </Text>
-                                </TouchableOpacity>
-
-                                {/* Modal Date Picker */}
-                                <DatePicker
-                                    modal
-                                    open={open}
-                                    date={selectedDate ? selectedDate : new Date()}
-                                    mode="datetime"
-                                    onConfirm={(date) => {
-                                        setOpen(false);
-                                        setSelectedDate(date);
-                                        setFieldValue("expressDate", date);
-                                    }}
-                                    onCancel={() => setOpen(false)}
-                                />
-                                {touched.expressDate && errors.expressDate && (
-                                    <Text style={{ color: "red" }}>{errors.expressDate}</Text>
-                                )}
-
-                                {/* Submit Button */}
-                                <TouchableOpacity onPress={handleSubmit} style={{
-                                    backgroundColor: "#007bff",
-                                    padding: 12,
-                                    borderRadius: 5,
-                                    alignItems: "center"
-                                }}>
-                                    <Text style={{ color: "#fff", fontSize: 16 }}>Submit</Text>
-                                </TouchableOpacity>
-                            </View>
+                {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) =>
+                (
+                    <View style={{ padding: 20 }}>
+                        {/* Volume Input */}
+                        <Text>Volume (ml):</Text>
+                        <TextInput
+                            style={{
+                                borderWidth: 1,
+                                borderColor: "#ccc",
+                                padding: 10,
+                                borderRadius: 5,
+                                marginBottom: 10
+                            }}
+                            keyboardType="numeric"
+                            onChangeText={handleChange("volume")}
+                            onBlur={handleBlur("volume")}
+                            value={values.volume}
+                        />
+                        {touched.volume && errors.volume && (
+                            <Text style={{ color: "red" }}>{errors.volume}</Text>
                         )}
-                    </Formik>
+
+                        {/* Express Date Picker */}
+                        <Text>Express Date:</Text>
+                        <TouchableOpacity
+                            onPress={() => setOpen(true)}
+                            style={{
+                                borderWidth: 1,
+                                borderColor: "#ccc",
+                                padding: 10,
+                                borderRadius: 5,
+                                marginBottom: 10,
+                                backgroundColor: "#f0f0f0"
+                            }}
+                        >
+                            <Text>
+                                {selectedDate ? selectedDate.toLocaleString("en-US", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    hour12: true, // Ensures AM/PM format
+                                }) : "Select Express Date"}
+                            </Text>
+                        </TouchableOpacity>
+
+                        {/* Modal Date Picker */}
+                        <DatePicker
+                            modal
+                            open={open}
+                            date={new Date()}
+                            mode="datetime"
+                            onConfirm={(date) => {
+                                setOpen(false);
+                                setSelectedDate(date);
+                                setFieldValue("expressDate", date);
+                            }}
+                            onCancel={() => setOpen(false)}
+                        />
+                        {touched.expressDate && errors.expressDate && (
+                            <Text style={{ color: "red" }}>{errors.expressDate}</Text>
+                        )}
+
+                        {/* Submit Button */}
+                        <TouchableOpacity onPress={handleSubmit} style={{
+                            backgroundColor: "#007bff",
+                            padding: 12,
+                            borderRadius: 5,
+                            alignItems: "center"
+                        }}>
+                            <Text style={{ color: "#fff", fontSize: 16 }}>Submit</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
+            </Formik>
                 }
-            </View>
+        </View >
         </>
     )
 }

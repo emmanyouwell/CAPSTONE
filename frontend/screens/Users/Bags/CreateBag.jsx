@@ -46,7 +46,8 @@ const CreateBag = ({ navigation }) => {
                         const data = {
                             volume: values.volume,
                             expressDate: values.expressDate,
-                            userID: userDetails._id
+                            userID: userDetails._id,
+                            type: 'Private'
                         }
                         dispatch(createBag(data)).then(() => { navigation.navigate('userHome') });
 
