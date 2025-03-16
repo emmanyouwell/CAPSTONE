@@ -10,6 +10,8 @@ export const bagSlice = createSlice({
         totalVolume: 0,
         totalBags: 0,
         totalPages: 0,
+        oldestExpressDate: null,
+        latestExpressDate: null,
         isUpdated: false,
         bagDetails: {}
     },
@@ -36,6 +38,8 @@ export const bagSlice = createSlice({
                 state.bags = action.payload.bags
                 state.totalBags = action.payload.count
                 state.totalVolume = action.payload.totalVolume
+                state.oldestExpressDate = action.payload.oldestExpressDate
+                state.latestExpressDate = action.payload.latestExpressDate
             })
             .addCase(getBags.rejected, (state, action) => {
                 state.loading = false;
