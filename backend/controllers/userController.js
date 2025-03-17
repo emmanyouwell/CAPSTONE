@@ -95,37 +95,31 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     const { emp } = req.query;
     let user;
     if (emp) {
-        // Validation
         if (!employeeID || !password) {
-            return next(new ErrorHandler('Please enter employeeID and password', 400));
+            return res.status(400).json({ success: false, message: "Please enter employeeID and password" });
         }
 
-        // Finding User in database
         user = await User.findOne({ employeeID }).select('+password');
 
         if (!user) {
-            return next(new ErrorHandler('Invalid employeeID or password', 401));
+            return res.status(401).json({ success: false, message: "Invalid employeeID or password" });
         }
-    }
-    else {
-        // Validation
+    } else {
         if (!email || !password) {
-            return next(new ErrorHandler('Please enter email and password', 400));
+            return res.status(400).json({ success: false, message: "Please enter email and password" });
         }
 
-        // Finding User in database
         user = await User.findOne({ email }).select('+password');
 
         if (!user) {
-            return next(new ErrorHandler('Invalid email or password', 401));
+            return res.status(401).json({ success: false, message: "Invalid email or password" });
         }
     }
 
-    // Checks if password is correct or not
+    // Check if password matches
     const isPasswordMatched = await user.comparePassword(password);
-
     if (!isPasswordMatched) {
-        return next(new ErrorHandler('Invalid email or password', 401));
+        return res.status(401).json({ success: false, message: "Invalid email or password" });
     }
 
     sendToken(user, 200, res);
