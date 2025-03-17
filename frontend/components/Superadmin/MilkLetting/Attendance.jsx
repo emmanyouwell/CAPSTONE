@@ -6,7 +6,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Picker,
+  RefreshControl,
   ScrollView,
   Alert,
 } from "react-native";
@@ -15,7 +15,10 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import DropDownPicker from "react-native-dropdown-picker";
 import Header from "../../../components/Superadmin/Header";
 import { getDonors } from "../../../redux/actions/donorActions";
-import { newPublicDonor } from "../../../redux/actions/lettingActions";
+import {
+  newPublicDonor,
+  markAttendance,
+} from "../../../redux/actions/lettingActions";
 import { logoutUser } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 
@@ -47,8 +50,8 @@ const Attendance = ({ route, navigation }) => {
     aog: "",
   }));
   const [bagDetails, setBagDetails] = useState(() => ({
-    volume: '',
-    quantity: '',
+    volume: "",
+    quantity: "",
   }));
   const { donors } = useSelector((state) => state.donors);
 
@@ -56,10 +59,18 @@ const Attendance = ({ route, navigation }) => {
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [donorItems, setDonorItems] = useState([]);
   const [bags, setBags] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     dispatch(getDonors({ search: "", page: 1, pageSize: 100 }));
   }, [dispatch]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    dispatch(getDonors({ search: "", page: 1, pageSize: 100 }))
+      .then(() => setRefreshing(false))
+      .catch(() => setRefreshing(false));
+  };
 
   useEffect(() => {
     if (donors) {
@@ -74,7 +85,7 @@ const Attendance = ({ route, navigation }) => {
   const addBags = () => {
     const { volume, quantity } = bagDetails;
 
-    if ( !volume || !quantity) {
+    if (!volume || !quantity) {
       Alert.alert("Error", "Please fill out all fields for the donation.");
       return;
     }
@@ -97,6 +108,26 @@ const Attendance = ({ route, navigation }) => {
   const handlePastDonor = () => setStep(3);
   const handleEligibility = (eligible) => (eligible ? setStep(4) : setStep(1));
 
+  const handleNewRecord = () => {
+    setForm({
+      donor_type: "Community",
+    });
+    setBags([]);
+    setBagDetails({});
+    setSelectedDonor(null);
+    console.log(
+      "State Data: \n",
+      "Form: " + form,
+      "\n",
+      "Bags: " + bags,
+      "\n",
+      "Bag Details: " + bagDetails,
+      "\n",
+      "SelectedDonor: " + selectedDonor
+    );
+    setStep(1);
+  };
+
   const handleSubmitNewDonor = () => {
     const data = {
       formData: form,
@@ -109,16 +140,42 @@ const Attendance = ({ route, navigation }) => {
       .catch((err) => Alert.alert("Error", err.message));
   };
 
-  const handleSubmit = () => {
-    console.log(bags, donorType);
-    // setStep(1);
+  const handleSubmit = async () => {
+    if (!donorType || !selectedDonor) {
+      Alert.alert("Error", "Please choose a Donor.");
+      return;
+    }
+    if (!bags) {
+      Alert.alert("Error", "Need atleast 1 bag details");
+      return;
+    }
+    if (!item) {
+      Alert.alert("Error", "Milk Letting not found");
+      return;
+    }
+
+    const newData = {
+      lettingId: item._id,
+      donorId: selectedDonor,
+      donorType: donorType,
+      bags: bags,
+    };
+
+    await dispatch(markAttendance(newData))
+      .then((res) => {
+        Alert.alert("Success", "Attendance recorded.");
+        setStep(5);
+      })
+      .catch((error) => {
+        console.error("Error adding inventory:", error);
+        Alert.alert("Error", "Failed to add attendance.");
+      });
   };
 
   const handleDateChange = (event, selectedDate, field) => {
     const date = selectedDate || form[field];
     setForm({ ...form, [field]: date.toISOString().split("T")[0] });
-
-    if (field === "birthday") setShowBirthday(false);
+    if (field === 'birthday') setShowBirthday(false);
   };
 
   const onMenuPress = () => {
@@ -173,9 +230,7 @@ const Attendance = ({ route, navigation }) => {
               value={new Date()}
               mode="date"
               display="default"
-              onChange={(event, date) =>
-                handleDateChange(event, date, "birthday")
-              }
+              onChange={(event, date) => handleDateChange(event, date, 'birthday')}
             />
           )}
         </View>
@@ -265,6 +320,9 @@ const Attendance = ({ route, navigation }) => {
             onChangeText={(value) => setForm({ ...form, aog: Number(value) })}
           />
         </View>
+        <View style={styles.section}>
+          <Button title="Submit Donor" onPress={handleSubmitNewDonor} />
+        </View>
       </>
     );
   };
@@ -274,7 +332,12 @@ const Attendance = ({ route, navigation }) => {
       <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
       <Text style={styles.screenTitle}>Attendance</Text>
 
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
         {step === 1 && (
           <View style={styles.navButtons}>
             <Text style={styles.title}>Are you a New or Past Donor?</Text>
@@ -368,8 +431,27 @@ const Attendance = ({ route, navigation }) => {
                 <Button title="Submit" onPress={handleSubmit} />
               </View>
             )}
-            
           </>
+        )}
+
+        {step === 5 && (
+          <View style={styles.navButtons}>
+            <Text style={styles.title}>
+              Do you want to make another attendance?
+            </Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleNewRecord()}
+            >
+              <Text style={styles.buttonText}>Yes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate("FinalizeLetting")}
+            >
+              <Text style={styles.buttonText}>No</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </ScrollView>
     </View>
@@ -458,7 +540,7 @@ const styles = StyleSheet.create({
   },
   subTitle: {
     fontSize: 18,
-    fontWeight: "bold",
+    // fontWeight: "bold",
   },
   dropdown: {
     marginBottom: 16,
