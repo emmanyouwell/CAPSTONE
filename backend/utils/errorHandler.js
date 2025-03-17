@@ -5,9 +5,6 @@ class ErrorHandler extends Error {
 
         Error.captureStackTrace(this, this.constructor)
     }
-    toJSON() {
-        return { message: this.message, statusCode: this.statusCode };
-    }
 
 }
 
