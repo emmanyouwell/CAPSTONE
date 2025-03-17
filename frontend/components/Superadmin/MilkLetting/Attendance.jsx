@@ -447,7 +447,7 @@ const Attendance = ({ route, navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("FinalizeLetting")}
+              onPress={() => navigation.navigate("FinalizeLetting", {item: item})}
             >
               <Text style={styles.buttonText}>No</Text>
             </TouchableOpacity>

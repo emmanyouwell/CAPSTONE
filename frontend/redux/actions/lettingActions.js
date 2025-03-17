@@ -155,12 +155,40 @@ export const getLettings = createAsyncThunk(
             }
             console.log("URL: ", urlString)
             const response = await axios.get(urlString, config);
-            console.log("Response Lettings: ", response.data)
             return response.data;
 
         } catch (error) {
-            // return thunkAPI.rejectWithValue(error.message);
-            console.log("Errpr: ", error)
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Get Letting Details
+export const getLettingDetails = createAsyncThunk(
+    'letting/getLettingDetails',
+    async (id, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/letting/${id}`, config)
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
         }
     }
 )
