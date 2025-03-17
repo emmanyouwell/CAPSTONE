@@ -22,6 +22,7 @@ export const lettingSlice = createSlice({
   reducers: {
     resetSuccess: (state) => {
       state.success = false;
+      state.error = null
     },
   },
   extraReducers: (builder) => {
@@ -104,5 +105,5 @@ export const lettingSlice = createSlice({
       });
   },
 });
-
+export const {resetSuccess} = lettingSlice.actions;
 export default lettingSlice.reducer;

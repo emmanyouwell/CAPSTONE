@@ -52,14 +52,6 @@ const Equipment = ({ navigation }) => {
 
             <View style={styles.buttonRow}>
                 <TouchableOpacity
-                    style={styles.historyButton}
-                    onPress={() => navigation.navigate('next')}
-                >
-                <Text style={styles.buttonText}>
-                <MaterialIcons name="history" size={16} color="white" /> History
-                </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
                 style={styles.addButton}
                 onPress={() => navigation.navigate('AddEquipment')}
                 >

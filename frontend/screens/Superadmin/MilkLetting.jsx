@@ -15,6 +15,7 @@ import { logoutUser } from '../../redux/actions/userActions';
 import { getLettings } from '../../redux/actions/lettingActions';
 import { SuperAdmin } from '../../styles/Styles';
 import MilkLettings from '../../components/Superadmin/MilkLetting/MilkLettings';
+import { resetSuccess } from '../../redux/slices/lettingSlice';
 
 const InventoryScreen = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -28,6 +29,7 @@ const InventoryScreen = ({ navigation }) => {
 
     const handleRefresh = () => {
         setRefreshing(true);
+        dispatch(resetSuccess());
         dispatch(getLettings())
             .then(() => setRefreshing(false))
             .catch(() => setRefreshing(false));
@@ -48,14 +50,6 @@ const InventoryScreen = ({ navigation }) => {
     const filteredLettings = lettings.filter(
         (lets) => lets.status && lets.status !== 'Done'
     );
-
-    if (error) {
-        return (
-            <View style={styles.center}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
-        );
-    }
 
     return (
         <View style={SuperAdmin.container}>
@@ -91,6 +85,10 @@ const InventoryScreen = ({ navigation }) => {
                 <SafeAreaView style={styles.form}>
                     {loading ? (
                         <Text>Loading...</Text>
+                    ) : error? (
+                        <View style={styles.center}>
+                            <Text style={styles.errorText}>A problem occur in loading the data. Please refresh the screen</Text>
+                        </View>
                     ) : (
                         <MilkLettings data={filteredLettings} />
                     )}

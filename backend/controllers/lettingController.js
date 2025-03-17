@@ -22,6 +22,9 @@ exports.allLettings = catchAsyncErrors(async (req, res, next) => {
         path: "attendance.bags",
         select: "volume",
       });
+    if (!lettings || lettings.length === 0) {
+      return next(new ErrorHandler("No milk letting events found", 404));
+    }
 
     const count = await Letting.countDocuments();
 
