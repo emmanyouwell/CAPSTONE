@@ -60,6 +60,12 @@ const MilkLettings = ({ data }) => {
             >
                 <MaterialIcons name="group-add" size={30} color="white" /> 
             </TouchableOpacity>
+            <TouchableOpacity
+                style={[styles.actionButton, styles.attendButton]}
+                onPress={() => navigation.navigate('FinalizeLetting', { item })}
+            >
+                <MaterialIcons name="done-all" size={30} color="white" /> 
+            </TouchableOpacity>
         </View>
     );
 
