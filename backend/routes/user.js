@@ -17,7 +17,7 @@ const { registerUser,
     getStaffDetails,
     updateStaff,
     deleteStaff,
-    loginEmployee
+    
 } = require('../controllers/userController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -25,7 +25,6 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 // All Users Routes
 router.route('/register').post(registerUser);
 router.route('/login').post(loginUser);
-router.route('/employee/login').post(loginEmployee);
 router.route('/password/forgot').post(forgotPassword);
 router.route('/password/reset/:token').put( resetPassword );
 
