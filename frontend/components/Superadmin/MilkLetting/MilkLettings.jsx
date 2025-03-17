@@ -61,7 +61,7 @@ const MilkLettings = ({ data }) => {
                 <MaterialIcons name="group-add" size={30} color="white" /> 
             </TouchableOpacity>
             <TouchableOpacity
-                style={[styles.actionButton, styles.attendButton]}
+                style={[styles.actionButton, styles.finalizeButton]}
                 onPress={() => navigation.navigate('FinalizeLetting', { item })}
             >
                 <MaterialIcons name="done-all" size={30} color="white" /> 
@@ -166,13 +166,16 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     editButton: {
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#2196F3',
     },
     deleteButton: {
         backgroundColor: '#F44336',
     },
     attendButton: {
         backgroundColor: '#E53777',
+    },
+    finalizeButton: {
+        backgroundColor: '#4CAF50',
     },
     actionText: {
         color: '#fff',

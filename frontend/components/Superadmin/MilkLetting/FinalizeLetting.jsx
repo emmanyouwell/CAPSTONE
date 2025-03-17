@@ -26,7 +26,7 @@ const FinalizeLetting = ({ route, navigation }) => {
   const { item } = route.params;
 
   const [userDetails, setUserDetails] = useState(null);
-  const { lettingDetails, loading, error } = useSelector(
+  const { lettingDetails, loading, success } = useSelector(
     (state) => state.lettings
   );
   const [refreshing, setRefreshing] = useState(false);
@@ -62,7 +62,7 @@ const FinalizeLetting = ({ route, navigation }) => {
       }
 
       const finalizeData = {
-        admiId: userDetails._id,
+        adminId: userDetails._id,
         lettingId: item._id,
       };
 
@@ -70,7 +70,7 @@ const FinalizeLetting = ({ route, navigation }) => {
         .then(() => {
           dispatch(recordPublicRecord({ lettingId: item._id })).then(() => {
             Alert.alert("Success", `Milk Letting event has been finalized`);
-            navigation.navigate("Dashboard")
+            navigation.navigate("superadmin_milkLetting");
           });
         })
         .catch((error) => {
