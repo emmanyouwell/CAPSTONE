@@ -318,18 +318,17 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
 exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
     const donor = await Donor.findById(req.params.id)
         .populate('user')
-        .populate('donation.invId', 'unpasteurizedDetails')
         .lean(); // Use lean() for performance if no further Mongoose methods are needed
 
-    // Ensure that donor data is valid
-    if (donor && donor.donation) {
-        // Sort donations by collectionDate in descending order (latest first)
-        donor.donation.sort((a, b) => {
-            const dateA = new Date(a.invId.unpasteurizedDetails.collectionDate);
-            const dateB = new Date(b.invId.unpasteurizedDetails.collectionDate);
-            return dateB - dateA; // Latest dates first (descending order)
-        });
-    }
+    // // Ensure that donor data is valid
+    // if (donor && donor.donation) {
+    //     // Sort donations by collectionDate in descending order (latest first)
+    //     donor.donation.sort((a, b) => {
+    //         const dateA = new Date(a.invId.unpasteurizedDetails.collectionDate);
+    //         const dateB = new Date(b.invId.unpasteurizedDetails.collectionDate);
+    //         return dateB - dateA; // Latest dates first (descending order)
+    //     });
+    // }
 
     if (!donor) {
         return next(new ErrorHandler(`donor is not found with this id: ${req.params.id}`))

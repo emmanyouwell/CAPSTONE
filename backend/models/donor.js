@@ -45,6 +45,13 @@ const donorSchema = new mongoose.Schema({
     enum: ["Community", "Private", "Employee", "Network Office/Agency"],
     required: [true, "Please enter type of donor"],
   },
+  eligibility: {
+    type: String,
+
+  },
+  dateTested: {
+    type: Date
+  },
   children: [
     {
       name: { type: String },
