@@ -134,7 +134,6 @@ exports.markAttendance = catchAsyncErrors(async (req, res, next) => {
         const event = await Letting.findById(lettingId);
         if (!event) return res.status(404).json({ error: 'Event not found' });
 
-        const eventBags = [];
         let total = Number(event.totalVolume) || 0;
 
         const newBags = bags.flatMap(bag => {

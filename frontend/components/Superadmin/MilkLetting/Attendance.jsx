@@ -25,8 +25,6 @@ const Attendance = ({ route, navigation }) => {
 
   const [step, setStep] = useState(1);
   const [donorType, setDonorType] = useState("");
-  const [donorName, setDonorName] = useState("");
-  const [volumeDonated, setVolumeDonated] = useState("");
   const [showBirthday, setShowBirthday] = useState(false);
   const [form, setForm] = useState(() => ({
     first_name: "",
@@ -48,12 +46,16 @@ const Attendance = ({ route, navigation }) => {
     birth_weight: "",
     aog: "",
   }));
+  const [bagDetails, setBagDetails] = useState(() => ({
+    volume: '',
+    quantity: '',
+  }));
   const { donors } = useSelector((state) => state.donors);
 
   const [open, setOpen] = useState(false);
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [donorItems, setDonorItems] = useState([]);
-  const [donations, setDonations] = useState([]);
+  const [bags, setBags] = useState([]);
 
   useEffect(() => {
     dispatch(getDonors({ search: "", page: 1, pageSize: 100 }));
@@ -68,6 +70,27 @@ const Attendance = ({ route, navigation }) => {
       setDonorItems(items);
     }
   }, [donors]);
+
+  const addBags = () => {
+    const { volume, quantity } = bagDetails;
+
+    if ( !volume || !quantity) {
+      Alert.alert("Error", "Please fill out all fields for the donation.");
+      return;
+    }
+
+    const newBags = {
+      volume: Number(volume),
+      quantity: Number(quantity),
+    };
+
+    setBags([...bags, newBags]);
+    setBagDetails({
+      ...bagDetails,
+      volume: "",
+      quantity: "",
+    });
+  };
 
   const handleNewDonor = () => setStep(2);
 
@@ -87,10 +110,8 @@ const Attendance = ({ route, navigation }) => {
   };
 
   const handleSubmit = () => {
-    console.log({ donorName, donorType, volumeDonated });
-    setDonorName("");
-    setVolumeDonated("");
-    setStep(1);
+    console.log(bags, donorType);
+    // setStep(1);
   };
 
   const handleDateChange = (event, selectedDate, field) => {
@@ -99,7 +120,6 @@ const Attendance = ({ route, navigation }) => {
 
     if (field === "birthday") setShowBirthday(false);
   };
-
 
   const onMenuPress = () => {
     navigation.openDrawer();
@@ -139,7 +159,7 @@ const Attendance = ({ route, navigation }) => {
             keyboardType="numeric"
             onChangeText={(value) => setForm({ ...form, age: Number(value) })}
           />
-          {/* <Text style={styles.sectionTitle}>Birthday</Text> */}
+          <Text style={styles.subTitle}>Birthday</Text>
           <TouchableOpacity
             onPress={() => setShowBirthday(true)}
             style={styles.datePickerButton}
@@ -316,28 +336,39 @@ const Attendance = ({ route, navigation }) => {
               searchable={true}
               searchPlaceholder="Search for a donor..."
             />
-            {/* <Button title="Add Breast Milk" onPress={addDonation} />
-            {donations.length > 0 && (
+            <Text style={styles.subTitle}>Bag Details:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Volume (ml)"
+              keyboardType="numeric"
+              onChangeText={(value) =>
+                setBagDetails({ ...bagDetails, volume: Number(value) })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Quantity"
+              keyboardType="numeric"
+              onChangeText={(value) =>
+                setBagDetails({ ...bagDetails, quantity: Number(value) })
+              }
+            />
+            <Button title="Add Bag Details" onPress={addBags} />
+            {bags.length > 0 && (
               <View style={styles.section}>
-                <View style={styles.donationsList}>
-                  <Text style={styles.subTitle}>Donations:</Text>
-                  {donations.map((donation, index) => (
+                <View style={styles.bagsList}>
+                  <Text style={styles.subTitle}>Bags:</Text>
+                  {bags.map((bag, index) => (
                     <View key={index} style={styles.itemContainer}>
-                      <Text>Volume: {donation.volume} mL</Text>
-                      <Text>Quantity: {donation.quantity}</Text>
+                      <Text>Volume: {bag.volume} mL</Text>
+                      <Text>Quantity: {bag.quantity}</Text>
                     </View>
                   ))}
                 </View>
+                <Button title="Submit" onPress={handleSubmit} />
               </View>
-            )} */}
-            <TextInput
-              style={styles.input}
-              placeholder="Volume Donated (ml)"
-              keyboardType="numeric"
-              value={volumeDonated}
-              onChangeText={setVolumeDonated}
-            />
-            <Button title="Submit" onPress={handleSubmit} />
+            )}
+            
           </>
         )}
       </ScrollView>
@@ -422,7 +453,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#ffffff",
   },
-  donationsList: {
+  bagsList: {
     marginTop: 20,
   },
   subTitle: {
@@ -431,7 +462,7 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     marginBottom: 16,
-},
+  },
 });
 
 export default Attendance;
