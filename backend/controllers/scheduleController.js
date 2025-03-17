@@ -174,31 +174,46 @@ exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
 
 
     const sched = await Schedule.aggregate([
-        { $match: { "donorDetails.donorId": donor._id , status: "Pending"} },
+        { $match: { "donorDetails.donorId": donor._id } },
         {
-            $addFields: {
-                statusOrder: {
-                    $switch: {
-                        branches: [
-                            { case: { $eq: ["$status", "Pending"] }, then: 1 },
-                            { case: { $eq: ["$status", "Approved"] }, then: 2 },
-                            { case: { $eq: ["$status", "Completed"] }, then: 3 }
-                        ],
-                        default: 4 // Default to lowest priority
-                    }
-                }
+            $facet: {
+                allSchedules: [
+                    {
+                        $addFields: {
+                            statusOrder: {
+                                $switch: {
+                                    branches: [
+                                        { case: { $eq: ["$status", "Pending"] }, then: 1 },
+                                        { case: { $eq: ["$status", "Approved"] }, then: 2 },
+                                        { case: { $eq: ["$status", "Completed"] }, then: 3 }
+                                    ],
+                                    default: 4 // Default to lowest priority
+                                }
+                            }
+                        }
+                    },
+                    { $sort: { statusOrder: 1, date: -1 } }, // Sort by status first, then by date (newest first)
+                    { $project: { statusOrder: 0 } } // Remove the temporary sorting field
+                ],
+                pendingCount: [
+                    { $match: { status: "Pending" } },
+                    { $count: "count" }
+                ]
             }
-        },
-        { $sort: { statusOrder: 1, date: -1 } }, // Sort by status first, then by date (newest first)
-        { $project: { statusOrder: 0 } } // Remove the temporary sorting field
+        }
     ]);
+    
+    // Extract values
+    const allSchedules = sched[0].allSchedules;
+    const pendingCount = sched[0].pendingCount.length > 0 ? sched[0].pendingCount[0].count : 0;
+    
 
     if (!sched) return res.status(404).json({ error: 'No pending schedule found' });
     console.log(sched.length)
     res.status(200).json({
         success: true,
-        count: sched.length,
-        schedules: sched
+        count: pendingCount,
+        schedules: allSchedules
     })
 });
 
