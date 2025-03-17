@@ -24,8 +24,6 @@ import { recordPublicRecord } from "../../../redux/actions/collectionActions";
 const FinalizeLetting = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { item } = route.params;
-  console.log("Item: ", item)
-  console.log("Details: ", lettingDetails)
 
   const [userDetails, setUserDetails] = useState(null);
   const { lettingDetails, loading, error } = useSelector(
@@ -72,7 +70,7 @@ const FinalizeLetting = ({ route, navigation }) => {
         .then(() => {
           dispatch(recordPublicRecord({ lettingId: item._id })).then(() => {
             Alert.alert("Success", `Milk Letting event has been finalized`);
-            navigation.navigate("superadmin_milkLetting")
+            navigation.navigate("Dashboard")
           });
         })
         .catch((error) => {

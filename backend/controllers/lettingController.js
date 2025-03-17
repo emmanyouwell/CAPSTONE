@@ -8,27 +8,33 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 
 // Get All lettings => /api/v1/lettings
 exports.allLettings = catchAsyncErrors(async (req, res, next) => {
-  const lettings = await Letting.find()
-    .populate({
-      path: "attendance.donor",
-      select: "user home_address",
-      populate: {
-        path: "user",
-        select: "name",
-      },
-    })
-    .populate({
-      path: "attendance.bags",
-      select: "volume",
+  try {
+    const lettings = await Letting.find()
+      .populate({
+        path: "attendance.donor",
+        select: "user home_address",
+        populate: {
+          path: "user",
+          select: "name",
+        },
+      })
+      .populate({
+        path: "attendance.bags",
+        select: "volume",
+      });
+
+    const count = await Letting.countDocuments();
+
+    res.status(200).json({
+      success: true,
+      count,
+      lettings,
     });
-
-  const count = await Letting.countDocuments();
-
-  res.status(200).json({
-    success: true,
-    count,
-    lettings,
-  });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Failed to finalize session", details: error.message });
+  }
 });
 
 // Create letting => /api/v1/lettings
