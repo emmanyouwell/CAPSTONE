@@ -24,6 +24,8 @@ import { recordPublicRecord } from "../../../redux/actions/collectionActions";
 const FinalizeLetting = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { item } = route.params;
+  console.log("Item: ", item)
+  console.log("Details: ", lettingDetails)
 
   const [userDetails, setUserDetails] = useState(null);
   const { lettingDetails, loading, error } = useSelector(
@@ -32,7 +34,9 @@ const FinalizeLetting = ({ route, navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    dispatch(getLettingDetails(item._id));
+    if (item?._id) {
+      dispatch(getLettingDetails(item._id));
+    }
   }, [dispatch]);
 
   useEffect(() => {
@@ -130,7 +134,7 @@ const FinalizeLetting = ({ route, navigation }) => {
               {/* Donor Attendance Section */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Donors Attendance</Text>
-                {lettingDetails.attendance.map((donor, index) => (
+                {lettingDetails?.attendance?.map((donor, index) => (
                   <View key={donor._id} style={styles.donorCard}>
                     <Text style={styles.donorName}>
                       {donor.donor.user.name.first}{" "}
