@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRoute } from '@react-navigation/native'
 import React, { useState, useEffect } from 'react'
@@ -23,10 +23,9 @@ const PickUpSchedules = ({ navigation }) => {
     }, [schedules])
     // Status color mapping
     const statusColors = {
-        Pending: "#FFA500",  // Orange
-        Scheduled: "#007bff", // Blue
-        Completed: "#28a745", // Green
-        Canceled: "#dc3545"   // Red
+        Pending: "#FFC107",  // Orange
+        Approved: "#E53777", // Blue
+        Completed: "#4CAF50", // Green
     };
     return (
         <>
@@ -34,30 +33,42 @@ const PickUpSchedules = ({ navigation }) => {
 
             <View style={styles.container}>
                 <Text style={SuperAdmin.headerText}>Schedule</Text>
-                <Card style={styles.card}>
-                    <Card.Content>
-                        <Text style={styles.title}>Schedule Details</Text>
-                        <View style={[styles.row, { flexWrap: "wrap" }]}>
+                <ScrollView>
+                    {schedules && schedules.map((schedule, index) => (
+                        <Card style={styles.card} key={index}>
+                            <Card.Content>
+                                <Text style={styles.title}>Schedule Details</Text>
+                                <View style={[styles.row, { flexWrap: "wrap" }]}>
 
-                            <Text style={styles.label}>📍 Address:</Text>
-                            <Text style={styles.value}>{schedules[0].address}</Text>
+                                    <Text style={styles.label}>📍 Address:</Text>
+                                    <Text style={styles.value}>{schedule.address}</Text>
 
-                        </View>
-                        <View style={styles.row}>
-                            <Text style={styles.label}>📅 Date:</Text>
-                            <Text style={styles.value}>{new Date(schedules[0].dates).toDateString()}</Text>
-                        </View>
+                                </View>
+                                <View style={styles.row}>
+                                    <Text style={styles.label}>📅 Date:</Text>
+                                    <Text style={styles.value}>{new Date(schedule.dates).toLocaleString("en-US", {
+                                        weekday: "short",
+                                        year: "numeric",
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                        hour12: true, // Ensures AM/PM format
+                                    })}</Text>
+                                </View>
 
-                        <View style={styles.row}>
-                            <Text style={styles.label}>🩸 Total Volume:</Text>
-                            <Text style={styles.value}>{schedules[0].totalVolume} ml</Text>
-                        </View>
+                                <View style={styles.row}>
+                                    <Text style={styles.label}>🩸 Total Volume:</Text>
+                                    <Text style={styles.value}>{schedule.totalVolume} ml</Text>
+                                </View>
 
-                        <View style={[styles.statusContainer, { backgroundColor: statusColors[schedules[0].status] || "#ccc" }]}>
-                            <Text style={styles.statusText}>{schedules[0].status}</Text>
-                        </View>
-                    </Card.Content>
-                </Card>
+                                <View style={[styles.statusContainer, { backgroundColor: statusColors[schedule.status] || "#ccc" }]}>
+                                    <Text style={styles.statusText}>{schedule.status}</Text>
+                                </View>
+                            </Card.Content>
+                        </Card>
+                    ))}
+                </ScrollView>
             </View>
 
         </>
@@ -92,7 +103,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: "bold",
-        
+
         color: "#333",
         flexWrap: "wrap",
         width: "40%"
