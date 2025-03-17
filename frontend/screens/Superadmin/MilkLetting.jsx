@@ -49,6 +49,14 @@ const InventoryScreen = ({ navigation }) => {
         (lets) => lets.status && lets.status !== 'Done'
     );
 
+    if (error) {
+        return (
+            <View style={styles.center}>
+                <Text style={styles.errorText}>{error}</Text>
+            </View>
+        );
+    }
+
     return (
         <View style={SuperAdmin.container}>
             {/* Header Component */}
