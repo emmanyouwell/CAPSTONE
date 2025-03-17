@@ -10,17 +10,30 @@ const checkEvents = async () => {
 
     try {
         // Find events that are "Not-Due" but should now be "Ongoing"
-        const events = await Event.find({
+        const OnGoingEvents = await Event.find({
             "eventDetails.start": { $lte: now },
             eventStatus: "Not-Due",
         });
-
-        if (events.length > 0) {
+        const DoneEvents = await Event.find({
+            "eventDetails.end": { $lte: now },
+            eventStatus: "On-Going",
+        });
+        if (OnGoingEvents.length > 0) {
             await Event.updateMany(
-                { _id: { $in: events.map(event => event._id) } },
+                { _id: { $in: OnGoingEvents.map(event => event._id) } },
                 { $set: { eventStatus: "On-Going" } }
             );
-            console.log(`Updated ${events.length} event(s) to Ongoing.`);
+            console.log(`Updated ${OnGoingEvents.length} event(s) to Ongoing.`);
+        }
+        else {
+            console.log("No events to update.");
+        }
+        if (DoneEvents.length > 0) {
+            await Event.updateMany(
+                { _id: { $in: DoneEvents.map(event => event._id) } },
+                { $set: { eventStatus: "Done" } }
+            );
+            console.log(`Updated ${DoneEvents.length} event(s) to Done.`);
         }
         else {
             console.log("No events to update.");

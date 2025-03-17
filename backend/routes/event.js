@@ -6,10 +6,14 @@ const {
     createEvent,
     getEventDetails,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    getUpcomingEvents
 } = require('../controllers/eventController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
+
+router.get('/events/upcoming', getUpcomingEvents);
+
 
 // Super Admin Routes
 router.route('/events')
