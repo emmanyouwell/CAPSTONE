@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { approveSchedule, getDonorSchedules, requestSchedule } from '../actions/scheduleActions';
 
-export const lettingSlice = createSlice({
+export const scheduleSlice = createSlice({
   name: 'schedule',
   initialState: {
     message: '',
@@ -12,6 +12,9 @@ export const lettingSlice = createSlice({
     count: 0,
   },
   reducers: {
+    resetSuccess: (state) => {
+      state.success = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -55,4 +58,5 @@ export const lettingSlice = createSlice({
   },
 });
 
-export default lettingSlice.reducer;
+export const { resetSuccess } = scheduleSlice.actions;
+export default scheduleSlice.reducer;

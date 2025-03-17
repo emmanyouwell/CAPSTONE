@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList } from 'react-native'
+import { View, Text, StyleSheet, FlatList, ScrollView, RefreshControl, SafeAreaView } from 'react-native'
 import React, { useState, useEffect, useCallback } from 'react'
 import { useFocusEffect } from '@react-navigation/native'
 
@@ -14,6 +14,9 @@ import { deleteBag } from '../../redux/actions/bagActions'
 import { TouchableOpacity } from 'react-native'
 import DatePicker from 'react-native-date-picker'
 import { requestSchedule, getDonorSchedules } from '../../redux/actions/scheduleActions'
+import { resetSuccess } from '../../redux/slices/scheduleSlice'
+
+
 const Home = ({ navigation }) => {
   const [visible, setVisible] = useState({});
   const dispatch = useDispatch();
@@ -21,6 +24,7 @@ const Home = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const { bags, totalVolume, totalBags, oldestExpressDate, latestExpressDate } = useSelector((state) => state.bags);
   const { schedules, count, success, loading } = useSelector((state) => state.schedules);
+  const [refreshing, setRefreshing] = useState(false);
   const openMenu = (id) => setVisible((prev) => ({ ...prev, [id]: true }));
   const closeMenu = (id) => setVisible((prev) => ({ ...prev, [id]: false }));
 
@@ -56,19 +60,26 @@ const Home = ({ navigation }) => {
     }
   }, [oldestExpressDate, latestExpressDate])
 
-  useEffect(()=>{
-    if (success){
+  useEffect(() => {
+    if (success) {
+      dispatch(resetSuccess());
       dispatch(getBags(userDetails._id));
+      dispatch(getDonorSchedules(userDetails._id)); 
     }
-  },[success])
+  }, [success])
+  const handleRefresh = () => {
+    setRefreshing(true);
+    dispatch(getBags(userDetails._id))
+      .then(() => setRefreshing(false))
+      .catch(() => setRefreshing(false));
+  };
   return (
     <>
       <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
-
       <View style={styles.container}>
 
         <Text style={styles.headerText}>Welcome back, {userDetails && userDetails.name.first}</Text>
-        <Button disabled={count && count > 0 ? true : false} mode="contained" style={count && count > 0 ? styles.pickUp : styles.btn} onPress={() => navigation.navigate('createBag')}>
+        <Button mode="contained" style={styles.btn} onPress={() => navigation.navigate('createBag')}>
           <Text>+ Add milk bag</Text>
         </Button>
         <View style={styles.card}>
@@ -185,6 +196,7 @@ const Home = ({ navigation }) => {
           />
         </View>
       </View>
+
     </>
   )
 }
@@ -198,7 +210,7 @@ const styles = StyleSheet.create({
   },
   pickUp: {
     backgroundColor: colors.color10_lpred,
-    
+
     padding: 4,
   },
   btn: {

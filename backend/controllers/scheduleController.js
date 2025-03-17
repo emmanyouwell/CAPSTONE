@@ -41,19 +41,24 @@ exports.createSchedule = catchAsyncErrors(async (req, res, next) => {
 
 // Get specific schedule details => /api/v1/schedule/:id
 exports.getScheduleDetails = catchAsyncErrors(async (req, res, next) => {
-    let schedule = await Schedule.findOne({
-        _id: req.params.id,
-        
-    })
+    let schedule = await Schedule.findOne({ _id: req.params.id })
         .populate({
             path: 'donorDetails.donorId',
             populate: { path: 'user' }
         })
-        .populate('donorDetails.bags');
+        .populate('donorDetails.bags')
+
 
     if (!schedule) {
         return next(new ErrorHandler(`schedule is not found with this id: ${req.params.id}`))
     }
+
+    // Sort the bags by expressDate (earliest first)
+    if (schedule?.donorDetails?.bags) {
+        schedule.donorDetails.bags.sort((a, b) => new Date(a.expressDate) - new Date(b.expressDate));
+    }
+
+
     let oldest;
     let latest;
     if (schedule.donorDetails.bags.length > 0) {
@@ -170,7 +175,7 @@ exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
     if (!donor) return res.status(404).json({ error: 'Donor not found' });
 
 
-    
+
 
 
     const sched = await Schedule.aggregate([
@@ -202,11 +207,11 @@ exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
             }
         }
     ]);
-    
+
     // Extract values
     const allSchedules = sched[0].allSchedules;
     const pendingCount = sched[0].pendingCount.length > 0 ? sched[0].pendingCount[0].count : 0;
-    
+
 
     if (!sched) return res.status(404).json({ error: 'No pending schedule found' });
     console.log(sched.length)
