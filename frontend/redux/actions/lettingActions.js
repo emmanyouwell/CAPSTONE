@@ -34,6 +34,36 @@ export const createLetting = createAsyncThunk(
     }
 )
 
+// Create Milk Letting
+export const newPublicDonor = createAsyncThunk(
+    'letting/newPublicDonor',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/letting-newDonor`, req, config)
+            return response.data;
+
+        } catch (error) {
+            console.log("Error: ", error)
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
 // Mark Attendance of donors
 export const markAttendance = createAsyncThunk(
     'letting/markAttendance',
