@@ -7,7 +7,12 @@ const Bag = require('../models/bags');
 const Donor = require('../models/donor');
 // Get All schedules => /api/v1/schedules
 exports.allSchedules = catchAsyncErrors(async (req, res, next) => {
-    const schedules = await Schedule.find();
+    const schedules = await Schedule.find()
+        .populate({
+            path: 'donorDetails.donorId',
+            populate: { path: 'user' }
+        })
+        .populate('donorDetails.bags')
 
     const count = await Schedule.countDocuments();
 
@@ -36,15 +41,34 @@ exports.createSchedule = catchAsyncErrors(async (req, res, next) => {
 
 // Get specific schedule details => /api/v1/schedule/:id
 exports.getScheduleDetails = catchAsyncErrors(async (req, res, next) => {
-    const schedule = await Schedule.findById(req.params.id);
+    let schedule = await Schedule.findById(req.params.id)
+        .populate({
+            path: 'donorDetails.donorId',
+            populate: { path: 'user' }
+        })
+        .populate('donorDetails.bags');
 
     if (!schedule) {
         return next(new ErrorHandler(`schedule is not found with this id: ${req.params.id}`))
     }
+    let oldest;
+    let latest;
+    if (schedule.donorDetails.bags.length > 0) {
+        oldest = schedule.donorDetails.bags.reduce((prev, curr) =>
+            new Date(prev.expressDate) < new Date(curr.expressDate) ? prev : curr
+        ).expressDate;
 
+        latest = schedule.donorDetails.bags.reduce((prev, curr) =>
+            new Date(prev.expressDate) > new Date(curr.expressDate) ? prev : curr
+        ).expressDate;
+
+
+    }
+    schedule = { ...schedule.toObject(), oldestExpressDate: oldest, latestExpressDate: latest };
     res.status(200).json({
         success: true,
-        schedule
+        schedule,
+      
     })
 })
 
