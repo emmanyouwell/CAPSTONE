@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 
-import { SafeAreaView, Text, Button, StyleSheet, Platform, StatusBar, ImageBackground, View, Dimensions, TextInput, KeyboardAvoidingView, ScrollView } from "react-native";
+import { SafeAreaView, Text, Button, StyleSheet, Platform, StatusBar, ImageBackground, View, Dimensions, TextInput, KeyboardAvoidingView, ScrollView, Alert } from "react-native";
 import LinearGradient from 'react-native-linear-gradient';
 import { loginStyle } from '../styles/Styles';
 import { divider } from '../styles/Styles';
@@ -9,6 +9,7 @@ const screenWidth = Dimensions.get('window').width;
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, logout} from '../redux/actions/userActions';
 import { viewAsyncStorage , getUser} from '../utils/helper';
+import Toast from 'react-native-toast-message';
 const Login = ({ navigation }) => {
     const dispatch = useDispatch();
     const [email, setEmail] = useState('');
@@ -49,11 +50,16 @@ const Login = ({ navigation }) => {
                 navigation.replace('userHome');
             }
             else {
-                console.log('wala userdetails')
+                
                 navigation.replace('superadmin_dashboard');
             }
         }
     },[isLoggedIn, userDetails])
+    useEffect(()=>{
+        if (error){
+            Alert.alert('Error', error);
+        }
+    },[error])
     return (
         <ImageBackground source={require('../assets/image/milk-letting-event-1.jpg')} imageStyle={styles.backgroundImageStyle} style={styles.backgroundImage}>
             <LinearGradient

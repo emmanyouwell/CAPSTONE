@@ -64,30 +64,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     sendToken(user, 200, res);
 })
 
-exports.loginEmployee = catchAsyncErrors(async (req, res, next) => {
-    const { employeeID, password } = req.body;
-    console.log(req.body);
-    // Validation
-    if (!employeeID || !password) {
-        return next(new ErrorHandler('Please enter employeeID and password', 400));
-    }
-
-    // Finding User in database
-    const user = await User.findOne({ employeeID }).select('+password');
-
-    if (!user) {
-        return next(new ErrorHandler('Invalid employeeID or password', 401));
-    }
-
-    // Checks if password is correct or not
-    const isPasswordMatched = await user.comparePassword(password);
-
-    if (!isPasswordMatched) {
-        return next(new ErrorHandler('Invalid employeeID or password', 401));
-    }
-
-    sendToken(user, 200, res);
-})
 
 // Login User => /api/v1/login
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {

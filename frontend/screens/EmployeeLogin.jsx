@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 
-import { SafeAreaView, Text, Button, StyleSheet, Platform, StatusBar, ImageBackground, View, Dimensions, TextInput, KeyboardAvoidingView, ScrollView } from "react-native";
+import { SafeAreaView, Text, Button, StyleSheet, Platform, StatusBar, ImageBackground, View, Dimensions, TextInput, KeyboardAvoidingView, ScrollView, Alert } from "react-native";
 import LinearGradient from 'react-native-linear-gradient';
 import { loginStyle } from '../styles/Styles';
 import { divider } from '../styles/Styles';
@@ -9,6 +9,7 @@ const screenWidth = Dimensions.get('window').width;
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, logout } from '../redux/actions/userActions';
 import { viewAsyncStorage } from '../utils/helper';
+import { resetError } from '../redux/slices/userSlice';
 const EmployeeLogin = ({ navigation }) => {
     const dispatch = useDispatch();
     const [employeeID, setEmployeeID] = useState('');
@@ -28,6 +29,12 @@ const EmployeeLogin = ({ navigation }) => {
             navigation.replace('superadmin_dashboard');
         }
     },[isLoggedIn])
+    useEffect(()=>{
+        if (error){
+            dispatch(resetError());
+            Alert.alert('Error', error);
+        }
+    },[error])
     return (
         <ImageBackground source={require('../assets/image/milk-letting-event-1.jpg')} imageStyle={styles.backgroundImageStyle} style={styles.backgroundImage}>
             <LinearGradient
