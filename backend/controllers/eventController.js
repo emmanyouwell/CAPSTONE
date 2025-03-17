@@ -2,11 +2,9 @@ const Event = require('../models/event')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
-// Get All Events => /api/v1/events
-exports.allEvents = catchAsyncErrors(async (req, res, next) => {
-    const { upcoming } = req.query;
 
-    if (upcoming) {
+exports.getUpcomingEvents = catchAsyncErrors(async (req, res, next) => {
+    try{
         const events = await Event.find({
             'eventDetails.start': {
                 $gte: new Date()
@@ -19,8 +17,17 @@ exports.allEvents = catchAsyncErrors(async (req, res, next) => {
             events
         })
     }
-    else {
-        const events = await Event.find();
+    catch(error){
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+})
+
+// Get All Events => /api/v1/events
+exports.allEvents = catchAsyncErrors(async (req, res, next) => {
+    const events = await Event.find();
 
         const count = await Event.countDocuments();
 
@@ -29,7 +36,6 @@ exports.allEvents = catchAsyncErrors(async (req, res, next) => {
             count,
             events
         })
-    }
 
 })
 
