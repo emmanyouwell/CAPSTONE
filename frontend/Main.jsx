@@ -84,7 +84,7 @@ const CustomDrawerContent = (props) => {
     dispatch(getUserDetails())
   }, [dispatch])
   useEffect(() => {
-    if (userDetails) {
+    if (userDetails && userDetails.role === 'User') {
       dispatch(getDonorSchedules(userDetails._id));
       console.log('User Details:', userDetails);
     }
