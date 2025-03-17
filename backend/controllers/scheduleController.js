@@ -41,7 +41,10 @@ exports.createSchedule = catchAsyncErrors(async (req, res, next) => {
 
 // Get specific schedule details => /api/v1/schedule/:id
 exports.getScheduleDetails = catchAsyncErrors(async (req, res, next) => {
-    let schedule = await Schedule.findById(req.params.id)
+    let schedule = await Schedule.findOne({
+        _id: req.params.id,
+        
+    })
         .populate({
             path: 'donorDetails.donorId',
             populate: { path: 'user' }
@@ -68,19 +71,25 @@ exports.getScheduleDetails = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
         success: true,
         schedule,
-      
+
     })
 })
 
 // Update schedule => /api/v1/schedule/:id
 exports.updateSchedule = catchAsyncErrors(async (req, res, next) => {
+    let newScheduleData = {};
+    if (req.body.dates) {
+        const schedDate = new Date(req.body.dates)
 
-    const schedDate = new Date(req.body.dates)
-
-    const newScheduleData = {
-        ...req.body,
-        dates: schedDate
+        newScheduleData = {
+            ...req.body,
+            dates: schedDate,
+        }
     }
+    else {
+        newScheduleData = { ...req.body }
+    }
+
 
     const schedule = await Schedule.findByIdAndUpdate(req.params.id, newScheduleData, {
         new: true,
@@ -161,11 +170,11 @@ exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
     if (!donor) return res.status(404).json({ error: 'Donor not found' });
 
 
-    const statusOrder = { Pending: 1, Approved: 2, Completed: 3 };
+    
 
 
     const sched = await Schedule.aggregate([
-        { $match: { "donorDetails.donorId": donor._id } },
+        { $match: { "donorDetails.donorId": donor._id , status: "Pending"} },
         {
             $addFields: {
                 statusOrder: {
