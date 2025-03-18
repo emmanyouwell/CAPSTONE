@@ -12,12 +12,12 @@ const {
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 router.route('/requests')
-    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allRequests)
+    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), allRequests)
     .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), createRequest);
 router.route('/request/:id')
-    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getRequestDetails)
-    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateRequest)
-    .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), deleteRequest);
+    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), getRequestDetails)
+    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), updateRequest)
+    .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), deleteRequest);
 
 
 module.exports = router;

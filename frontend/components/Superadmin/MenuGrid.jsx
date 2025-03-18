@@ -28,7 +28,7 @@ const adminItems = [
 ];
 
 const staffItems = [
-  { id: '1', title: 'Add Patient', route: 'AddPatient', image: require('../../assets/image/donor-records.png') },
+  { id: '1', title: 'New Patient', route: 'AddPatient', image: require('../../assets/image/donor-records.png') },
   { id: '2', title: 'Add Request', route: 'AddRequest', image: require('../../assets/image/recipient-records.png') },
 ];
 
