@@ -11,6 +11,9 @@ const lettingSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String
+    },
     actDetails: {
         start: {
             type: Date,
