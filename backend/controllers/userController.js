@@ -275,10 +275,13 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
             query.$or.push({ employeeID: Number(search) });
         }
     }
+   
     if (role) {
         query.role = role;
     }
-
+    else {
+        query.role = { $nin: ["SuperAdmin", "User"] };
+    }
     // Ensure sorting field is allowed; default to "employeeID"
     const allowedSortFields = ["employeeID", "firstName", "lastName"];
     const sortField = allowedSortFields.includes(sortBy) ? sortBy : "employeeID";
@@ -293,8 +296,8 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
 
     try {
         // Aggregation pipeline
-        const aggregationPipeline = [{ $match: { ...query, role: { $nin: ["SuperAdmin", "User"] } } }];
-
+        const aggregationPipeline = [{ $match: query }];
+        
         // Convert `employeeID` to a number for proper sorting if sorting by `employeeID`
         if (sortField === "employeeID") {
             aggregationPipeline.push({
@@ -333,7 +336,7 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
         }));
 
         // Get total count of users
-        const totalUsers = await User.countDocuments(query);
+        const totalUsers = users.length
         const totalPages = Math.ceil(totalUsers / pageSize);
 
         res.status(200).json({

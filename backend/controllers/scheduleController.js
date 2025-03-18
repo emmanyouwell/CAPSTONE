@@ -104,13 +104,13 @@ exports.updateSchedule = catchAsyncErrors(async (req, res, next) => {
     })
 
     if (schedule.status === 'Completed') {
-        
         const collection = await Collection.create({
             collectionType: "Private",
             collectionDate: new Date(),
             privDetails: schedule._id,
-            user: req.body.user
+            user: [req.body.admin]
         })
+        
     }
 
     res.status(200).json({

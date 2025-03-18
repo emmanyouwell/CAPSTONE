@@ -58,7 +58,7 @@ const PickUpSchedules = ({ navigation }) => {
                                 </View>
 
                                 <View style={styles.row}>
-                                    <Text style={styles.label}>🩸 Total Volume:</Text>
+                                    <Text style={styles.label}>🥛 Total Volume:</Text>
                                     <Text style={styles.value}>{schedule.totalVolume} ml</Text>
                                 </View>
 
