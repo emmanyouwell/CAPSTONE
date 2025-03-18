@@ -39,7 +39,7 @@ exports.allLettings = catchAsyncErrors(async (req, res, next) => {
         select: "user home_address",
         populate: {
           path: "user",
-          select: "name",
+          select: "name phone",
         },
       })
       .populate({
@@ -94,7 +94,7 @@ exports.getLettingDetails = catchAsyncErrors(async (req, res, next) => {
       select: "user home_address",
       populate: {
         path: "user",
-        select: "name",
+        select: "name phone",
       },
     })
     .populate({
@@ -277,6 +277,11 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
       .json({ error: "Failed to finalize session", details: error.message });
   }
 });
+
+exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
+  console.log("req.body", req.body);
+})
+
 
 // New Public Donor
 exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
