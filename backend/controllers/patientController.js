@@ -32,7 +32,7 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
     try {
         // Find donors based on the query object
         const patients = await Patient.find(query)
-            .populate('requested', 'date volRequested')
+            .populate('requested', 'date volumeRequested')
             .sort({name: 1})
             .skip(skip)
             .limit(pageSize);
@@ -69,7 +69,7 @@ exports.createPatient = catchAsyncErrors(async (req, res, next) => {
 // Get specific Patient details => /api/v1/patient/:id
 exports.getPatientDetails = catchAsyncErrors(async (req, res, next) => {
     const patient = await Patient.findById(req.params.id)
-    .populate([{path:'requested'}, {path:'staff', select: 'name'}]);
+    .populate([{path:'requested', select: 'volumeRequested'}, {path:'staff', select: 'name'}]);
 
     if (!patient) {
         return next(new ErrorHandler(`Patient is not found with this id: ${req.params.id}`))
