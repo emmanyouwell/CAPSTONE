@@ -32,11 +32,6 @@ const patientSchema = new mongoose.Schema({
         type: String,
         enum: ['Inpatient', 'Outpatient'],
         default: 'Inpatient',
-        required: true
-    },
-    hospital: {
-        type: String,
-        required: [true, 'Please enter the hospital name of the patient is admitted']
     },
     staff: {
         type: ObjectId,
@@ -45,10 +40,9 @@ const patientSchema = new mongoose.Schema({
     },
     requested: [
         {
-            reqId: {
-                type: ObjectId,
-                ref: 'Request'
-            },
+            type: ObjectId,
+            required: true,
+            ref: 'Request'
         }
     ],
     createdAt: {

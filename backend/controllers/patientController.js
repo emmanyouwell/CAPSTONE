@@ -13,9 +13,8 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
     if (search) {
         query.$or = [
             { 'name': { $regex: search, $options: 'i' } },  
-            { 'patientType': { $regex: search, $options: 'i' } }, 
-            { 'hospital': { $regex: search, $options: 'i' } },    
-            { 'milkRequested': { $regex: search, $options: 'i' } }
+            { 'patientType': { $regex: search, $options: 'i' } },    
+            { 'requested': { $regex: search, $options: 'i' } }
         ];
     }
     if (type){
@@ -33,7 +32,7 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
     try {
         // Find donors based on the query object
         const patients = await Patient.find(query)
-            .populate('requested.reqId', 'date volume')
+            .populate('requested', 'date volRequested')
             .sort({name: 1})
             .skip(skip)
             .limit(pageSize);
@@ -58,7 +57,7 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
 
 // Create Patient => /api/v1/patients
 exports.createPatient = catchAsyncErrors(async (req, res, next) => {
-console.log(req.body)
+    console.log(req.body)
     const patient = await Patient.create(req.body);
 
     res.status(201).json({
@@ -70,7 +69,7 @@ console.log(req.body)
 // Get specific Patient details => /api/v1/patient/:id
 exports.getPatientDetails = catchAsyncErrors(async (req, res, next) => {
     const patient = await Patient.findById(req.params.id)
-    .populate([{path:'requested.reqId'}, {path:'staff', select: 'name'}]);
+    .populate([{path:'requested'}, {path:'staff', select: 'name'}]);
 
     if (!patient) {
         return next(new ErrorHandler(`Patient is not found with this id: ${req.params.id}`))
