@@ -25,7 +25,7 @@ exports.allLettings = catchAsyncErrors(async (req, res, next) => {
     if (!lettings || lettings.length === 0) {
       return res
       .status(404)
-      .json({ error: "No Milk Letting Events Found", details: error.message });
+      .json({ error: "No Milk Letting Events Found" });
     }
 
     const count = await Letting.countDocuments();
