@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
+import { deleteLetting } from '../../../redux/actions/lettingActions';
 
 const MilkLettings = ({ data }) => {
     const navigation = useNavigation();
@@ -16,24 +17,24 @@ const MilkLettings = ({ data }) => {
         console.log("Edit Milk Letting Event: ", item)
     };
 
-    // const handleDelete = (id) => {
-    //     Alert.alert(
-    //         "Confirm Deletion",
-    //         "Are you sure you want to delete this equipment?",
-    //         [
-    //             { text: "Cancel", style: "cancel" },
-    //             {
-    //                 text: "Delete",
-    //                 style: "destructive",
-    //                 onPress: () => {
-    //                     dispatch(deleteEquipments(id))
-    //                         .then(Alert.alert("Deleted", "Equipment deleted successfully."))
-    //                         .catch((err) => Alert.alert('Error', err.message));;
-    //                 },
-    //             },
-    //         ]
-    //     );
-    // };
+    const handleDelete = (id) => {
+        Alert.alert(
+            "Confirm Deletion",
+            "Are you sure you want to delete this Milk Letting event?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: () => {
+                        dispatch(deleteLetting(id))
+                            .then(Alert.alert("Deleted", "Milk Letting deleted successfully."))
+                            .catch((err) => Alert.alert('Error', err.message));;
+                    },
+                },
+            ]
+        );
+    };
 
     const renderRightActions = (item) => (
         <View style={styles.actionsContainer}>
@@ -43,12 +44,12 @@ const MilkLettings = ({ data }) => {
             >
                 <MaterialIcons name="edit" size={30} color="white" /> 
             </TouchableOpacity>
-            {/* <TouchableOpacity
+            <TouchableOpacity
                 style={[styles.actionButton, styles.deleteButton]}
                 onPress={() => handleDelete(item._id)}
             >
                 <MaterialIcons name="delete" size={30} color="white" /> 
-            </TouchableOpacity> */}
+            </TouchableOpacity>
         </View>
     );
 
