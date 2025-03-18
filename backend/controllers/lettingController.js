@@ -72,11 +72,11 @@ exports.createLetting = catchAsyncErrors(async (req, res, next) => {
     start: new Date(req.body.start), // This stores in UTC
     end: new Date(req.body.end), // This stores in UTC
   };
-  
+
   const letting = await Letting.create({
     ...req.body,
     actDetails,
-    
+
   });
 
 
@@ -279,12 +279,77 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
 });
 
 exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
-  console.log("req.body", req.body.data.fields);
-  let data = {};
-  req.body.data.fields.forEach((field) => {
-    data[field.label] = field.value;
-  });
-  console.log("data", data);
+  try {
+
+    let data = {};
+    req.body.data.fields.forEach((field) => {
+      data[field.label] = field.value;
+    });
+    // Prepare children array with one child object
+    const children = [
+      {
+        name: data.child_name,
+        age: data.child_age,
+        birth_weight: data.birth_weight,
+        aog: data.aog,
+      },
+    ];
+    let password = `${data.first_name
+      .replace(/\s+/g, "")
+      .toLowerCase()}${data.last_name.replace(/\s+/g, "").toLowerCase()}`;
+
+    const name = {
+      first: data.first_name || "",
+      middle: data.middle_name || "",
+      last: data.last_name || "",
+    };
+
+    const userExist = await User.findOne({
+      name,
+      email: data.email,
+    });
+
+    if (userExist) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    const user = await User.create({
+      name: name,
+      email: data.email,
+      phone: data.contact_number,
+      password: password,
+      role: "User",
+    });
+
+    // Create donor
+    const donor = await Donor.create({
+      user: user._id,
+      home_address: {
+        street: data.street,
+        brgy: data.brgy,
+        city: data.city || "Taguig City",
+      },
+      age: data.age,
+      birthday: data.birthday,
+      children: children,
+      office_address: data.office_address,
+      contact_number: data.contact_number_2,
+      donorType: "Community",
+      occupation: data.occupation,
+    });
+
+    res.status(200).json({
+      success: true,
+      user,
+      donor,
+    });
+  } catch (error) {
+    console.error("Error in createDonor:", error);
+    res.status(500).json({ error: error.message });
+  }
 })
 
 
