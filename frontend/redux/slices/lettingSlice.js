@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   createLetting,
+  deleteLetting,
   finalizeSession,
   getLettingDetails,
   getLettings,
@@ -18,11 +19,13 @@ export const lettingSlice = createSlice({
     loading: false,
     error: null,
     success: false,
+    isUpdated: false,
+    isDeleted: false,
   },
   reducers: {
     resetSuccess: (state) => {
       state.success = false;
-      state.error = null
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -102,8 +105,20 @@ export const lettingSlice = createSlice({
       .addCase(getLettingDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      .addCase(deleteLetting.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteLetting.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isDeleted = action.payload.success;
+      })
+      .addCase(deleteLetting.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
-export const {resetSuccess} = lettingSlice.actions;
+export const { resetSuccess } = lettingSlice.actions;
 export default lettingSlice.reducer;
