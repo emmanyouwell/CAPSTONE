@@ -1,4 +1,4 @@
-import React, { useEffect, useState, startTransition } from "react";
+import React, { useEffect, useState, startTransition, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import Header from "../../../components/Superadmin/Header";
-import { logoutUser } from "../../../redux/actions/userActions";
+import { logoutUser, getUserDetails} from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import { getUser } from "../../../utils/helper";
 import {
@@ -20,12 +20,14 @@ import {
   getLettingDetails,
 } from "../../../redux/actions/lettingActions";
 import { recordPublicRecord } from "../../../redux/actions/collectionActions";
+import { useFocusEffect } from "@react-navigation/native";
 
 const FinalizeLetting = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { item } = route.params;
 
-  const [userDetails, setUserDetails] = useState(null);
+  // const [userDetails, setUserDetails] = useState(null);
+  const { userDetails } = useSelector((state) => state.users);
   const { lettingDetails, loading, success } = useSelector(
     (state) => state.lettings
   );
@@ -37,15 +39,22 @@ const FinalizeLetting = ({ route, navigation }) => {
     }
   }, [dispatch]);
 
-  useEffect(() => {
-    startTransition(() => {
-      const fetchUserDetails = async () => {
-        const user = await getUser();
-        setUserDetails(user);
-      };
-      fetchUserDetails();
-    });
-  }, []);
+  // useEffect(() => {
+  //   startTransition(() => {
+  //     const fetchUserDetails = async () => {
+  //       const user = await getUser();
+  //       setUserDetails(user);
+  //     };
+  //     fetchUserDetails();
+  //   });
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(getUserDetails());
+    }, [dispatch]) // Only depends on `dispatch`
+  );
+
 
   const handleRefresh = () => {
     setRefreshing(true);

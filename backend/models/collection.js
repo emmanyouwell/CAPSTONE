@@ -16,7 +16,6 @@ const collectionSchema = new mongoose.Schema({
         {
             type: ObjectId,
             required: [true, 'Admin user is needed to complete the collection'],
-            unique: true,
             ref: 'User'
         }
     ],

@@ -5,6 +5,7 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const User = require('../models/user');
 const Bag = require('../models/bags');
 const Donor = require('../models/donor');
+
 // Get All schedules => /api/v1/schedules
 exports.allSchedules = catchAsyncErrors(async (req, res, next) => {
     const schedules = await Schedule.find()
@@ -101,6 +102,16 @@ exports.updateSchedule = catchAsyncErrors(async (req, res, next) => {
         runValidators: true,
         useFindAndModify: false,
     })
+
+    if (schedule.status === 'Completed') {
+        
+        const collection = await Collection.create({
+            collectionType: "Private",
+            collectionDate: new Date(),
+            privDetails: schedule._id,
+            user: req.body.user
+        })
+    }
 
     res.status(200).json({
         success: true,

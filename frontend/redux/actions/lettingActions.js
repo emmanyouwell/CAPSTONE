@@ -130,10 +130,11 @@ export const finalizeSession = createAsyncThunk(
 export const getLettings = createAsyncThunk(
     'letting/getLettings',
     async (query, thunkAPI) => {
-        
+
         const token = await getToken();
 
         if (!token) {
+            console.log('No token available');
             throw new Error('No token available');
         }
 
@@ -147,7 +148,7 @@ export const getLettings = createAsyncThunk(
         console.log("Config: ", config)
         try {
             let urlString = ''
-            if (query){
+            if (query) {
                 urlString = `${REACT_APP_API_URL}/api/v1/lettings?search=${query}`
             }
             else {
@@ -158,6 +159,7 @@ export const getLettings = createAsyncThunk(
             return response.data;
 
         } catch (error) {
+            console.log("Error: ", error)
             return thunkAPI.rejectWithValue(error.message);
         }
     }
