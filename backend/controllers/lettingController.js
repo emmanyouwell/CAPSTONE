@@ -280,6 +280,11 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
 
 exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
   console.log("req.body", req.body.data.fields);
+  let data = {};
+  req.body.data.fields.forEach((field) => {
+    data[field.label] = field.value;
+  });
+  console.log("data", data);
 })
 
 
