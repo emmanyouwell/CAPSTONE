@@ -279,7 +279,7 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
 });
 
 exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
-  console.log("req.body", req.body);
+  console.log("req.body", req.body.data.fields);
 })
 
 
