@@ -11,9 +11,13 @@ const {
     markAttendance,
     finalizeSession,
     newPublicDonor,
+    getUpcomingLettings,
 } = require('../controllers/lettingController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
+
+
+router.get('/upcoming/lettings', getUpcomingLettings)
 
 router.route('/lettings')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allLettings)

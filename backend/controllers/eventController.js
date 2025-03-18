@@ -1,7 +1,7 @@
 const Event = require('../models/event')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
-
+const Letting = require('../models/letting')
 
 exports.getUpcomingEvents = catchAsyncErrors(async (req, res, next) => {
     try{
@@ -58,10 +58,17 @@ exports.createEvent = catchAsyncErrors(async (req, res, next) => {
         eventType: req.body.type,
         user: req.body.user
     });
-
+    const letting = await Letting.create({
+        activity: req.body.title,
+        venue: req.body.description,
+        status: eventStatus,
+        actDetails: eventDetails,
+        admin: req.body.user
+    }) 
     res.status(201).json({
         success: true,
-        event
+        event,
+        letting
     });
 })
 

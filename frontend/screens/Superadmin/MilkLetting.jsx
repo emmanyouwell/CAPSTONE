@@ -15,7 +15,7 @@ import { logoutUser } from '../../redux/actions/userActions';
 import { getLettings } from '../../redux/actions/lettingActions';
 import { SuperAdmin } from '../../styles/Styles';
 import MilkLettings from '../../components/Superadmin/MilkLetting/MilkLettings';
-import { resetSuccess } from '../../redux/slices/lettingSlice';
+import { resetError, resetSuccess } from '../../redux/slices/lettingSlice';
 
 const InventoryScreen = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -25,8 +25,13 @@ const InventoryScreen = ({ navigation }) => {
 
     useEffect(() => {
         dispatch(getLettings());
+        dispatch(resetError())
     }, [dispatch]);
-
+    useEffect(()=>{
+        if (error){
+            // dispatch(resetError())
+        }
+    },[error])
     const handleRefresh = () => {
         setRefreshing(true);
         dispatch(resetSuccess());
@@ -87,7 +92,7 @@ const InventoryScreen = ({ navigation }) => {
                         <Text>Loading...</Text>
                     ) : error? (
                         <View style={styles.center}>
-                            <Text style={styles.errorText}>A problem occur in loading the data. Please refresh the screen</Text>
+                            <Text style={styles.errorText}>{error}</Text>
                         </View>
                     ) : (
                         <MilkLettings data={filteredLettings} />
