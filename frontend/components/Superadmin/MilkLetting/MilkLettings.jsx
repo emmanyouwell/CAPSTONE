@@ -43,29 +43,29 @@ const MilkLettings = ({ data }) => {
             >
                 <MaterialIcons name="edit" size={30} color="white" /> 
             </TouchableOpacity>
-            <TouchableOpacity
+            {item.status !== 'Done' && item.attendance.lenght !== 0 && (<TouchableOpacity
                 style={[styles.actionButton, styles.deleteButton]}
                 onPress={() => handleDelete(item._id)}
             >
                 <MaterialIcons name="delete" size={30} color="white" /> 
-            </TouchableOpacity>
+            </TouchableOpacity>)}
         </View>
     );
 
     const renderLeftActions = (item) => (
         <View style={styles.actionsContainer}>
-            <TouchableOpacity
+            {item.status === 'On-Going' && (<TouchableOpacity
                 style={[styles.actionButton, styles.attendButton]}
                 onPress={() => navigation.navigate('Attendance', { item })}
             >
                 <MaterialIcons name="group-add" size={30} color="white" /> 
-            </TouchableOpacity>
-            <TouchableOpacity
+            </TouchableOpacity>)}
+            {item.status === 'On-Going' && item.attendance.lenght > 0 && (<TouchableOpacity
                 style={[styles.actionButton, styles.finalizeButton]}
                 onPress={() => navigation.navigate('FinalizeLetting', { item })}
             >
                 <MaterialIcons name="done-all" size={30} color="white" /> 
-            </TouchableOpacity>
+            </TouchableOpacity>)}
         </View>
     );
 

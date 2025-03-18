@@ -62,7 +62,11 @@ const EditMilkLetting = ({ route, navigation }) => {
                         };
                         console.log("data: ", formData)
                         dispatch(updateLetting(formData));
-                        navigation.navigate('superadmin_milkLetting')
+                        if (status === 'Done'){
+                            navigation.navigate('HistoryLetting')
+                        } else {
+                            navigation.navigate('superadmin_milkLetting')
+                        }
                     }}
                 >
                     {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
