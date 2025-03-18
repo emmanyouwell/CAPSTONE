@@ -224,3 +224,34 @@ export const deleteLetting = createAsyncThunk(
         }
     }
 )
+
+// Update Milk Letting
+export const updateLetting = createAsyncThunk(
+    'letting/updateLetting',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+        console.log("Update Lettings: ", req)
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/letting/${req.id}`, req, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

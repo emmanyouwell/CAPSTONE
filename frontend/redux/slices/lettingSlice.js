@@ -7,6 +7,7 @@ import {
   getLettings,
   markAttendance,
   newPublicDonor,
+  updateLetting,
 } from "../actions/lettingActions";
 
 export const lettingSlice = createSlice({
@@ -115,6 +116,18 @@ export const lettingSlice = createSlice({
         state.isDeleted = action.payload.success;
       })
       .addCase(deleteLetting.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(updateLetting.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updateLetting.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isUpdated = action.payload.success;
+      })
+      .addCase(updateLetting.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
