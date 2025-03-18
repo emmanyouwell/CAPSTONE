@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { 
+const {
     allLettings,
     createLetting,
     getLettingDetails,
@@ -12,6 +12,7 @@ const {
     finalizeSession,
     newPublicDonor,
     getUpcomingLettings,
+    newPublicDonorTally,
 } = require('../controllers/lettingController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -41,5 +42,7 @@ router.route('/finalize-session')
 
 router.route('/letting-newDonor')
     .post(isAuthenticatedUser, newPublicDonor);
+router.route('/tally/newDonor')
+    .post(newPublicDonorTally)
 
 module.exports = router;
