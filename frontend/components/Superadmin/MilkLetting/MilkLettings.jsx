@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
 import { deleteLetting } from '../../../redux/actions/lettingActions';
@@ -10,10 +10,9 @@ import { deleteLetting } from '../../../redux/actions/lettingActions';
 const MilkLettings = ({ data }) => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
-    // const { isDeleted } = useSelector((state) => state.equipments);
 
     const handleEdit = (item) => {
-        // navigation.navigate('EditEquipment', { item });
+        navigation.navigate('EditMilkLetting', { item });
         console.log("Edit Milk Letting Event: ", item)
     };
 
