@@ -5,6 +5,7 @@ import {
   finalizeSession,
   getLettingDetails,
   getLettings,
+  getUpcomingLettings,
   markAttendance,
   newPublicDonor,
   updateLetting,
@@ -26,8 +27,10 @@ export const lettingSlice = createSlice({
   reducers: {
     resetSuccess: (state) => {
       state.success = false;
-      state.error = null;
     },
+    resetError: (state) => {
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -95,7 +98,17 @@ export const lettingSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
+      .addCase(getUpcomingLettings.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getUpcomingLettings.fulfilled, (state, action) => {
+        state.loading = false;
+        state.lettings = action.payload.events;
+      })
+      .addCase(getUpcomingLettings.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(getLettingDetails.pending, (state, action) => {
         state.loading = true;
       })
@@ -133,5 +146,5 @@ export const lettingSlice = createSlice({
       });
   },
 });
-export const { resetSuccess } = lettingSlice.actions;
+export const { resetSuccess, resetError } = lettingSlice.actions;
 export default lettingSlice.reducer;

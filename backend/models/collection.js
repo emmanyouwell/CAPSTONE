@@ -19,6 +19,11 @@ const collectionSchema = new mongoose.Schema({
             ref: 'User'
         }
     ],
+    status: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Stored', 'Dispensed'],
+        default: 'Pending'
+    },
     pubDetails: {
         type: ObjectId,
         ref: 'Letting'

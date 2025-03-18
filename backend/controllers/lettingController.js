@@ -5,6 +5,30 @@ const Donor = require("../models/donor");
 const Bag = require("../models/bags");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
+const Event = require("../models/event");
+
+
+
+exports.getUpcomingLettings = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const events = await Letting.find({
+      'actDetails.start': {
+        $gte: new Date()
+      }
+    }).sort('actDetails.start');
+
+    return res.status(200).json({
+      success: true,
+      count: events.length,
+      events
+    })
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+})
 
 // Get All lettings => /api/v1/lettings
 exports.allLettings = catchAsyncErrors(async (req, res, next) => {
@@ -24,8 +48,8 @@ exports.allLettings = catchAsyncErrors(async (req, res, next) => {
       });
     if (!lettings || lettings.length === 0) {
       return res
-      .status(404)
-      .json({ error: "No Milk Letting Events Found" });
+        .status(404)
+        .json({ error: "No Milk Letting Events Found" });
     }
 
     const count = await Letting.countDocuments();
@@ -48,11 +72,13 @@ exports.createLetting = catchAsyncErrors(async (req, res, next) => {
     start: new Date(req.body.start), // This stores in UTC
     end: new Date(req.body.end), // This stores in UTC
   };
-
+  
   const letting = await Letting.create({
     ...req.body,
     actDetails,
+    
   });
+
 
   res.status(201).json({
     success: true,
@@ -90,8 +116,8 @@ exports.getLettingDetails = catchAsyncErrors(async (req, res, next) => {
 // Update letting => /api/v1/letting/:id
 exports.updateLetting = catchAsyncErrors(async (req, res, next) => {
   const actDetails = {
-    start: req.body.start,
-    end: req.body.end,
+    start: req.body.actDetails.start,
+    end: req.body.actDetails.end,
   };
 
   const newLettingData = {
@@ -135,7 +161,7 @@ exports.deleteletting = catchAsyncErrors(async (req, res, next) => {
 
 // Create Milk Letting Event
 exports.createEvent = catchAsyncErrors(async (req, res) => {
-  const { activity, venue, actDetails, admin } = req.body;
+  const { activity, venue, actDetails, admin, description } = req.body;
 
   try {
     const newEvent = await Letting.create({
@@ -143,6 +169,7 @@ exports.createEvent = catchAsyncErrors(async (req, res) => {
       venue,
       actDetails,
       admin,
+      description
     });
     res
       .status(201)

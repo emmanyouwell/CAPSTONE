@@ -160,7 +160,39 @@ export const getLettings = createAsyncThunk(
 
         } catch (error) {
             console.log("Error: ", error)
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.response.data.error);
+        }
+    }
+)
+
+// Get all Milk Letting Event
+export const getUpcomingLettings = createAsyncThunk(
+    'letting/getUpcomingLettings',
+    async (query, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            console.log('No token available');
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        console.log("Config: ", config)
+        try {
+            
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/upcoming/lettings`, config);
+            return response.data;
+
+        } catch (error) {
+            console.log("Error: ", error)
+            return thunkAPI.rejectWithValue(error.response.data.error);
         }
     }
 )

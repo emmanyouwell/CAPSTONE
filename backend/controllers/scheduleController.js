@@ -104,12 +104,17 @@ exports.updateSchedule = catchAsyncErrors(async (req, res, next) => {
     })
 
     if (schedule.status === 'Completed') {
-        const collection = await Collection.create({
+        await Collection.create({
             collectionType: "Private",
             collectionDate: new Date(),
             privDetails: schedule._id,
             user: [req.body.admin]
         })
+
+        await Bag.updateMany(
+            { _id: { $in: schedule.donorDetails.bags } }, 
+            { $set: { status: 'Collected' } }
+        );
         
     }
 
@@ -167,7 +172,7 @@ exports.requestSchedule = catchAsyncErrors(async (req, res) => {
         });
 
         await Bag.updateMany(
-            { donor: donor._id, status: 'Expressed', collectionType: 'Private' },
+            { _id: {$in: newSchedule.donorDetails.bags} },
             { $set: { status: 'Scheduled' } }
         );
 
