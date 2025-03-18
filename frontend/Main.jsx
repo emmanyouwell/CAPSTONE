@@ -45,6 +45,7 @@ import Attendance from "./components/Superadmin/MilkLetting/Attendance";
 import FinalizeLetting from "./components/Superadmin/MilkLetting/FinalizeLetting";
 import EditMilkLetting from "./components/Superadmin/MilkLetting/EditMilkLetting";
 import HistoryLetting from "./components/Superadmin/MilkLetting/HistoryLetting";
+import MilkLettingDetails from "./components/Superadmin/MilkLetting/MilkLettingDetails";
 
 import Equipment from "./screens/Superadmin/Inventories/Equipment";
 import AddEquipment from "./components/Superadmin/Inventories/Equipment/AddEquipment";
@@ -278,6 +279,7 @@ const MainStack = () => {
         <Stack.Screen name="FinalizeLetting" component={FinalizeLetting} />
         <Stack.Screen name="EditMilkLetting" component={EditMilkLetting} />
         <Stack.Screen name="HistoryLetting" component={HistoryLetting} />
+        <Stack.Screen name="MilkLettingDetails" component={MilkLettingDetails} />
 
       </Stack.Group>
     </Stack.Navigator>
