@@ -4,23 +4,20 @@ import {
     Text,
     SafeAreaView,
     StyleSheet,
-    TouchableOpacity,
     ScrollView,
     RefreshControl,
 } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useDispatch, useSelector } from 'react-redux';
-import Header from '../../components/Superadmin/Header';
-import { logoutUser } from '../../redux/actions/userActions';
-import { getLettings } from '../../redux/actions/lettingActions';
-import { SuperAdmin } from '../../styles/Styles';
-import MilkLettings from '../../components/Superadmin/MilkLetting/MilkLettings';
-import { resetSuccess } from '../../redux/slices/lettingSlice';
+import Header from '../Header';
+import { logoutUser } from '../../../redux/actions/userActions';
+import { getLettings } from '../../../redux/actions/lettingActions';
+import { SuperAdmin } from '../../../styles/Styles';
+import MilkLettings from './MilkLettings';
+import { resetSuccess } from '../../../redux/slices/lettingSlice';
 
-const InventoryScreen = ({ navigation }) => {
+const HistoryLetting = ({ navigation }) => {
     const dispatch = useDispatch();
     const { lettings, error, loading }  = useSelector((state) => state.lettings);
-    console.log("Milk Lettings: ", lettings)
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
@@ -48,7 +45,7 @@ const InventoryScreen = ({ navigation }) => {
     };
 
     const filteredLettings = lettings.filter(
-        (lets) => lets.status && lets.status !== 'Done'
+        (lets) => lets.status && lets.status === 'Done'
     );
 
     return (
@@ -56,26 +53,7 @@ const InventoryScreen = ({ navigation }) => {
             {/* Header Component */}
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
 
-            <Text style={styles.screenTitle}>Milk Letting Management</Text>
-
-            <View style={styles.buttonRow}>
-                <TouchableOpacity
-                    style={styles.historyButton}
-                    onPress={() => navigation.navigate('HistoryLetting')}
-                >
-                <Text style={styles.buttonText}>
-                <MaterialIcons name="history" size={16} color="white" /> History
-                </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                style={styles.addButton}
-                onPress={() => navigation.navigate('AddMilkLetting')}
-                >
-                <Text style={styles.buttonText}>
-                <MaterialIcons name="add" size={16} color="white" /> Add
-                </Text>
-                </TouchableOpacity>
-            </View>
+            <Text style={styles.screenTitle}>Milk Letting History</Text>
 
             <ScrollView
                 refreshControl={
@@ -163,4 +141,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default InventoryScreen;
+export default HistoryLetting;
