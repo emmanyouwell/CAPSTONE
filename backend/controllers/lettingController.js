@@ -116,8 +116,8 @@ exports.getLettingDetails = catchAsyncErrors(async (req, res, next) => {
 // Update letting => /api/v1/letting/:id
 exports.updateLetting = catchAsyncErrors(async (req, res, next) => {
   const actDetails = {
-    start: req.body.actDetails.start,
-    end: req.body.actDetails.end,
+    start: req.body.start,
+    end: req.body.end,
   };
 
   const newLettingData = {

@@ -29,7 +29,7 @@ const InventoryScreen = ({ navigation }) => {
     }, [dispatch]);
     useEffect(()=>{
         if (error){
-            // dispatch(resetError())
+            dispatch(resetError())
         }
     },[error])
     const handleRefresh = () => {
