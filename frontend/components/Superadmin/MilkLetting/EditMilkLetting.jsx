@@ -15,7 +15,7 @@ import { resetSuccess } from '../../../redux/slices/lettingSlice';
 const EditMilkLetting = ({ route, navigation }) => {
     const item = route.params?.item;
 
-    const [open, setOpen] = useState(false); 
+    const [open, setOpen] = useState(false);
     const [status, setStatus] = useState(item?.status || '');
     const [startDateOpen, setStartDateOpen] = useState(false);
     const [endDateOpen, setEndDateOpen] = useState(false);
@@ -47,7 +47,8 @@ const EditMilkLetting = ({ route, navigation }) => {
                         activity: item?.activity || '',
                         venue: item?.venue || '',
                         start: item?.actDetails?.start || '',
-                        end: item?.actDetails?.end || ''
+                        end: item?.actDetails?.end || '',
+                        description: item?.description
                     }}
                     validationSchema={validationSchema}
                     onSubmit={values => {
@@ -55,14 +56,15 @@ const EditMilkLetting = ({ route, navigation }) => {
                             id: item._id,
                             activity: values.activity,
                             venue: values.venue,
-                            start: values.start, 
+                            start: values.start,
                             end: values.end,
                             status: status,
+                            description: values.description,
                             admin: item.admin,
                         };
                         console.log("data: ", formData)
                         dispatch(updateLetting(formData));
-                        if (status === 'Done'){
+                        if (status === 'Done') {
                             navigation.navigate('HistoryLetting')
                         } else {
                             navigation.navigate('superadmin_milkLetting')
@@ -71,24 +73,35 @@ const EditMilkLetting = ({ route, navigation }) => {
                 >
                     {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
                         <View>
+                            <Text>Event name</Text>
                             <TextInput
-                                placeholder="Activity"
+                                placeholder="Enter name of the activity"
                                 onChangeText={handleChange('activity')}
                                 onBlur={handleBlur('activity')}
                                 value={values.activity}
                                 style={styles.textInputStyle}
                             />
                             {errors.activity && touched.activity && <Text style={styles.errorText}>{errors.activity}</Text>}
-
+                            <Text>Venue</Text>
                             <TextInput
-                                placeholder="Venue"
+                                placeholder="Enter the name of the venue"
                                 onChangeText={handleChange('venue')}
                                 onBlur={handleBlur('venue')}
                                 value={values.venue}
-                                style={styles.textAreaStyle}
-                                multiline
-                            />
+                                style={styles.textInputStyle}
 
+                            />
+                            <Text>Description</Text>
+                            <TextInput
+                                placeholder="Description"
+                                onChangeText={handleChange('description')}
+                                onBlur={handleBlur('description')}
+                                value={values.description}
+                                style={styles.textAreaStyle}
+                                multiline={true} // Enable multiline
+                                numberOfLines={4} // Adjust the number of visible lines
+                            />
+                            <Text>Status</Text>
                             <DropDownPicker
                                 open={open}
                                 value={status}
@@ -99,10 +112,21 @@ const EditMilkLetting = ({ route, navigation }) => {
                                 style={styles.dropdown}
                             />
 
-                            <TouchableOpacity style={buttonStyle.defaultBtn} onPress={() => setStartDateOpen(true)}>
-                                <Text style={{ color: 'white' }}>Start Date</Text>
+                            <Text>Start Date</Text>
+                            <TouchableOpacity
+                                onPress={() => setStartDateOpen(true)}
+                                style={{
+                                    borderWidth: 1,
+                                    borderColor: "#ccc",
+                                    padding: 10,
+                                    borderRadius: 5,
+                                    marginBottom: 10,
+                                    backgroundColor: "#f0f0f0",
+                                    marginVertical: 8,
+                                }}
+                            >
+                                <Text>{values.start ? moment(values.start).format('MMMM Do YYYY, h:mm:ss a') : "Select Start Date"}</Text>
                             </TouchableOpacity>
-                            <Text style={styles.selectedDate}>{values.start ? moment(values.start).format('MMMM Do YYYY, h:mm:ss a') : "Select Start Date"}</Text>
                             {startDateOpen && (
                                 <DatePicker
                                     modal
@@ -117,10 +141,21 @@ const EditMilkLetting = ({ route, navigation }) => {
                                 />
                             )}
 
-                            <TouchableOpacity style={buttonStyle.defaultBtn} onPress={() => setEndDateOpen(true)}>
-                                <Text style={{ color: 'white' }}>End Date</Text>
+                            <Text>End Date</Text>
+                            <TouchableOpacity
+                                onPress={() => setEndDateOpen(true)}
+                                style={{
+                                    borderWidth: 1,
+                                    borderColor: "#ccc",
+                                    padding: 10,
+                                    borderRadius: 5,
+                                    marginBottom: 10,
+                                    backgroundColor: "#f0f0f0",
+                                    marginVertical: 8,
+                                }}
+                            >
+                                <Text >{values.end ? moment(values.end).format('MMMM Do YYYY, h:mm:ss a') : "Select End Date"}</Text>
                             </TouchableOpacity>
-                            <Text style={styles.selectedDate}>{values.end ? moment(values.end).format('MMMM Do YYYY, h:mm:ss a') : "Select End Date"}</Text>
                             {endDateOpen && (
                                 <DatePicker
                                     modal
@@ -147,8 +182,8 @@ const EditMilkLetting = ({ route, navigation }) => {
 const styles = StyleSheet.create({
     container: { padding: 10, flex: 1 },
     textInputStyle: { padding: 8, marginVertical: 8, borderWidth: 1, borderColor: '#ccc', borderRadius: 4 },
-    textAreaStyle: { height: 100, padding: 8, borderColor: '#ccc', borderRadius: 4, borderWidth: 1, textAlignVertical: 'top' },
-    dropdown: { backgroundColor: '#fafafa', borderColor: '#ccc', borderWidth: 1, borderRadius: 4 },
+    textAreaStyle: { height: 100, marginVertical: 8, padding: 8, borderColor: '#ccc', borderRadius: 4, borderWidth: 1, textAlignVertical: 'top' },
+    dropdown: { marginVertical: 8, backgroundColor: '#fafafa', borderColor: '#ccc', borderWidth: 1, borderRadius: 4 },
     selectedDate: { borderWidth: 1, padding: 8, marginBottom: 10, borderRadius: 4, borderColor: '#ccc' },
     errorText: { marginVertical: 4, color: 'red' }
 });
