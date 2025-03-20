@@ -4,7 +4,7 @@ import { createLetting } from '../../../redux/actions/lettingActions'
 
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet } from 'react-native'
 import Header from '../Header'
-import { logoutUser, getUserDetails} from '../../../redux/actions/userActions'
+import { logoutUser, getUserDetails } from '../../../redux/actions/userActions'
 import { Formik } from "formik";
 import * as Yup from "yup";
 import moment from 'moment'
@@ -15,22 +15,22 @@ import { getUser } from '../../../utils/helper'
 import { resetSuccess } from '../../../redux/slices/lettingSlice'
 
 const AddMilkLetting = ({ navigation }) => {
-    
+
     const [open, setOpen] = useState(false); // Whether the dropdown is open
-    const [startDateOpen, setStartDateOpen] = useState(false); 
+    const [startDateOpen, setStartDateOpen] = useState(false);
     const [startDate, setStartDate] = useState(new Date());
-    const [endDateOpen, setEndDateOpen] = useState(false); 
+    const [endDateOpen, setEndDateOpen] = useState(false);
     const [endDate, setEndDate] = useState(new Date());
     const handleStartConfirm = () => {
-        setStartDateOpen(false);  
+        setStartDateOpen(false);
     };
     const handleEndConfirm = () => {
-        setEndDateOpen(false);  
+        setEndDateOpen(false);
     }
 
     const dispatch = useDispatch();
     const { success, loading, error } = useSelector(state => state.events);
-    const {userDetails} = useSelector(state => state.users);
+    const { userDetails } = useSelector(state => state.users);
     const handleMenuClick = () => {
         navigation.openDrawer();
     }
@@ -56,15 +56,15 @@ const AddMilkLetting = ({ navigation }) => {
     });
 
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(getUserDetails());
-    },[dispatch])
-    useEffect(()=>{
-        if (success){
+    }, [dispatch])
+    useEffect(() => {
+        if (success) {
             dispatch(resetSuccess());
             navigation.navigate('superadmin_milkLetting')
         }
-    },[dispatch, success])
+    }, [dispatch, success])
     return (
         <>
             <Header onLogoutPress={handleLogoutClick} onMenuPress={handleMenuClick} />
@@ -72,7 +72,7 @@ const AddMilkLetting = ({ navigation }) => {
                 <Text style={SuperAdmin.headerText}>Add Milk Letting Event</Text>
                 <View style={{ padding: 8 }}>
                     <Formik
-                        initialValues={{ activity: '', venue: '', status: '', start: '', end: '', user: userDetails ? userDetails._id : '' }}
+                        initialValues={{ description: '', activity: '', venue: '', status: '', start: '', end: '', user: userDetails ? userDetails._id : '' }}
                         validationSchema={validationSchema}
                         onSubmit={values => {
                             const localStart = new Date(values.start);
@@ -80,9 +80,10 @@ const AddMilkLetting = ({ navigation }) => {
                             const formData = {
                                 activity: values.activity,
                                 venue: values.venue,
+                                description: values.description ? values.description : '',
                                 actDetails: {
                                     start: localStart,
-                                    end:  localEnd,
+                                    end: localEnd,
                                 },
                                 admin: userDetails._id
                             }
@@ -92,32 +93,51 @@ const AddMilkLetting = ({ navigation }) => {
                     >
                         {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
                             <View>
+                                <Text>Event name</Text>
                                 <TextInput
-                                    placeholder="activity"
+                                    placeholder="Enter name of activity"
                                     onChangeText={handleChange('activity')}
                                     onBlur={handleBlur('activity')}
                                     value={values.activity}
                                     style={styles.textInputStyle}
                                 />
                                 {errors.activity && touched.activity && <Text style={styles.errorText}>{errors.activity}</Text>}
-
+                                <Text>Venue</Text>
                                 <TextInput
-                                    placeholder="venue"
+                                    placeholder="Enter name of venue"
                                     onChangeText={handleChange('venue')}
                                     onBlur={handleBlur('venue')}
                                     value={values.venue}
+                                    style={styles.textInputStyle}
+                                />
+                                <Text>Description</Text>
+                                <TextInput
+                                    placeholder="Description"
+                                    onChangeText={handleChange('description')}
+                                    onBlur={handleBlur('description')}
+                                    value={values.description}
                                     style={styles.textAreaStyle}
                                     multiline={true} // Enable multiline
                                     numberOfLines={4} // Adjust the number of visible lines
                                 />
 
-
                                 {errors.status && touched.status && <Text style={styles.errorText}>{errors.status}</Text>}
 
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-
-                                    <TouchableOpacity style={buttonStyle.defaultBtn} onPress={() => setStartDateOpen(true)}><Text style={{ color: 'white' }}>Start Date</Text></TouchableOpacity>
-                                    <Text style={styles.selectedDate}>{values.start ? moment(values.start).format('MMMM Do YYYY, h:mm:ss a') : "Select Start Date"}</Text>
+                                <View>
+                                    <Text>Start Date</Text>
+                                    <TouchableOpacity
+                                        onPress={() => setStartDateOpen(true)}
+                                        style={{
+                                            borderWidth: 1,
+                                            borderColor: "#ccc",
+                                            padding: 10,
+                                            borderRadius: 5,
+                                            marginBottom: 10,
+                                            backgroundColor: "#f0f0f0",
+                                            marginVertical: 8,
+                                        }}
+                                    >
+                                        <Text>{values.start ? moment(values.start).format('MMMM Do YYYY, h:mm:ss a') : "Select Start Date"}</Text></TouchableOpacity>
                                     {startDateOpen && (
                                         <>
 
@@ -140,10 +160,22 @@ const AddMilkLetting = ({ navigation }) => {
 
                                 </View>
                                 {errors.start && touched.start && <Text style={styles.errorText}>{errors.start}</Text>}
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <View>
+                                    <Text>End Date</Text>
 
-                                    <TouchableOpacity style={buttonStyle.defaultBtn} onPress={() => setEndDateOpen(true)}><Text style={{ color: 'white' }}>End Date</Text></TouchableOpacity>
-                                    <Text style={styles.selectedDate}>{values.end ? moment(values.end).format('MMMM Do YYYY, h:mm:ss a') : "Select End Date"}</Text>
+                                    <TouchableOpacity
+                                        onPress={() => setEndDateOpen(true)}
+                                        style={{
+                                            borderWidth: 1,
+                                            borderColor: "#ccc",
+                                            padding: 10,
+                                            borderRadius: 5,
+                                            marginBottom: 10,
+                                            backgroundColor: "#f0f0f0",
+                                            marginVertical: 8
+                                        }}
+                                    >
+                                        <Text >{values.end ? moment(values.end).format('MMMM Do YYYY, h:mm:ss a') : "Select End Date"}</Text></TouchableOpacity>
                                     {endDateOpen && (
                                         <>
 
@@ -212,7 +244,7 @@ const styles = StyleSheet.create({
     textAreaStyle: {
         height: 100,  // Adjust the height as needed
         padding: 8,
-
+        marginVertical: 8,
         borderColor: '#ccc',
         borderRadius: 4,
         borderWidth: 1,
