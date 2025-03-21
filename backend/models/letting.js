@@ -39,7 +39,7 @@ const lettingSchema = mongoose.Schema({
             },
             donorType: {
                 type: String,
-                enum: ['New Donor', 'Past Donor'],
+                enum: ['New Donor', 'Old Donor'],
                 default: 'New Donor'
             },
             bags: [
