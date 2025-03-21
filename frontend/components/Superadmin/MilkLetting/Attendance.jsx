@@ -340,7 +340,7 @@ const Attendance = ({ route, navigation }) => {
       >
         {step === 1 && (
           <View style={styles.navButtons}>
-            <Text style={styles.title}>Are you a New or Past Donor?</Text>
+            <Text style={styles.title}>Are you a New or Old Donor?</Text>
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
@@ -354,11 +354,11 @@ const Attendance = ({ route, navigation }) => {
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
-                setDonorType("Past Donor");
+                setDonorType("Old Donor");
                 handlePastDonor();
               }}
             >
-              <Text style={styles.buttonText}>Past Donor</Text>
+              <Text style={styles.buttonText}>Old Donor</Text>
             </TouchableOpacity>
           </View>
         )}
