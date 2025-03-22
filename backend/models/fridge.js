@@ -11,10 +11,6 @@ const fridgeSchema = new mongoose.Schema({
         enum: ['Unpasteurized', 'Pasteurized'],
         default: 'Unpasteurized'
     },
-    capacity: {
-        type: Number,
-        required: [true, 'Please enter capacity of the fridge']
-    },
     createdAt: {
         type: Date,
         default: Date.now
