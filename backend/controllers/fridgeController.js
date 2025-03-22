@@ -3,7 +3,7 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
 // Get All fridges => /api/v1/fridges
-exports.allFridges = catchAsyncErrors( async (res) => {
+exports.allFridges = catchAsyncErrors( async (req, res) => {
     const fridges = await Fridge.find();
 
     const count = await Fridge.countDocuments();
