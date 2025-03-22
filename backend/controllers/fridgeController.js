@@ -3,7 +3,7 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 
 // Get All fridges => /api/v1/fridges
-exports.allFridges = catchAsyncErrors( async (req, res, next) => {
+exports.allFridges = catchAsyncErrors( async (res) => {
     const fridges = await Fridge.find();
 
     const count = await Fridge.countDocuments();
@@ -16,13 +16,12 @@ exports.allFridges = catchAsyncErrors( async (req, res, next) => {
 })
 
 // Create fridge => /api/v1/fridges
-exports.createFridge= catchAsyncErrors( async (req, res, next) => {
+exports.createFridge= catchAsyncErrors( async (req, res) => {
     const data = req.body;
 
     const fridge = await Fridge.create({
         name: data.name,
         fridgeType: data.fridgeType.trim(),
-        capacity: data.capacity,
     });
 
     res.status(201).json({
@@ -52,7 +51,6 @@ exports.updateFridge = catchAsyncErrors( async (req, res, next) => {
     const newfridgeData = {
         name: data.name,
         fridgeType: data.fridgeType.trim(),
-        capacity: data.capacity,
     }
 
     const fridge = await Fridge.findByIdAndUpdate(req.params.id, newfridgeData, {
