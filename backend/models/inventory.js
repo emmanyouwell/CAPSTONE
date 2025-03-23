@@ -25,61 +25,48 @@ const inventorySchema = new mongoose.Schema({
   pasteurizedDetails: {
     pasteurizationDate: {
       type: Date,
-      required: function () {
-        return this._fridgeType === "Pasteurized";
-      },
+      required: function () { return this._fridgeType === "Pasteurized"; },
     },
     batch: {
       type: Number,
-      required: function () {
-        return this._fridgeType === "Pasteurized";
-      },
+      required: function () { return this._fridgeType === "Pasteurized"; },
     },
     pool: {
       type: Number,
-      required: function () {
-        return this._fridgeType === "Pasteurized";
-      },
+      required: function () { return this._fridgeType === "Pasteurized"; },
     },
-    bottle: {
-      type: Number,
-      required: function () {
-        return this._fridgeType === "Pasteurized";
+    bottles: [
+      {
+        bottleNumber: {
+          type: Number,
+          required: true,
+        }, 
+        status: {
+          type: String,
+          enum: ["Available", "Reserved", "Dispensed"],
+          default: "Available",
+        },
       },
-    },
+    ],
     bottleType: {
-      type: String,
-      enum: ["100ml", "200ml"],
-      default: "100ml",
-      required: function () {
-        return this._fridgeType === "Pasteurized";
-      },
+      type: Number,
+      enum: [100, 200],
+      default: 100,
+      required: function () { return this._fridgeType === "Pasteurized"; },
     },
     batchVolume: {
       type: Number,
-      required: function () {
-        return this._fridgeType === "Pasteurized";
-      },
+      required: function () { return this._fridgeType === "Pasteurized"; },
     },
     expiration: {
       type: Date,
-      required: function () {
-        return this._fridgeType === "Pasteurized";
-      },
-    },
-    quantity: {
-      type: Number,
-      required: function () {
-        return this._fridgeType === "Pasteurized";
-      },
+      required: function () { return this._fridgeType === "Pasteurized"; },
     },
     donors: [
       {
         type: ObjectId,
         ref: "Donor",
-        required: function () {
-          return this._fridgeType === "Pasteurized";
-        },
+        required: true,
       },
     ],
   },
@@ -87,27 +74,19 @@ const inventorySchema = new mongoose.Schema({
     collectionId: {
       type: ObjectId,
       ref: "Collection",
-      required: function () {
-        return this._fridgeType === "Unpasteurized";
-      },
+      required: function () { return this._fridgeType === "Unpasteurized"; },
     },
     expressDateStart: {
       type: Date,
-      required: function () {
-        return this._fridgeType === "Unpasteurized";
-      },
+      required: function () { return this._fridgeType === "Unpasteurized"; },
     },
     expressDateEnd: {
       type: Date,
-      required: function () {
-        return this._fridgeType === "Unpasteurized";
-      },
+      required: function () { return this._fridgeType === "Unpasteurized"; },
     },
     expiration: {
       type: Date,
-      required: function () {
-        return this._fridgeType === "Unpasteurized";
-      },
+      required: function () { return this._fridgeType === "Unpasteurized"; },
     },
   },
 });
