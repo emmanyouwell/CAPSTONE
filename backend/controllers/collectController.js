@@ -3,7 +3,7 @@ const Letting = require('../models/letting');
 const Schedule = require('../models/schedule');
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
-
+const Collection = require('../models/collection');
 // Record Public Donation after Milk Letting
 exports.recordPublicDonation = catchAsyncErrors(async (req, res, next) => {
     const { lettingId } = req.body;
@@ -32,15 +32,15 @@ exports.recordPublicDonation = catchAsyncErrors(async (req, res, next) => {
             return next(new ErrorHandler('No matching donors found for this event.'));
         }
 
-        res.status(200).json({ 
-            success: true, 
+        res.status(200).json({
+            success: true,
             message: 'Donation recorded successfully',
             updatedDonors: result.modifiedCount
         });
     } catch (error) {
-        res.status(500).json({ 
-            error: 'Failed to record donation', 
-            details: error.message 
+        res.status(500).json({
+            error: 'Failed to record donation',
+            details: error.message
         });
     }
 });
@@ -66,9 +66,64 @@ exports.recordPrivateDonation = catchAsyncErrors(async (req, res, next) => {
 
         await donor.save();
         await schedule.save();
-        
+
         res.status(200).json({ message: 'Donation recorded successfully', donor });
     } catch (error) {
         res.status(500).json({ error: 'Failed to record donation' });
     }
 });
+
+
+exports.getCollections = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const collections = await Collection.find()
+            .populate('user')
+            .populate({
+                path: 'pubDetails',
+                populate: [
+                    {
+                        path: 'attendance.donor',
+                        populate: { path: 'user', select: 'name phone' }
+                    },
+                    {
+                        path: 'attendance.bags',
+                        select: 'volume'
+                    },
+                    {
+                        path: 'attendance.additionalBags',
+                        select: 'volume expressDate',
+                    }
+                ],
+                select: { 'activity': 1, 'venue': 1, 'totalVolume': 1, 'attendance': 1 }
+            })
+
+            .populate({
+                path: 'privDetails',
+                populate: [
+                    {
+                        path: 'donorDetails.donorId',
+                        populate: {path: 'user', select: 'name phone'}
+                    },
+                    {
+                        path: 'donorDetails.bags'
+                    }
+                ]
+            
+            })
+            .sort({ collectionDate: -1 });
+
+
+
+
+        res.status(200).json({
+            success: true,
+            collections
+        })
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve collections', message: error.message });
+    }
+
+
+
+})

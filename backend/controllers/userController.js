@@ -261,7 +261,8 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 // Get all users => /api/v1/super/users
 exports.allUsers = catchAsyncErrors(async (req, res, next) => {
     const { search, sortBy, order = "asc", role } = req.query;
-
+    const id = req.user.id || null;
+    const user = await User.findById(id);
     // Create a query object to hold the search criteria
     const query = {};
     if (search) {
@@ -275,12 +276,18 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
             query.$or.push({ employeeID: Number(search) });
         }
     }
-   
+
     if (role) {
         query.role = role;
     }
     else {
-        query.role = { $nin: ["SuperAdmin", "User"] };
+        if (user.role === "Admin") {
+            query.role = { $nin: ["SuperAdmin", "Admin", "User"] };
+        }
+        else {
+            query.role = { $nin: ["SuperAdmin", "User"] };
+        }
+
     }
     // Ensure sorting field is allowed; default to "employeeID"
     const allowedSortFields = ["employeeID", "firstName", "lastName"];
@@ -297,7 +304,7 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
     try {
         // Aggregation pipeline
         const aggregationPipeline = [{ $match: query }];
-        
+
         // Convert `employeeID` to a number for proper sorting if sorting by `employeeID`
         if (sortField === "employeeID") {
             aggregationPipeline.push({
