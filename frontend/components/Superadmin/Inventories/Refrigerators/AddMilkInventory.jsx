@@ -1,525 +1,413 @@
-import React, { useState, useEffect } from 'react';
-import { View, Alert, Text, Button, StyleSheet, ScrollView, TextInput, ActivityIndicator, TouchableOpacity } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { useDispatch, useSelector } from 'react-redux';
-import DropDownPicker from 'react-native-dropdown-picker';
-import { getDonors } from '../../../../redux/actions/donorActions';
-import Header from '../../../../components/Superadmin/Header';
-import { logoutUser } from '../../../../redux/actions/userActions';
-import { SuperAdmin } from '../../../../styles/Styles';
-import { addInventory, updateInventory } from '../../../../redux/actions/inventoryActions';
-import { getFridges } from '../../../../redux/actions/fridgeActions';
-import { getUser } from '../../../../utils/helper';
-import { updateDonor } from '../../../../redux/actions/donorActions';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Alert,
+  Text,
+  Button,
+  StyleSheet,
+  ScrollView,
+  TextInput,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { RadioButton } from "react-native-paper";
+import { useDispatch, useSelector } from "react-redux";
+import DropDownPicker from "react-native-dropdown-picker";
+import Header from "../../../../components/Superadmin/Header";
+import { logoutUser } from "../../../../redux/actions/userActions";
+import { SuperAdmin } from "../../../../styles/Styles";
+import { getFridges } from "../../../../redux/actions/fridgeActions";
 
 const AddMilkInventory = ({ route, navigation }) => {
+  const fridge = route.params.selectedBags
+    ? { fridgeType: "Pasteurized" }
+    : route.params;
 
-    const fridge = route.params.selectedInventories ? { fridgeType: "Pasteurized" } : route.params;
+  const items = route.params.selectedBags ? route.params.selectedBags : [];
 
-    const items = route.params.selectedInventories ? route.params.selectedInventories : [];
+  const totalVolume = items.reduce((total, item) => {
+    return total + (Number(item.volume) || 0);
+  }, 0);
+  //   console.log("Items: ", items);
+  const dispatch = useDispatch();
+  const [bottleType, setBottleType] = useState(null);
+  const [formData, setFormData] = useState(() => ({}));
 
-    const totalVolume = items.reduce((total, item) => total + (item.unpasteurizedDetails?.quantity * item.unpasteurizedDetails?.volume || 0), 0);
+  const { fridges, loading, error } = useSelector((state) => state.fridges);
+  const { userDetails } = useSelector((state) => state.users);
 
-    const dispatch = useDispatch();
-    const [formData, setFormData] = useState(() => ({
-        volume: totalVolume || '',
-        quantity: '',
-    }));
-    const { donors, loading, error } = useSelector((state) => state.donors);
-    const { fridges } = useSelector((state) => state.fridges);
+  const [open, setOpen] = useState(false);
+  const [selectedFridge, setSelectedFridge] = useState(null);
+  const [fridgeItems, setFridgeItems] = useState([]);
 
-    const [open, setOpen] = useState(false);
-    const [selectedDonor, setSelectedDonor] = useState(null);
-    const [donorItems, setDonorItems] = useState([]);
+  const [donors, setDonors] = useState([]);
+  const [showPasteurizationDatePicker, setShowPasteurizationDatePicker] =
+    useState(false);
 
-    const [selectedFridge, setSelectedFridge] = useState(null);
-    const [fridgeItems, setFridgeItems] = useState([]);
+  useEffect(() => {
+    dispatch(getFridges());
+  }, [dispatch]);
 
-    const [donations, setDonations] = useState([]);
-    const [showExpressDatePicker, setShowExpressDatePicker] = useState(false);
-    const [showCollectionDatePicker, setShowCollectionDatePicker] = useState(false);
-    const [showPasteurizationDatePicker, setShowPasteurizationDatePicker] = useState(false);
-    const [showExpirationDatePicker, setShowExpirationDatePicker] = useState(false);
-
-    useEffect(() => {
-        dispatch(getFridges())
-        dispatch(getDonors({ search: "", page: 1, pageSize: 100 }))
-    }, [dispatch]);
-
-    useEffect(() => {
-        if (donors) {
-            const items = donors.map((donor) => (
-                {
-                label: `${donor.user.name.first} ${donor.user.name.last} (${donor.home_address.street}, ${donor.home_address.brgy}, ${donor.home_address.city} | ${donor.user.phone} | ${donor.donorType})`,
-                value: donor._id,
-            }));
-            setDonorItems(items);
-        }
-        if (fridges) {
-            const filteredFridges = fridges.filter((fridge) => fridge.fridgeType === 'Pasteurized');
-            const items = filteredFridges.map((fridge) => ({
-                label: `${fridge.name}`,
-                value: fridge._id,
-            }));
-            setFridgeItems(items);
-        }
-    }, [donors, fridges]);
-
-    const fetchUserDetails = async () => {
-        const user = await getUser();
-        return user
-    };
-
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const handleDateChange = (event, selectedDate, field) => {
-        const date = selectedDate || formData[field];
-        setFormData({ ...formData, [field]: date.toISOString().split('T')[0] });
-
-        if (field === 'expressDate') setShowExpressDatePicker(false);
-        if (field === 'collectionDate') setShowCollectionDatePicker(false);
-        if (field === 'pasteurizationDate') setShowPasteurizationDatePicker(false);
-        if (field === 'expirationDate') setShowExpirationDatePicker(false);
-    };
-
-    const addDonation = () => {
-        const { expressDate, collectionDate, volume, quantity } = formData;
-
-        if (!expressDate || !collectionDate || !volume || !quantity) {
-            Alert.alert("Error", "Please fill out all fields for the donation.");
-            return;
-        }
-        const expiration = new Date(expressDate);
-        expiration.setDate(expiration.getDate() + 14);
-        
-        const newDonation = {
-            donor: selectedDonor,
-            expressDate,
-            collectionDate,
-            volume: Number(volume),
-            expiration: expiration.getTime(),
-            quantity: Number(quantity),
-        };
-
-        setDonations([...donations, newDonation]);
-        setFormData({ ...formData, expressDate: '', collectionDate: '', volume: '', quantity: '' });
-    };
-
-    if (loading) {
-        return (
-            <View style={styles.center}>
-                <ActivityIndicator size="large" color="#007AFF" />
-            </View>
-        );
+  useEffect(() => {
+    if (fridges) {
+      const filteredFridges = fridges.filter(
+        (fridge) => fridge.fridgeType === "Pasteurized"
+      );
+      const item = filteredFridges.map((fridge) => ({
+        label: `${fridge.name}`,
+        value: fridge._id,
+      }));
+      setFridgeItems(item);
     }
-
-    if (error) {
-        return (
-            <View style={styles.center}>
-                <Text style={styles.errorText}>{error}</Text>
-            </View>
-        );
+    if (items) {
+      const donated = [];
+      items.forEach((donate) => {
+        if (!donated.includes(donate.donor._id)) {
+          donated.push(donate.donor._id);
+        }
+      });
+      setDonors(donated);
     }
+  }, [fridges, items]);
 
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
+  const onMenuPress = () => {
+    navigation.openDrawer();
+  };
 
-    const handleSubmit = async () => {
-        if (!formData || (!selectedDonor && fridge.fridgeType === "Unpasteurized")) {
-            Alert.alert("Error", "Please fill out all fields.");
-            return;
-        }
+  const handleDateChange = (event, selectedDate, field) => {
+    const date = selectedDate || formData[field];
+    setFormData({ ...formData, [field]: date.toISOString().split("T")[0] });
+    if (field === "pasteurizationDate") setShowPasteurizationDatePicker(false);
+  };
 
-        if (!formData || (!selectedFridge && !items)) {
-            Alert.alert("Error", "Please fill out all fields.");
-            return;
-        }
-
-        const inventoryDate = new Date().toISOString().split("T")[0];
-        const user = await fetchUserDetails();
-
-        if (!user || !user._id) {
-            Alert.alert("Error", "Failed to retrieve user details.");
-            return;
-        }
-
-        const fid = selectedFridge ? selectedFridge : fridge._id;
-
-        const newData = {
-            fridgeId: fid,
-            inventoryDate,
-            userId: user._id,
-            status: "Available",
-            temp: 0
-        };
-
-        if (fridge.fridgeType === "Pasteurized") {
-            const {
-                pasteurizationDate,
-                batch,
-                pool,
-                bottle,
-                volume,
-                expirationDate,
-            } = formData;
-
-            if (!pasteurizationDate || !batch || !pool || !bottle || !volume || !expirationDate) {
-                Alert.alert("Error", "Please fill out all fields for pasteurized milk.");
-                return;
-            }
-
-            newData.pasteurizedDetails = {
-                pasteurizationDate,
-                batch,
-                pool,
-                bottle,
-                volume,
-                expiration: expirationDate,
-            };
-
-            try {
-                dispatch(addInventory(newData));
-                Alert.alert("Success", "Inventory has been added successfully.");
-
-                if (items && items.length > 0) {
-                    for (const item of items) {
-                        const updatedItem = { ...item, status: "Unavailable", id: item._id };
-                        dispatch(updateInventory(updatedItem));
-                        console.log(`Updated item ${item._id} to Unavailable`);
-                    }
-                }
-
-                navigation.goBack();
-            } catch (error) {
-                Alert.alert("Error", "Failed to add Inventory or update item status. Please try again.");
-                console.error(error);
-            }
-        } else if (fridge.fridgeType === "Unpasteurized") {
-            if (!selectedDonor || donations.length === 0) {
-                Alert.alert("Error", "Please add at least one donation.");
-                return;
-            }
-
-            try {
-                const inventoryId = [];
-                for (const donation of donations) {
-                    const newInventoryData = {
-                        ...newData,
-                        unpasteurizedDetails: donation,
-                    };
-                    await dispatch(addInventory(newInventoryData))
-                        .then((res) => {
-                            const newInvId = res.payload.inventory._id; 
-                            inventoryId.push({ invId: newInvId }); 
-                        })
-                        .catch((error) => {
-                            console.error('Error adding inventory:', error);
-                            Alert.alert('Error', 'Failed to add inventory.');
-                        });
-                }
-
-                const donorToUpdate = donors.find((donor) => donor._id === selectedDonor);
-                const updatedDonor = {
-                    ...donorToUpdate,
-                    donation: [...(donorToUpdate.donation || []), ...inventoryId], 
-                    id: selectedDonor,
-                };
-
-                dispatch(updateDonor(updatedDonor))
-
-                Alert.alert("Success", "Inventory Added and Donor Updated");
-                navigation.goBack();
-            } catch (error) {
-                Alert.alert("Error", "Failed to add Inventory. Please try again.");
-                console.error(error);
-            }
-        } else {
-            console.log("Unknown fridge type");
-            Alert.alert("Error", "Unknown fridge type. Please contact support.");
-        }
-    };
-
-    const renderFormFields = () => {
-        if (fridge.fridgeType === 'Unpasteurized') {
-            return (
-                <>
-                    <View style={styles.section}>
-                    <DropDownPicker
-                        open={open}
-                        value={selectedDonor}
-                        items={donorItems}
-                        setOpen={setOpen}
-                        setValue={setSelectedDonor}
-                        setItems={setDonorItems}
-                        placeholder="Select Donor"
-                        style={styles.dropdown}
-                        listItemContainerStyle={{ height: 60, borderBottomWidth: 1 }}
-                        searchable={true}
-                        searchPlaceholder='Search for a donor...'
-                        disabled={donations.length > 0 ? true : false}
-                    />
-
-                    <TouchableOpacity
-                        onPress={() => setShowExpressDatePicker(true)}
-                        style={styles.datePickerButton}
-                    >
-                        <Text style={styles.datePickerText}>
-                            {formData.expressDate || 'Select Express Date'}
-                        </Text>
-                    </TouchableOpacity>
-                    {showExpressDatePicker && (
-                        <DateTimePicker
-                            value={new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={(event, date) =>
-                                handleDateChange(event, date, 'expressDate')
-                            }
-                        />
-                    )}
-
-                    <TouchableOpacity
-                        onPress={() => setShowCollectionDatePicker(true)}
-                        style={styles.datePickerButton}
-                    >
-                        <Text style={styles.datePickerText}>
-                            {formData.collectionDate || 'Select Collection Date'}
-                        </Text>
-                    </TouchableOpacity>
-                    {showCollectionDatePicker && (
-                        <DateTimePicker
-                            value={new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={(event, date) =>
-                                handleDateChange(event, date, 'collectionDate')
-                            }
-                        />
-                    )}
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Volume"
-                        keyboardType="numeric"
-                        onChangeText={(value) => setFormData({ ...formData, volume: Number(value) })}
-                    />
-
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Quantity"
-                        keyboardType="numeric"
-                        onChangeText={(value) => setFormData({ ...formData, quantity: Number(value) })}
-                    />
-
-                    <Button title="Add Milk Info" onPress={addDonation} />
-                    </View>
-                    
-                    {donations.length > 0 && (
-                        <View style={styles.section}>
-                            <View style={styles.donationsList}>
-                                <Text style={styles.subTitle}>Donations:</Text>
-                                {donations.map((donation, index) => (
-                                    <View key={index} style={styles.itemContainer}>
-                                        <Text>Express Date: {donation.expressDate}</Text>
-                                        <Text>Collection Date: {donation.collectionDate}</Text>
-                                        <Text>Volume: {donation.volume} mL</Text>
-                                        <Text>Quantity: {donation.quantity}</Text>
-                                    </View>
-                                ))}
-                            </View>
-                        </View>
-                    )}
-                </>
-            );
-        } else if (fridge.fridgeType === 'Pasteurized') {
-            return (
-                <>
-                    <DropDownPicker
-                        open={open}
-                        value={selectedFridge}
-                        items={fridgeItems}
-                        setOpen={setOpen}
-                        setValue={setSelectedFridge}
-                        setItems={setFridgeItems}
-                        placeholder="Select Fridge"
-                        style={styles.dropdown}
-                    />
-                    <TouchableOpacity
-                        onPress={() => setShowPasteurizationDatePicker(true)}
-                        style={styles.datePickerButton}
-                    >
-                        <Text style={styles.datePickerText}>
-                            {formData.pasteurizationDate || 'Select Pasteurization Date'}
-                        </Text>
-                    </TouchableOpacity>
-                    {showPasteurizationDatePicker && (
-                        <DateTimePicker
-                            value={new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={(event, date) =>
-                                handleDateChange(event, date, 'pasteurizationDate')
-                            }
-                        />
-                    )}
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Batch"
-                        keyboardType="numeric"
-                        onChangeText={(value) => setFormData({ ...formData, batch: Number(value) })}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Pool"
-                        keyboardType="numeric"
-                        onChangeText={(value) => setFormData({ ...formData, pool: Number(value) })}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Bottle"
-                        keyboardType="numeric"
-                        onChangeText={(value) => setFormData({ ...formData, bottle: Number(value) })}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Volume"
-                        keyboardType="numeric"
-                        value={formData.volume.toString()}
-                        onChangeText={(value) => setFormData({ ...formData, volume: Number(value) })}
-                    />
-
-                    <TouchableOpacity
-                        onPress={() => setShowExpirationDatePicker(true)}
-                        style={styles.datePickerButton}
-                    >
-                        <Text style={styles.datePickerText}>
-                            {formData.expirationDate || 'Select Expiration Date'}
-                        </Text>
-                    </TouchableOpacity>
-                    {showExpirationDatePicker && (
-                        <DateTimePicker
-                            value={new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={(event, date) =>
-                                handleDateChange(event, date, 'expirationDate')
-                            }
-                        />
-                    )}
-                </>
-            );
-        }
-        return null;
-    };
-
+  if (loading) {
     return (
-        <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
-            <ScrollView style={styles.container}>
-                <Text style={styles.title}>Add Inventory</Text>
-                {renderFormFields()}
-            </ScrollView>
-            <Button title="Submit Inventory" onPress={handleSubmit} />
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.cancelButton}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-        </View>
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
     );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View>
+    );
+  }
+
+  const onLogoutPress = () => {
+    dispatch(logoutUser())
+      .then(() => {
+        navigation.replace("login");
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleSubmit = async () => {
+    if (!formData || !selectedFridge || !items || !bottleType) {
+      Alert.alert("Error", "Please fill out all fields.");
+      return;
+    }
+
+    if (!userDetails || !userDetails._id) {
+      Alert.alert("Error", "Failed to retrieve user details.");
+      return;
+    }
+
+    if (!donors) {
+      Alert.alert("Error", "There are no donors");
+      return;
+    }
+
+    const fid = selectedFridge ? selectedFridge : fridge._id;
+
+    const newData = {
+      fridgeId: fid,
+      userId: userDetails._id,
+    };
+
+    if (fridge.fridgeType === "Pasteurized") {
+      const { pasteurizationDate, batch, pool, bottleQty } = formData;
+
+      if (!pasteurizationDate || !batch || !pool || !bottleQty) {
+        Alert.alert(
+          "Error",
+          "Please fill out all fields for pasteurized milk."
+        );
+        return;
+      }
+
+      newData.pasteurizedDetails = {
+        pasteurizationDate,
+        batch,
+        pool,
+        bottleQty,
+        bottleType,
+        donors: donors,
+      };
+
+      try {
+        // dispatch(addInventory(newData));
+        console.log(newData);
+        Alert.alert("Success", "Inventory has been added successfully.");
+
+        // if (items && items.length > 0) {
+        //     for (const item of items) {
+        //         const updatedItem = { ...item, status: "Unavailable", id: item._id };
+        //         dispatch(updateInventory(updatedItem));
+        //         console.log(`Updated item ${item._id} to Unavailable`);
+        //     }
+        // }
+
+        // navigation.goBack();
+      } catch (error) {
+        Alert.alert(
+          "Error",
+          "Failed to add Inventory or update item status. Please try again."
+        );
+        console.error(error);
+      }
+    } else {
+      console.log("Wrong fridge type");
+      Alert.alert("Error", "Unknown fridge type. Please contact support.");
+    }
+  };
+
+  const renderFormFields = () => {
+    if (fridge.fridgeType === "Pasteurized") {
+      return (
+        <>
+          <DropDownPicker
+            open={open}
+            value={selectedFridge}
+            items={fridgeItems}
+            setOpen={setOpen}
+            setValue={setSelectedFridge}
+            setItems={setFridgeItems}
+            placeholder="Select Fridge"
+            style={styles.dropdown}
+          />
+          <TouchableOpacity
+            onPress={() => setShowPasteurizationDatePicker(true)}
+            style={styles.datePickerButton}
+          >
+            <Text style={styles.datePickerText}>
+              {formData.pasteurizationDate || "Select Pasteurization Date"}
+            </Text>
+          </TouchableOpacity>
+          {showPasteurizationDatePicker && (
+            <DateTimePicker
+              value={new Date()}
+              mode="date"
+              display="default"
+              onChange={(event, date) =>
+                handleDateChange(event, date, "pasteurizationDate")
+              }
+            />
+          )}
+          <TextInput
+            style={styles.input}
+            placeholder="Batch"
+            keyboardType="numeric"
+            onChangeText={(value) =>
+              setFormData({ ...formData, batch: Number(value) })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Pool"
+            keyboardType="numeric"
+            onChangeText={(value) =>
+              setFormData({ ...formData, pool: Number(value) })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="bottleQty"
+            keyboardType="numeric"
+            onChangeText={(value) =>
+              setFormData({ ...formData, bottleQty: Number(value) })
+            }
+          />
+          <Text style={styles.radioLabel}>Bottle Type</Text>
+          <View style={styles.radioContainer}>
+            <RadioButton.Group
+              onValueChange={(value) => setBottleType(Number(value))}
+              value={bottleType}
+            >
+              <View style={styles.radioOption}>
+                <RadioButton value={100} />
+                <Text>100 ml</Text>
+              </View>
+              <View style={styles.radioOption}>
+                <RadioButton value={200} />
+                <Text>200 ml</Text>
+              </View>
+            </RadioButton.Group>
+          </View>
+        </>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <View style={SuperAdmin.container}>
+      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <ScrollView>
+        <View style={styles.section}>
+          <Text style={styles.title}>Add Pastuerized Milk</Text>
+          {renderFormFields()}
+        </View>
+        {items && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Donors:</Text>
+            {[
+              ...new Map(
+                items.map((donor) => [donor.donor._id, donor])
+              ).values(),
+            ].map((donor) => (
+              <View key={donor.donor._id} style={styles.donorCard}>
+                <Text style={styles.donorName}>
+                  {donor.donor.user.name.first} {donor.donor.user.name.middle}{" "}
+                  {donor.donor.user.name.last}
+                </Text>
+                <Text>
+                  Address: {donor.donor.home_address.street},{" "}
+                  {donor.donor.home_address.brgy},{" "}
+                  {donor.donor.home_address.city}
+                </Text>
+              </View>
+            ))}
+            <Text style={styles.sectionTitle}>
+              Volume to Pasteur:{"\t"}{totalVolume} mL
+            </Text>
+          </View>
+        )}
+
+        <View style={styles.section}>
+          <Button title="Submit Inventory" onPress={handleSubmit} />
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.cancelButton}
+          >
+            <Text style={styles.cancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#f5f5f5',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 16,
-        textAlign: 'center',
-    },
-    input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 4,
-        marginBottom: 16,
-        paddingHorizontal: 8,
-    },
-    dropdown: {
-        marginBottom: 16,
-    },
-    center: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        color: 'red',
-        fontSize: 16,
-    },
-    datePickerButton: {
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#e0e0e0',
-        borderRadius: 4,
-        marginBottom: 16,
-    },
-    datePickerText: {
-        color: '#000',
-    },
-    donationsList: {
-        marginTop: 20,
-    },
-    subTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    center: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        color: 'red',
-        fontSize: 16,
-    },
-    cancelButton: {
-        marginTop: 20,
-        padding: 10,
-        backgroundColor: '#ccc',
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    cancelButtonText: {
-        color: '#333',
-        fontSize: 16,
-    },
-    itemContainer: {
-        marginBottom: 8,
-        padding: 8,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        backgroundColor: '#ffffff',
-    },
-    section: {
-        marginBottom: 16,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
-        backgroundColor: '#f9f9f9',
-    },
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: "#f5f5f5",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  input: {
+    height: 40,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+  dropdown: {
+    marginBottom: 16,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+  },
+  datePickerButton: {
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#e0e0e0",
+    borderRadius: 4,
+    marginBottom: 16,
+  },
+  datePickerText: {
+    color: "#000",
+  },
+  donationsList: {
+    marginTop: 20,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 16,
+  },
+  cancelButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#ccc",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  cancelButtonText: {
+    color: "#333",
+    fontSize: 16,
+  },
+  section: {
+    marginBottom: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  donorCard: {
+    backgroundColor: "#e3f2fd",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+  donorName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  radioLabel: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  radioContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 15,
+    marginBottom: 10,
+  },
+  radioOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
 });
 
 export default AddMilkInventory;

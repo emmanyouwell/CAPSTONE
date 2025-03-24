@@ -21,7 +21,7 @@ export const getDonors = createAsyncThunk(
         };
 
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/donors?page=${page}&pageSize=${pageSize}`;
+            let urlString = `http://192.168.1.24:4000/api/v1/donors?page=${page}&pageSize=${pageSize}`;
             if (search) {
                 urlString += `&search=${encodeURIComponent(search)}`;
             }
@@ -55,7 +55,7 @@ export const updateDonor = createAsyncThunk(
         }
         
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/donor/${req.id}`, req, config)
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/donor/${req.id}`, req, config)
 
             return response.data;
 
@@ -86,7 +86,7 @@ export const getMilkPerMonth = createAsyncThunk(
         }
         
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/milkPerMonth`, config)
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/milkPerMonth`, config)
             console.log("Response: ", response.data)
             return response.data;
 
@@ -116,7 +116,7 @@ export const getDonorsPerMonth = createAsyncThunk(
         }
         
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/donorsPerMonth`, config)
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/donorsPerMonth`, config)
             
             return response.data;
 

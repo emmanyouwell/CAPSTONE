@@ -37,7 +37,7 @@ const requestSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Pending", "Done"],
+    enum: ["Pending", "Reserved", "Done"],
     default: "Pending",
   },
   volumeRequested: {
@@ -54,12 +54,23 @@ const requestSchema = new mongoose.Schema({
     type: String,
   },
   tchmb: {
-    ebm: [
-      {
+    ebm: {
+      invId: [{
         type: ObjectId,
-        ref: "Inventory",
-      },
-    ],
+        ref: 'Inventory'
+      }],
+      batch: [Number],
+      pool: [Number],
+      bottle: [
+        {
+          start: { type: Number },
+          end: { type: Number }
+        }
+      ],
+      volDischarge: {
+        type: Number
+      }
+    },
     transport: {
       type: String,
     },
@@ -72,11 +83,11 @@ const requestSchema = new mongoose.Schema({
     {
       public_id: {
         type: String,
-        req: true
+        required: true
       }, 
       url: {
         type: String,
-        req: true
+        required: true
       },
     },
   ],

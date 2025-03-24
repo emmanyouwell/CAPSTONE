@@ -12,8 +12,6 @@ exports.allRequests = catchAsyncErrors(async (req, res, next) => {
         .populate('tchmb.approvedBy', 'name email role')
         .populate('tchmb.ebm', 'pasteurizedDetails');
 
-    
-
     const count = await Request.countDocuments();
 
     res.status(200).json({
@@ -196,4 +194,66 @@ exports.deleteRequest = catchAsyncErrors(async (req, res, next) => {
         success: true,
         message: "Request Deleted"
     })
-})
+});
+
+// Update Request Status
+exports.updateRequestStatus = catchAsyncErrors(async (req, res, next) => {
+    const { status } = req.body;
+
+    try {
+        const request = await Request.findById(req.params.id);
+        if (!request) {
+            return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`))
+        }
+
+        request.status = status;
+        await request.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Request status updated successfully",
+            data: request,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+});
+
+// Assign Inventory to Request
+exports.assignInventoryToRequest = catchAsyncErrors(async (req, res) => {
+    const { inventoryDetails } = req.body;
+
+    try {
+        const request = await Request.findById(req.params.id);
+        if (!request) {
+            return res.status(404).json({
+                success: false,
+                message: "Request not found",
+            });
+        }
+
+        request.tchmb.ebm = {
+            invId: inventoryDetails.map(item => item.inventoryId),
+            batch: inventoryDetails.map(item => item.batch),
+            pool: inventoryDetails.map(item => item.pool),
+            bottle: inventoryDetails.map(item => item.bottleRange),
+            volDischarge: inventoryDetails.reduce((total, item) => total + item.volume, 0)
+        };
+
+        await request.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Inventory successfully assigned to request",
+            request,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+});

@@ -7,28 +7,26 @@ const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const Event = require("../models/event");
 
-
-
 exports.getUpcomingLettings = catchAsyncErrors(async (req, res, next) => {
   try {
     const events = await Letting.find({
-      'actDetails.start': {
-        $gte: new Date()
-      }
-    }).sort('actDetails.start');
+      "actDetails.start": {
+        $gte: new Date(),
+      },
+    }).sort("actDetails.start");
 
     return res.status(200).json({
       success: true,
       count: events.length,
-      events
-    })
+      events,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
-    })
+      message: error.message,
+    });
   }
-})
+});
 
 // Get All lettings => /api/v1/lettings
 exports.allLettings = catchAsyncErrors(async (req, res, next) => {
@@ -47,9 +45,7 @@ exports.allLettings = catchAsyncErrors(async (req, res, next) => {
         select: "volume",
       });
     if (!lettings || lettings.length === 0) {
-      return res
-        .status(404)
-        .json({ error: "No Milk Letting Events Found" });
+      return res.status(404).json({ error: "No Milk Letting Events Found" });
     }
 
     const count = await Letting.countDocuments();
@@ -76,9 +72,7 @@ exports.createLetting = catchAsyncErrors(async (req, res, next) => {
   const letting = await Letting.create({
     ...req.body,
     actDetails,
-
   });
-
 
   res.status(201).json({
     success: true,
@@ -99,7 +93,7 @@ exports.getLettingDetails = catchAsyncErrors(async (req, res, next) => {
     })
     .populate({
       path: "attendance.bags",
-      select: "volume",
+      select: "volume expressDate",
     });
   if (!letting) {
     return next(
@@ -169,7 +163,7 @@ exports.createEvent = catchAsyncErrors(async (req, res) => {
       venue,
       actDetails,
       admin,
-      description
+      description,
     });
     res
       .status(201)
@@ -245,12 +239,18 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
 
     if (!collection) {
       if (event.status !== "Done") {
+        await Bag.updateMany(
+          { _id: { $in: event.attendance.bags } },
+          { $set: { status: "Collected" } }
+        );
+
         event.status = "Done";
         await event.save();
 
         collection = await Collection.create({
           collectionType: "Public",
           collectionDate: new Date(),
+          status: "Collected",
           pubDetails: lettingId,
           user: [adminId],
         });
@@ -280,7 +280,6 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
 
 exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
   try {
-
     let data = {};
     req.body.data.fields.forEach((field) => {
       data[field.label] = field.value;
@@ -350,8 +349,7 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
     console.error("Error in createDonor:", error);
     res.status(500).json({ error: error.message });
   }
-})
-
+});
 
 // New Public Donor
 exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {

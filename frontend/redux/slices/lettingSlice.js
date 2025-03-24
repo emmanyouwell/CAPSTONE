@@ -30,7 +30,10 @@ export const lettingSlice = createSlice({
     },
     resetError: (state) => {
       state.error = null;
-    }
+    },
+    resetLettingDetails: (state) => {
+      state.lettingDetails = {};
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -146,5 +149,5 @@ export const lettingSlice = createSlice({
       });
   },
 });
-export const { resetSuccess, resetError } = lettingSlice.actions;
+export const { resetSuccess, resetError, resetLettingDetails } = lettingSlice.actions;
 export default lettingSlice.reducer;
