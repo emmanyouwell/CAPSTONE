@@ -35,7 +35,7 @@ router.route('/password/update').put(isAuthenticatedUser, updatePassword);
 router.route('/me/update').put(isAuthenticatedUser, updateProfile);
 
 // Super Admin Routes
-router.route('/super/users').get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), allUsers);
+router.route('/super/users').get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allUsers);
 router.route('/super/user/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin'), getUserDetails)
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin'), updateUser)
