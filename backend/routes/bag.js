@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 
 
-
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
-const { createBag, getDonorBags, getSingleBag, updateBag, deleteBag } = require('../controllers/bagController');
+const { createBag, getDonorBags, getSingleBag, updateBag, deleteBag, allBags } = require('../controllers/bagController');
 
 // Super Admin Routes
 router.route('/bag')
     .post(isAuthenticatedUser, createBag);
+router.route('/bags')
+    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allBags);
 // .get(isAuthenticatedUser, allInventories)
 router.route('/bag/donor/:id')
     .get(isAuthenticatedUser, getDonorBags);

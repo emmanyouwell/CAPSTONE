@@ -39,19 +39,19 @@ const inventorySchema = new mongoose.Schema({
       {
         bottleNumber: {
           type: Number,
-          required: true,
+          required: function () { return this._fridgeType === "Pasteurized"; },
         }, 
         status: {
           type: String,
           enum: ["Available", "Reserved", "Dispensed"],
           default: "Available",
+          required: function () { return this._fridgeType === "Pasteurized"; },
         },
       },
     ],
     bottleType: {
       type: Number,
       enum: [100, 200],
-      default: 100,
       required: function () { return this._fridgeType === "Pasteurized"; },
     },
     batchVolume: {
@@ -66,7 +66,7 @@ const inventorySchema = new mongoose.Schema({
       {
         type: ObjectId,
         ref: "Donor",
-        required: true,
+        required: function () { return this._fridgeType === "Pasteurized"; },
       },
     ],
   },

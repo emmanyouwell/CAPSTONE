@@ -25,10 +25,10 @@ export const getInventories = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `${REACT_APP_API_URL}/api/v1/inventories?search=${query}`
+                urlString = `http://192.168.1.24:4000/api/v1/inventories?search=${query}`
             }
             else {
-                urlString = `${REACT_APP_API_URL}/api/v1/inventories`
+                urlString = `http://192.168.1.24:4000/api/v1/inventories`
             }
             const response = await axios.get(urlString, config);
             return response.data;
@@ -59,7 +59,7 @@ export const addInventory = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/inventories`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/inventories`, req, config)
 
             return response.data;
 
@@ -89,7 +89,7 @@ export const updateInventory = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/inventory/${req.id}`, req, config)
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/inventory/${req.id}`, req, config)
             console.log("Updated Inventory: ", req.id)
             return response.data;
 
@@ -120,7 +120,7 @@ export const deleteInventory = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/inventory/${id}`, config)
+            const response = await axios.delete(`http://192.168.1.24:4000/api/v1/inventory/${id}`, config)
 
             return response.data;
 
@@ -152,7 +152,7 @@ export const getInventoryDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/inventory/${id}`, config)
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/inventory/${id}`, config)
             console.log("Response: ", response.data)
             return response.data;
 

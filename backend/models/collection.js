@@ -21,7 +21,7 @@ const collectionSchema = new mongoose.Schema({
     ],
     status: {
         type: String,
-        enum: ['Pending', 'Approved', 'Stored', 'Dispensed'],
+        enum: ['Pending', 'Collected', 'Stored', 'Dispensed'],
         default: 'Pending'
     },
     pubDetails: {
