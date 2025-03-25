@@ -21,11 +21,13 @@ import {
 } from "../../../redux/actions/lettingActions";
 import { logoutUser } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
+import DatePicker from "react-native-date-picker";
 
 const Attendance = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { item } = route.params;
-
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [lastDonationOpen, setLastDonationOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [donorType, setDonorType] = useState("");
   const [showBirthday, setShowBirthday] = useState(false);
@@ -158,6 +160,7 @@ const Attendance = ({ route, navigation }) => {
       lettingId: item._id,
       donorId: selectedDonor,
       donorType: donorType,
+      lastDonation: selectedDate,
       bags: bags,
     };
 
@@ -399,6 +402,38 @@ const Attendance = ({ route, navigation }) => {
               searchable={true}
               searchPlaceholder="Search for a donor..."
             />
+            {donorType === "Old Donor" && (
+              <>
+                <Text style={styles.subTitle}>Last Breast Milk Donation:</Text>
+                <TouchableOpacity
+                  onPress={() => setLastDonationOpen(true)}
+                  style={{...styles.input, flex: 1, justifyContent: "center"}}
+                >
+                  <Text>
+                    {selectedDate ? selectedDate.toLocaleString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      
+                    }) : "Select Express Date"}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Modal Date Picker */}
+                <DatePicker
+                  modal
+                  open={lastDonationOpen}
+                  date={selectedDate ? selectedDate : new Date()}
+                  mode="date"
+                  onConfirm={(date) => {
+                    setOpen(false);
+                    setSelectedDate(date);
+                    
+                  }}
+                  onCancel={() => setLastDonationOpen(false)}
+                />
+              </>
+            )}
             <Text style={styles.subTitle}>Bag Details:</Text>
             <TextInput
               style={styles.input}
@@ -447,7 +482,7 @@ const Attendance = ({ route, navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("FinalizeLetting", {item: item})}
+              onPress={() => navigation.navigate("FinalizeLetting", { item: item })}
             >
               <Text style={styles.buttonText}>No</Text>
             </TouchableOpacity>

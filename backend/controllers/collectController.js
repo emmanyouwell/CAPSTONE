@@ -91,6 +91,57 @@ exports.recordPrivateDonation = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+exports.getCollections = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const collections = await Collection.find()
+            .populate('user')
+            .populate({
+                path: 'pubDetails',
+                populate: [
+                    {
+                        path: 'attendance.donor',
+                        populate: { path: 'user', select: 'name phone' }
+                    },
+                    {
+                        path: 'attendance.bags',
+                        select: 'volume'
+                    },
+                    {
+                        path: 'attendance.additionalBags',
+                        select: 'volume expressDate',
+                    }
+                ],
+                select: { 'activity': 1, 'venue': 1, 'totalVolume': 1, 'attendance': 1 }
+            })
+
+            .populate({
+                path: 'privDetails',
+                populate: [
+                    {
+                        path: 'donorDetails.donorId',
+                        populate: {path: 'user', select: 'name phone'}
+                    },
+                    {
+                        path: 'donorDetails.bags'
+                    }
+                ]
+            
+            })
+            .sort({ collectionDate: -1 });
+
+
+
+
+        res.status(200).json({
+            success: true,
+            collections
+        })
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve collections', message: error.message });
+    }
+})
+
 // Get specific collection details => /api/v1/collection/:id
 exports.getCollectionDetails = catchAsyncErrors(async (req, res, next) => {
   const collection = await Collection.findById(req.params.id)
