@@ -9,13 +9,14 @@ const {
     deleteCollection,
     recordPublicDonation,
     recordPrivateDonation,
+    getCollections
 } = require('../controllers/collectController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 // Super Admin Routes
 router.route('/collections')
-    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allCollections)
+    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getCollections)
 //     .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), createCollection);
 router.route('/collection/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getCollectionDetails)

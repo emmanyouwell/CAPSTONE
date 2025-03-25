@@ -6,6 +6,8 @@ const Bag = require("../models/bags");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const Event = require("../models/event");
+const mongoose = require('mongoose');
+
 
 exports.getUpcomingLettings = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -94,7 +96,11 @@ exports.getLettingDetails = catchAsyncErrors(async (req, res, next) => {
     .populate({
       path: "attendance.bags",
       select: "volume expressDate",
-    });
+    })
+    .populate({
+      path: 'attendance.additionalBags',
+      select: 'volume expressDate'
+    })
   if (!letting) {
     return next(
       new ErrorHandler(`letting is not found with this id: ${req.params.id}`)
@@ -226,6 +232,87 @@ exports.markAttendance = catchAsyncErrors(async (req, res, next) => {
     });
   }
 });
+
+exports.updateAttendance = catchAsyncErrors(async (req, res, next) => {
+  const { donorId, bags } = req.body;
+  const { id } = req.params
+  const donorObjectID = new mongoose.Types.ObjectId(donorId);
+  try {
+    const event = await Letting.findById(id);
+    if (!event) return res.status(404).json({ error: "Event not found" });
+
+    let total = Number(event.totalVolume) || 0;
+
+    // Calculate new total volume
+    const newBags = bags.map((bag) => {
+      const numericVolume = Number(bag.volume) || 0;
+      total += numericVolume;
+
+      return {
+        collectionType: "Public",
+        donor: donorId,
+        status: "Collected",
+        volume: bag.volume,
+        expressDate: bag.expressDate
+      };
+    });
+
+    // Insert new bags
+    const createdBags = await Bag.insertMany(newBags);
+    const bagIds = createdBags.map((bag) => bag._id);
+
+    // Find the donor's attendance entry
+    const donorAttendance = event.attendance.find(a => a.donor.toString() === donorId);
+
+    if (donorAttendance) {
+      // Donor exists in attendance
+      if (Array.isArray(donorAttendance.additionalBags) && donorAttendance.additionalBags.length > 0) {
+        // Donor already has additional bags, so push new ones
+        const updatedEvent = await Letting.findOneAndUpdate(
+          { _id: id, "attendance.donor": donorObjectID },
+          {
+            $push: { "attendance.$.additionalBags": { $each: bagIds } }, // Append new bags
+            $set: { totalVolume: total } // Update totalVolume
+          },
+          { new: true }
+        );
+        res.status(200).json({
+          success: true,
+          message: "Additional bags recorded successfully",
+          event: updatedEvent,
+        })
+      } else {
+        // Donor exists but additionalBags is empty or undefined, initialize it
+        const updatedEvent = await Letting.findOneAndUpdate(
+          { _id: id, "attendance.donor": donorObjectID },
+          {
+            $set: { "attendance.$.additionalBags": bagIds, totalVolume: total } // Initialize additionalBags
+          },
+          { new: true }
+        );
+        res.status(200).json({
+          success: true,
+          message: "Additional bags recorded successfully",
+          event: updatedEvent,
+        })
+      }
+    } else {
+      res.status(404).json({ error: "Donor not found in attendance" });
+    }
+
+
+
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to add additional bags",
+      details: error.message,
+    });
+  }
+
+
+
+})
+
 
 // Finalize the Milk Letting Session
 exports.finalizeSession = catchAsyncErrors(async (req, res) => {
