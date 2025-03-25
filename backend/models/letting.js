@@ -49,6 +49,12 @@ const lettingSchema = mongoose.Schema({
                     required: true
                 }
             ],
+            additionalBags: [
+                {
+                    type: ObjectId,
+                    ref: 'Bags'
+                }
+            ],
             lastDonation: {
                 type: Date
             }

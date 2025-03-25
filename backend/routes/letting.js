@@ -13,6 +13,7 @@ const {
     newPublicDonor,
     getUpcomingLettings,
     newPublicDonorTally,
+    updateAttendance,
 } = require('../controllers/lettingController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -44,5 +45,6 @@ router.route('/letting-newDonor')
     .post(isAuthenticatedUser, newPublicDonor);
 router.route('/tally/newDonor')
     .post(newPublicDonorTally)
-
+router.route('/additional-bags/:id')
+    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateAttendance)
 module.exports = router;
