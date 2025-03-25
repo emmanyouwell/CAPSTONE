@@ -12,7 +12,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import Header from "../../../components/Superadmin/Header";
-import { logoutUser, getUserDetails} from "../../../redux/actions/userActions";
+import { logoutUser, getUserDetails } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import { getUser } from "../../../utils/helper";
 import {
@@ -148,6 +148,13 @@ const FinalizeLetting = ({ route, navigation }) => {
                       {donor.donor.user.name.middle}{" "}
                       {donor.donor.user.name.last}
                     </Text>
+                    {donor.donorType === "Old Donor" && <Text>Last Breast Milk Donation: {new Date(donor.lastDonation).toLocaleString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+
+                    })}</Text>}
+
                     <Text>Donor Type: {donor.donorType}</Text>
                     <Text>
                       Address: {donor.donor.home_address.street},{" "}
