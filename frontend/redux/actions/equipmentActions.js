@@ -24,10 +24,10 @@ export const getEquipments = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `http://192.168.1.24:4000/api/v1/equipments?search=${query}`
+                urlString = `${REACT_APP_API_URL}/api/v1/equipments?search=${query}`
             }
             else {
-                urlString = `http://192.168.1.24:4000/api/v1/equipments`
+                urlString = `${REACT_APP_API_URL}/api/v1/equipments`
             }
 
             const response = await axios.get(urlString, config);
@@ -62,7 +62,7 @@ export const addEquipments = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.24:4000/api/v1/equipments`, req, config)
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/equipments`, req, config)
 
             return response.data;
 
@@ -92,7 +92,7 @@ export const updateEquipment = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`http://192.168.1.24:4000/api/v1/equipment/${req.id}`, req, config)
+            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/equipment/${req.id}`, req, config)
             console.log(response)
             return response.data;
 
@@ -122,7 +122,7 @@ export const deleteEquipments = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`http://192.168.1.24:4000/api/v1/equipment/${id}`, config)
+            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/equipment/${id}`, config)
 
             return response.data;
 
@@ -153,7 +153,7 @@ export const getEquipmentDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`http://192.168.1.24:4000/api/v1/equipment/${id}`, config)
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/equipment/${id}`, config)
             console.log("Response: ", response.data)
             return response.data;
 
