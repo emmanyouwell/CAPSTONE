@@ -108,6 +108,7 @@ exports.updateSchedule = catchAsyncErrors(async (req, res, next) => {
             collectionType: "Private",
             collectionDate: new Date(),
             privDetails: schedule._id,
+            status: "Collected",
             user: [req.body.admin]
         })
 
@@ -152,9 +153,6 @@ exports.requestSchedule = catchAsyncErrors(async (req, res) => {
         const sched = await Schedule.findOne({ "donorDetails.donorId": donor._id, status: 'Pending' });
         if (sched) return res.status(400).json({ error: 'You already have a pending schedule' });
 
-
-
-
         const bags = await Bag.find({ donor: donor._id, status: 'Expressed', collectionType: 'Private' });
         if (bags.length === 0) return res.status(404).json({ error: 'No bags found for this donor' });
 
@@ -176,7 +174,6 @@ exports.requestSchedule = catchAsyncErrors(async (req, res) => {
             { $set: { status: 'Scheduled' } }
         );
 
-
         res.status(201).json({ message: 'Schedule requested successfully', newSchedule });
     } catch (error) {
         res.status(500).json({ error: 'Failed to request schedule', details: error.message });
@@ -189,10 +186,6 @@ exports.getDonorSchedules = catchAsyncErrors(async (req, res) => {
 
     const donor = await Donor.findOne({ user: id });
     if (!donor) return res.status(404).json({ error: 'Donor not found' });
-
-
-
-
 
     const sched = await Schedule.aggregate([
         { $match: { "donorDetails.donorId": donor._id } },

@@ -1,16 +1,20 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { recordPrivateRecord, recordPublicRecord } from '../actions/collectionActions';
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  getCollectionDetails,
+  recordPrivateRecord,
+  recordPublicRecord,
+} from "../actions/collectionActions";
 
 export const collectionSlice = createSlice({
-  name: 'collection',
+  name: "collection",
   initialState: {
-    message: '',
+    message: "",
     loading: false,
-    error: null, 
+    error: null,
     success: false,
+    collectionDetails: {},
   },
-  reducers: {
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(recordPublicRecord.pending, (state, action) => {
@@ -38,6 +42,18 @@ export const collectionSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      .addCase(getCollectionDetails.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getCollectionDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.collectionDetails = action.payload.collection;
+      })
+      .addCase(getCollectionDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

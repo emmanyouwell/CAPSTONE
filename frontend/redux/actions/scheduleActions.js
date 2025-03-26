@@ -95,3 +95,33 @@ export const getDonorSchedules = createAsyncThunk(
         }
     }
 )
+
+// Get Schedule Details
+export const getScheduleDetails = createAsyncThunk(
+    'schedule/getScheduleDetails',
+    async (id, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/schedule/${id}`, config)
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

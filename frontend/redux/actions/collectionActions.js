@@ -64,3 +64,34 @@ export const recordPrivateRecord = createAsyncThunk(
         }
     }
 )
+
+// Get Collection Details
+export const getCollectionDetails = createAsyncThunk(
+    'collection/getCollectionDetails',
+    async (id, thunkAPI) => {
+
+        const token = await getToken();
+        
+        if (!token) {
+            throw new Error('No token available');
+        }
+        console.log("Id: ", id)
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            console.log("URL: ", `${REACT_APP_API_URL}/api/v1/collection/${id}`)
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/collection/${id}`, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

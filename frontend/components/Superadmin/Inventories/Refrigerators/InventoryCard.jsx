@@ -16,26 +16,11 @@ const Inventory = ({ route }) => {
     const navigation = useNavigation();
     const { inventory, loading, error } = useSelector((state) => state.inventories);
 
-    const [selectionMode, setSelectionMode] = useState(false);
-    const [selectedItems, setSelectedItems] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         dispatch(getInventories());
     }, [dispatch]);
-
-    const toggleSelectionMode = () => {
-        setSelectionMode(!selectionMode);
-        setSelectedItems([]); 
-    };
-
-    const toggleSelectItem = (id) => {
-        if (selectedItems.includes(id)) {
-            setSelectedItems(selectedItems.filter(itemId => itemId !== id));
-        } else {
-            setSelectedItems([...selectedItems, id]);
-        }
-    };
 
     const handleRefresh = () => {
         setRefreshing(true);
@@ -44,60 +29,28 @@ const Inventory = ({ route }) => {
             .catch(() => setRefreshing(false));
     };
 
-    const handleNavigate = () => {
-        const selectedInventories = inventory.filter(inv => selectedItems.includes(inv._id));
-        const targetScreen = fridge.fridgeType === 'Pasteurized' ? 'MilkRequest' : 'AddMilkInventory';
-        navigation.navigate(targetScreen, { selectedInventories });
-    };
-
     const filteredInventories = inventory.filter(
         (inv) => inv.fridge && inv.fridge._id === fridge._id && inv.status === 'Available'
     );
 
     const renderCard = (inv) => {
-        const isSelected = selectedItems.includes(inv._id);
         const details = fridge.fridgeType === 'Pasteurized' ? inv.pasteurizedDetails : inv.unpasteurizedDetails;
-        const temp = inv.temp
-        const quantity = details?.quantity || 1
-
         return (
             <TouchableOpacity
                 key={inv._id}
-                style={[styles.card, isSelected && styles.selectedCard]}
-                onLongPress={() => {
-                    if ((fridge.fridgeType === 'Unpasteurized')) {
-                        toggleSelectionMode();
-                    }
-                }}
-                onPress={() => {
-                    if (selectionMode) {
-                        toggleSelectItem(inv._id);
-                    }
-                }}
+                style={styles.card}
+                onPress={() => navigation.navigate("BagCards" , {item: inv.unpasteurizedDetails.collectionId})}
             >
-                <Text style={styles.cardTitle}>Date: {formatDate(inv.inventoryDate)}</Text>
+                <Text style={styles.cardTitle}>Inventory Date: {formatDate(inv.inventoryDate)}</Text>
                 <Text>Status: {inv.status}</Text>
-                {details ? (
-                    fridge.fridgeType === 'Pasteurized' ? (
+                <Text>Collection Type: {details?.collectionId.collectionType}</Text>
+                {details && (
                         <>
-                            <Text>Pasteur Date: {formatDate(details.pasteurizationDate)}</Text>
-                            <Text>Batch: {details.batch}</Text>
-                            <Text>Pool: {details.pool}</Text>
-                            {temp !== 0 ? (
-                                <Text>Remaining Volume: {temp} mL</Text>
-                            ) : ( <Text>Volume: {details.volume} mL</Text> )}
-                            <Text>Expiration: {formatDate(details.expiration)}</Text>
+                            <Text>Express Date Start: {formatDate(details.expressDateStart)}</Text>
+                            <Text>Express Date End: {formatDate(details.expressDateEnd)}</Text>
+                            {details?.collectionId.collectionType === 'Public' ? (
+                                <Text>Volume: {details.collectionId?.pubDetails?.totalVolume} mL</Text>) : <Text>Volume: {details.collectionId?.privDetails?.totalVolume} mL</Text>}
                         </>
-                    ) : (
-                        <>
-                            <Text>Donor: {details.donor?.name?.last || 'Unknown'}</Text>
-                            <Text>Express Date: {formatDate(details.expressDate)}</Text>
-                            <Text>Collection Date: {formatDate(details.collectionDate)}</Text>
-                            <Text>Volume: {details.volume * quantity} mL</Text>
-                        </>
-                    )
-                ) : (
-                    <Text>No details available</Text>
                 )}
             </TouchableOpacity>
         );
@@ -130,7 +83,7 @@ const Inventory = ({ route }) => {
     return (
         <View style={SuperAdmin.container}>
             <Header onLogoutPress={() => onLogoutPress()} onMenuPress={() => navigation.openDrawer()} />
-            <Text style={styles.screenTitle}>{fridge.name} Available Milk</Text>
+            <Text style={styles.screenTitle}>{fridge.name} Stored Milk</Text>
             <View style={styles.buttonRow}>
                 <TouchableOpacity
                     style={styles.historyButton}
@@ -159,16 +112,6 @@ const Inventory = ({ route }) => {
                     {filteredInventories.map((inv) => renderCard(inv))}
                 </ScrollView>
             </View>
-            {selectionMode && (
-                <View style={styles.selectionFooter}>
-                    <Button title="Cancel" onPress={toggleSelectionMode} color="#FF3B30" />
-                    <Button
-                        title={`Next (${selectedItems.length} Selected)`}
-                        onPress={handleNavigate}
-                        disabled={selectedItems.length === 0}
-                    />
-                </View>
-            )}
         </View>
     );
 };

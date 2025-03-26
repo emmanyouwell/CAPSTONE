@@ -112,3 +112,24 @@ exports.deleteBag = catchAsyncErrors(async (req, res, next) => {
         message: 'Bag deleted successfully'
     });
 })
+
+// Get All Bags => /api/v1/Equipments
+exports.allBags = catchAsyncErrors( async (req, res, next) => {
+    const allBags = await Bag.find()
+    .populate({
+        path: "donor",
+        select: "user home_address",
+        populate: {
+            path: "user",
+            select: "name"
+        }
+    });
+
+    const count = await Bag.countDocuments();
+
+    res.status(200).json({
+        success: true,
+        count,
+        allBags
+    })
+})
