@@ -30,7 +30,7 @@ const scheduleSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Approved', 'Completed'],
+        enum: ['Pending', 'Approved', 'Completed', 'Bags-Pasteurized'],
         default: 'Pending'
     },
     approvedBy: {
