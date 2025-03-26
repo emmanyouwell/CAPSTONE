@@ -1,8 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { addInventory, deleteInventory, getInventories, getInventoryDetails, updateInventory } from '../actions/inventoryActions';
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  addInventory,
+  deleteInventory,
+  getInventories,
+  getInventoryDetails,
+  updateInventory,
+} from "../actions/inventoryActions";
 
 export const inventorySlice = createSlice({
-  name: 'inventory',
+  name: "inventory",
   initialState: {
     inventory: [],
     loading: false, // Useful for async actions like login/signup
@@ -13,10 +19,13 @@ export const inventorySlice = createSlice({
     isDeleted: false,
   },
   reducers: {
+    resetInventory: (state) => {
+      state.inventory = [];
+    },
   },
   extraReducers: (builder) => {
     builder
-      
+
       .addCase(getInventories.pending, (state, action) => {
         state.loading = true;
       })
@@ -28,7 +37,7 @@ export const inventorySlice = createSlice({
       })
       .addCase(getInventories.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; 
+        state.error = action.payload;
       })
 
       .addCase(addInventory.pending, (state, action) => {
@@ -43,7 +52,7 @@ export const inventorySlice = createSlice({
         state.error = action.payload;
       })
 
-       .addCase(updateInventory.pending, (state, action) => {
+      .addCase(updateInventory.pending, (state, action) => {
         state.loading = true;
       })
       .addCase(updateInventory.fulfilled, (state, action) => {
@@ -64,7 +73,7 @@ export const inventorySlice = createSlice({
       })
       .addCase(getInventoryDetails.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload
+        state.error = action.payload;
       })
 
       .addCase(deleteInventory.pending, (state, action) => {
@@ -78,8 +87,8 @@ export const inventorySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
-      
   },
 });
 
+export const { resetInventory } = inventorySlice.actions;
 export default inventorySlice.reducer;
