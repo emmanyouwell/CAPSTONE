@@ -40,7 +40,7 @@ const Login = ({ navigation }) => {
 
 
     useEffect(()=>{
-        console.log(viewAsyncStorage());
+        // console.log(viewAsyncStorage());
     }, []);
 
     useEffect(()=>{
