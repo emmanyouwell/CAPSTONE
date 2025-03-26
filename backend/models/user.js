@@ -21,9 +21,9 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: [true, 'Please enter your email'],
+        // required: [true, 'Please enter your email'],
         unique: true,
-        validate: [validator.isEmail, 'Please enter valid email address']
+        // validate: [validator.isEmail, 'Please enter valid email address']
     },
     employeeID: {
         type: Number,
@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: [true, 'Please enter your phone'],
-        minlength: [11, 'Phone number is invalid'],
+        // minlength: [11, 'Phone number is invalid'],
     },
     avatar: {
         public_id: {
