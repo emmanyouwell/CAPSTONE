@@ -509,3 +509,35 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+exports.checkLettingBagStatus = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+      const letting = await Letting.findById(id).populate('attendance.bags').populate('attendance.additionalBags');
+      if (!letting) {
+          return next(new ErrorHandler("Letting not found", 404));
+      }
+
+      // Combine all bags from attendance and additionalBags
+      const allBags = [
+          ...letting.attendance.flatMap(att => att.bags),
+          ...letting.attendance.flatMap(att => att.additionalBags)
+      ];
+
+      // Check if all bags have the status 'Pasteurized'
+      const allPasteurized = allBags.every(bag => bag.status === 'Pasteurized');
+
+      if (allPasteurized) {
+          letting.status = 'Bags-Pasteurized';
+          await letting.save();
+          return res.status(200).json({ message: 'Letting status updated to Bags-Pasteurized', letting });
+      } else {
+          return res.status(200).json({ message: 'Not all bags are pasteurized yet', letting });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});

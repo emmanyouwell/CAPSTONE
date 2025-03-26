@@ -257,3 +257,30 @@ exports.approveSchedule = catchAsyncErrors(async (req, res) => {
         res.status(500).json({ error: 'Failed to approve schedule', details: error.message });
     }
 });
+
+exports.checkScheduleBagStatus = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+      const schedule = await Schedule.findById(id).populate('donorDetails.bags')
+      if (!schedule) {
+          return next(new ErrorHandler("schedule not found", 404));
+      }
+
+      const allBags = schedule.donorDetails.bags || [];
+
+      // Check if all bags have the status 'Pasteurized'
+      const allPasteurized = allBags.every(bag => bag.status === 'Pasteurized');
+
+      if (allPasteurized) {
+          schedule.status = 'Bags-Pasteurized';
+          await schedule.save();
+          return res.status(200).json({ message: 'schedule status updated to Bags-Pasteurized', schedule });
+      } else {
+          return res.status(200).json({ message: 'Not all bags are pasteurized yet', schedule });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+});
