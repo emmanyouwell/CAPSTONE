@@ -59,13 +59,13 @@ const donorSchema = new mongoose.Schema({
         type: Date,
       },
       age: {
-        type: Number,
+        type: String,
       },
       birth_weight: {
-        type: Number,
+        type: String,
       },
       aog: {
-        type: Number,
+        type: String,
       },
     },
   ],
