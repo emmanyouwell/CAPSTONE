@@ -82,7 +82,6 @@ const Refrigerator = ({ route }) => {
             onLongPress={() => showEditDeleteOptions(item)} 
             key={item._id}>
             <Text style={styles.fridgeName}>{item.name}</Text>
-            <Text style={styles.fridgeCapacity}>Capacity: {item.capacity}</Text>
         </TouchableOpacity>
     );
 

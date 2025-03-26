@@ -1,20 +1,29 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { approveSchedule, getDonorSchedules, requestSchedule } from '../actions/scheduleActions';
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  approveSchedule,
+  getDonorSchedules,
+  getScheduleDetails,
+  requestSchedule,
+} from "../actions/scheduleActions";
 
 export const scheduleSlice = createSlice({
-  name: 'schedule',
+  name: "schedule",
   initialState: {
-    message: '',
+    message: "",
     loading: false,
-    error: null, 
+    error: null,
     success: false,
-    schedules : [],
+    schedules: [],
+    scheduleDetails: {},
     count: 0,
   },
   reducers: {
     resetSuccess: (state) => {
       state.success = false;
-    }
+    },
+    resetScheduleDetails: (state) => {
+      state.scheduleDetails = {};
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -55,8 +64,20 @@ export const scheduleSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      .addCase(getScheduleDetails.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getScheduleDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.scheduleDetails = action.payload.schedule;
+      })
+      .addCase(getScheduleDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
-export const { resetSuccess } = scheduleSlice.actions;
+export const { resetSuccess, resetScheduleDetails } = scheduleSlice.actions;
 export default scheduleSlice.reducer;

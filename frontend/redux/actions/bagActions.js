@@ -156,4 +156,32 @@ export const deleteBag = createAsyncThunk(
 );
 
 
+export const getAllBags = createAsyncThunk(
+    'bag/getAllBags',
+    async (req, thunkAPI) => {
+        const token = await getToken();
+        console.log('Token Retrieved:', token);
 
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        };
+
+        try {
+            const urlString = `${REACT_APP_API_URL}/api/v1/bags`;
+
+            const response = await axios.get(urlString, config);
+
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+);

@@ -7,6 +7,8 @@ const {
     getRequestDetails,
     updateRequest,
     deleteRequest,
+    updateRequestStatus,
+    assignInventoryToRequest,
 } = require('../controllers/requestController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -18,6 +20,12 @@ router.route('/request/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), getRequestDetails)
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), updateRequest)
     .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), deleteRequest);
+
+router.route('/request-status/:id')
+    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateRequestStatus)
+
+router.route('/assign-inventory/:id')
+    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), assignInventoryToRequest)
 
 
 module.exports = router;
