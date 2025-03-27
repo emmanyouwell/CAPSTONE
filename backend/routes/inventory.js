@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
-const { 
+const Letting = require('../models/letting');
+const {
     allInventories,
     createInventory,
     getInventoryDetails,
@@ -27,6 +27,5 @@ router.route('/inventory-status/:id')
 
 router.route('/reserved-bottle/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), reserveInventoryForRequest)
-
 
 module.exports = router;
