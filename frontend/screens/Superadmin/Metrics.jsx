@@ -1,58 +1,102 @@
-import React from 'react'
-import { View, Text, FlatList, ScrollView } from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import React, { useEffect, useState } from 'react'
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl, ActivityIndicator, ScrollView } from 'react-native'
 import Header from '../../components/Superadmin/Header'
-import DonorRecordsTable from '../../components/Superadmin/DonorRecordTable'
-import { SuperAdmin, metricsStyle, colors, sticky } from '../../styles/Styles'
-import donors from '../../assets/image/donors.jpg'
+import { SuperAdmin, metricsStyle, colors } from '../../styles/Styles'
 import Cards from '../../components/Superadmin/Metrics/Cards';
-import BarChart from '../../components/Superadmin/Metrics/BarChart';
-const Metrics = ({ navigation }) => {
+import { logoutUser } from '../../redux/actions/userActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { getMilkPerMonth, getDonorsPerMonth } from '../../redux/actions/donorActions';
+
+const Metrics = ({navigation}) => {
+    const dispatch = useDispatch();
+    const [refreshing, setRefreshing] = useState(false);
+
+    const { stats, loading, error, monthlyDonors } = useSelector((state) => state.donors);
+    
+    useEffect(() => {
+        dispatch(getMilkPerMonth());
+        dispatch(getDonorsPerMonth())
+    }, [dispatch]);
+    
     const cardData = [
-        { id: '1', title: 'Revenue', subtitle: '100k', icon: 'cash-multiple' },
-        { id: '2', title: 'Stored Milk', subtitle: '100', icon: 'baby-bottle' },
-        { id: '3', title: 'Donors', subtitle: '10.9k', icon: 'account-group' },
-        { id: '4', title: 'Recipient', subtitle: '7.4k', icon: 'account-heart' },
-        
-        // Add more card data as needed
+        { id: '1', title: 'Total Donors', subtitle: `${monthlyDonors.total?.total}`, icon: 'account-group', route: 'DonorsPerMonth' },
+        { id: '2', title: 'Total Milk Collected', subtitle: `${stats.total?.total / 1000} L`, icon: 'baby-bottle', route: 'MilkPerMonth' },
+        // { id: '3', title: 'Total Recipient', subtitle: `7.4k`, icon: 'account-heart', route: 'TestNotif' },
+        // { id: '4', title: 'Total Milk Released', subtitle: `100 L`, icon: 'baby-bottle', route: 'superadmin_donor_record' },
     ];
     const handleMenuClick = () => {
         navigation.openDrawer();
     }
     const handleLogoutClick = () => {
-
+        dispatch(logoutUser())
+            .then(() => {
+                navigation.replace('login');
+            })
+            .catch((err) => console.log(err));
     }
-    return (
-        
-            <View>
-                <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
-                <View style={sticky.sticky}>
-                <ScrollView>
-                <Text style={SuperAdmin.headerText}>Metrics</Text>
-                <View style={{ padding: 10 }}>
-                    <View style={metricsStyle.gridContainer}>
-                        {cardData.map((item) => (
-                            <View key={item.id} style={metricsStyle.cardContainer}>
-                                <Cards title={item.title} subtitle={item.subtitle} icon={item.icon} />
-                            </View>
-                        ))}
-                    </View>
+
+    const renderItem = (item) => (
+        <View style={metricsStyle.cardContainer}>
+            <TouchableOpacity 
+            onPress={() => navigation.navigate(item.route)}>
+                <Cards title={item.title} subtitle={item.subtitle} icon={item.icon} />
+            </TouchableOpacity>
+         </View>
+    )
+
+    if (loading) {
+            return (
+                <View style={styles.center}>
+                    <ActivityIndicator size="large" color="#007AFF" />
                 </View>
-                <View style={metricsStyle.container}>
-                <View style={metricsStyle.chartContainer}>
-                    <Text style={SuperAdmin.subHeaderText}>Bar Chart</Text>
-                    <BarChart />
-                </View>
-                <View style={metricsStyle.chartContainer}>
-                    <Text style={SuperAdmin.subHeaderText}>Bar Chart</Text>
-                    <BarChart />
-                </View>
-                </View>
-                </ScrollView>
-                </View>
+            );
+        }
+    
+    if (error) {
+        return (
+            <View style={styles.center}>
+                <Text style={styles.errorText}>{error}</Text>
             </View>
-        
+        );
+    }
+
+    const handleRefresh = () => {
+        setRefreshing(true);
+        dispatch(getMilkPerMonth())
+            .then(() => setRefreshing(false))
+            .catch(() => setRefreshing(false));
+    };
+
+    return (
+        <View style={SuperAdmin.container}>
+            <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
+            <Text style={styles.screenTitle}>Metrics</Text>
+            <ScrollView style={{ padding: 10 }} 
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+            }>
+                <FlatList
+                    data={cardData}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => renderItem(item)}
+                    contentContainerStyle={metricsStyle.flatListContent}
+                    showsVerticalScrollIndicator={false}
+                    numColumns={2} 
+                    columnWrapperStyle={metricsStyle.columnWrapper}
+                    ItemSeparatorComponent={() => <View style={metricsStyle.separator} />}
+                />
+            </ScrollView>
+        </View>
     )
 }
+
+const styles = StyleSheet.create({
+    screenTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 16,
+    }
+});
 
 export default Metrics

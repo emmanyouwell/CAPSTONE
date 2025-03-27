@@ -95,11 +95,13 @@ export const SuperAdminMenuGrid = StyleSheet.create({
   icon: {
     height: 50,
     resizeMode: 'contain',
-    marginBottom: 5
+    marginBottom: 5,
+    width: 50,
   }
 });
 export const SuperAdmin = StyleSheet.create({
   container: {
+    
     flex: 1,
     
   },
@@ -207,21 +209,9 @@ export const dataTableStyle = StyleSheet.create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  nameColumn: {
-    width: 150,
-  },
-  emailColumn: {
-   width: 200,
-  },
-  roleColumn: {
-    width: 100,
-  },
-  ageColumn: {
-   width: 80,
-  },
-  locationColumn: {
-    width: 150,
-  },
+  columnWidth: {
+    width: 200
+  }
 })
 
 
@@ -230,8 +220,8 @@ export const drawerStyle = StyleSheet.create({
     flex: 1,
   },
   profileContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 0,
+    padding: 16,
   },
   profilePic: {
     width: 80,
@@ -240,6 +230,7 @@ export const drawerStyle = StyleSheet.create({
     marginBottom: 10,
   },
   profileName: {
+    
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -334,6 +325,14 @@ export const buttonStyle = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start'
   },
+  calendarBtn: {
+    backgroundColor: colors.color1,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    
+    
+  }
 });
 export const defaultStyle = StyleSheet.create({
   container: {

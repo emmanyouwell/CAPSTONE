@@ -1,31 +1,73 @@
-import React from 'react'
-import {View, Text, ImageBackground, TextInput} from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, ImageBackground, TextInput, RefreshControl, ScrollView } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Superadmin/Header'
 import RecipientRecordTable from '../../components/Superadmin/RecipientRecordTable'
-import { SuperAdmin, donorRecordsStyle, colors, sticky } from '../../styles/Styles'
-import recipients from '../../assets/image/recipients.jpg'
-const RecipientRecords = ({navigation}) => {
-    const handleMenuClick = () => {
-        navigation.openDrawer();
-    }
-    const handleLogoutClick = () => {
+import { SuperAdmin, donorRecordsStyle, colors } from '../../styles/Styles'
+import recipientsImg from '../../assets/image/recipients.jpg'
+import { getRecipients } from '../../redux/actions/recipientActions';
+import { logoutUser } from '../../redux/actions/userActions';
+import { useDispatch, useSelector } from 'react-redux';
 
-    }
+const RecipientRecords = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const { recipients, totalPatients, totalPages, pageSize, loading, error } = useSelector((state) => state.recipients);
+
+  const [search, setSearch] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const handleMenuClick = () => {
+    navigation.openDrawer();
+  }
+  const handleLogoutClick = () => {
+    dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
+  }
+  // Using onChangeText to update the state when text changes
+  const handleTextChange = (newText) => {
+    setSearch(newText);
+  };
+  const handleSubmit = () => {
+    setCurrentPage(1);
+    dispatch(getRecipients({search: search}));
+  }
+  useEffect(() => {
+    console.log('Dispatching getDonors...');
+
+    dispatch(getRecipients({search: search, page:currentPage +1, pageSize: pageSize}))
+      .unwrap()
+      .then((data) => console.log('Recipients fetched:', data))
+      .catch((err) => console.error('Error fetching donors:', err));
+  }, [dispatch])
+
+  const handleRefresh = () => {
+      setRefreshing(true);
+      dispatch(getRecipients())
+        .then(() => setRefreshing(false))
+        .catch(() => setRefreshing(false));
+  };
+
   return (
     <View>
-        <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick}/>
-        <View style={[donorRecordsStyle.imageContainer, sticky.sticky]}>
-        <ImageBackground source={recipients} style={donorRecordsStyle.image}>
+      <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
+      <View style={donorRecordsStyle.imageContainer}>
+        <ImageBackground source={recipientsImg} style={donorRecordsStyle.image}>
           <View style={donorRecordsStyle.overlay} />
           <Text style={donorRecordsStyle.headerText}>Recipient Records</Text>
           <View style={donorRecordsStyle.searchContainer}>
-          <TextInput style={donorRecordsStyle.searchInput} placeholder="Search Recipient Records" placeholderTextColor="#ccc" />
-          <Icon name="search" size={20} color={colors.color1} style={donorRecordsStyle.searchIcon}/>
+            <TextInput style={donorRecordsStyle.searchInput} placeholder="Search Recipient Records" placeholderTextColor="#ccc" onChangeText={handleTextChange} onSubmitEditing={handleSubmit}  // This will trigger when the user presses 'Enter'
+              returnKeyType="Search" />
+            <Icon name="search" size={20} color={colors.color1} style={donorRecordsStyle.searchIcon} />
           </View>
         </ImageBackground>
       </View>
-        <RecipientRecordTable/>
+      <ScrollView
+        refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        {loading ? (<Text>Loading...</Text>) : recipients && <RecipientRecordTable recipients={recipients} setCurrentPage={setCurrentPage} currentPage={currentPage} totalPages={totalPages} totalPatients={totalPatients} pageSize={pageSize} />}
+      </ScrollView>
+
     </View>
   )
 }

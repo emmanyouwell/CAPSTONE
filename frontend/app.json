@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "frontend",
+    "name": "TCHMB Portal",
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/image/TCHMB-logo-whitebg.png",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -16,14 +16,24 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/image/TCHMB-logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.tup.tchmbportal"
+      "package": "com.tup.tchmbportal",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ],
+    "owner": "tchmb",
     "extra": {
       "eas": {
         "projectId": "f50b6e41-3df5-434c-9976-b2a169603a91"
