@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   addInventory,
+  checkInventories,
   deleteInventory,
   getInventories,
   getInventoryDetails,
@@ -17,6 +18,7 @@ export const inventorySlice = createSlice({
     inventoryDetails: {},
     isUpdated: false,
     isDeleted: false,
+    message: "",
   },
   reducers: {
     resetInventory: (state) => {
@@ -84,6 +86,18 @@ export const inventorySlice = createSlice({
         state.isDeleted = action.payload.success;
       })
       .addCase(deleteInventory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      .addCase(checkInventories.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(checkInventories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(checkInventories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

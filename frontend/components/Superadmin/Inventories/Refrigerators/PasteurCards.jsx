@@ -185,14 +185,6 @@ const Inventory = ({ route }) => {
                                 <MaterialIcons name="history" size={16} color="white" /> History
                             </Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.addButton}
-                            onPress={() => navigation.navigate('AddMilkInventory', fridge)}
-                        >
-                            <Text style={styles.buttonText}>
-                                <MaterialIcons name="add" size={16} color="white" /> Add
-                            </Text>
-                        </TouchableOpacity>
                     </View>
                 )}
                 <View style={dataTableStyle.tableContainer}>
