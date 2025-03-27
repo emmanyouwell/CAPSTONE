@@ -40,7 +40,7 @@ exports.allFridges = catchAsyncErrors(async (req, res) => {
                     });
                 if (inventories.length > 0) {
                     // Flatten all bags and additionalBags
-                    const allBags = inventories.flatMap(inv => 
+                    const allBags = inventories.flatMap(inv =>
                         inv.unpasteurizedDetails.collectionId.pubDetails.attendance.flatMap(att => [
                             ...(att.bags || []),
                             ...(att.additionalBags || [])
@@ -168,34 +168,64 @@ exports.deleteFridge = catchAsyncErrors(async (req, res, next) => {
 
 exports.openFridge = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
-
+    let allBags
+    let total = 0
     const fridge = await Fridge.findById(id);
     const inventories = await Inventory.find({ fridge: id })
         .populate({
             path: "unpasteurizedDetails.collectionId",
-            populate: {
+            populate: [{
                 path: "pubDetails",
-                populate: [{
-                    path: "attendance.donor",
-                    populate: {
-                        path: "user",
-                        select: "name email phone"
+                populate: [
+                    {
+                        path: "attendance.donor",
+                        populate: {
+                            path: "user",
+                            select: "name email phone"
+                        },
+                        select: "_id home_address"
                     },
-                    select: "_id home_address"
-                },
-                {
-                    path: "attendance.bags",
-                    select: "volume"
-                },
-                {
-                    path: "attendance.additionalBags",
-                    select: "volume"
-                }
+                    {
+                        path: "attendance.bags",
+                        select: "volume"
+                    },
+                    {
+                        path: "attendance.additionalBags",
+                        select: "volume"
+                    }
                 ]
-            }
-        });
-    let allBags
-    let total = 0
+            },
+            {
+                path: 'privDetails',
+                populate: [
+                    {
+                        path: 'donorDetails.donorId',
+                        populate: { path: 'user', select: 'name phone' }
+                    },
+                    {
+                        path: 'donorDetails.bags'
+                    }
+                ]
+            }]
+        })
+        
+    const formattedInventories = inventories.map(inventory => {
+        const attendance = inventory.unpasteurizedDetails.collectionId.pubDetails.attendance;
+
+        const totalBags = attendance.reduce((sum, att) =>
+            sum + (att.bags?.length || 0) + (att.additionalBags?.length || 0), 0
+        );
+        total = attendance.reduce((sum, att) =>
+            sum + (att.bags?.reduce((acc, bag) => acc + (bag.volume || 0), 0) || 0) +
+            (att.additionalBags?.reduce((acc, bag) => acc + (bag.volume || 0), 0) || 0), 0
+        );
+        return {
+            ...inventory.toObject(),
+            totalBags,
+            totalVolume: total
+        };
+    });
+
     if (inventories) {
         allBags = inventories.flatMap(inv =>
             inv.unpasteurizedDetails.collectionId.pubDetails.attendance.flatMap(att => [...(att.bags) || [], ...(att.additionalBags || [])])
@@ -206,7 +236,7 @@ exports.openFridge = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
         success: true,
         fridge,
-        inventories,
+        inventories: formattedInventories,
         allBags,
         total
     })
