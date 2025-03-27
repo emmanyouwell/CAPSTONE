@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   approveSchedule,
-  checkScheduleBagStatus,
   getDonorSchedules,
   getScheduleDetails,
   requestSchedule,
@@ -74,18 +73,6 @@ export const scheduleSlice = createSlice({
         state.scheduleDetails = action.payload.schedule;
       })
       .addCase(getScheduleDetails.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      .addCase(checkScheduleBagStatus.pending, (state, action) => {
-        state.loading = true;
-      })
-      .addCase(checkScheduleBagStatus.fulfilled, (state, action) => {
-        state.loading = false;
-        state.message = action.payload.message;
-      })
-      .addCase(checkScheduleBagStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

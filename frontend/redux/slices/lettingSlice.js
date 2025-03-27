@@ -1,6 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  checkLettingBagStatus,
   createLetting,
   deleteLetting,
   finalizeSession,
@@ -145,18 +144,6 @@ export const lettingSlice = createSlice({
         state.isUpdated = action.payload.success;
       })
       .addCase(updateLetting.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      .addCase(checkLettingBagStatus.pending, (state, action) => {
-        state.loading = true;
-      })
-      .addCase(checkLettingBagStatus.fulfilled, (state, action) => {
-        state.loading = false;
-        state.message = action.payload.message;
-      })
-      .addCase(checkLettingBagStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

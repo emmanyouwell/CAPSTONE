@@ -27,7 +27,7 @@ const lettingSchema = mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Not-Due', 'On-Going', 'Done', 'Bags-Pasteurized'],
+        enum: ['Not-Due', 'On-Going', 'Done'],
         default: 'Not-Due'
     },
     attendance: [

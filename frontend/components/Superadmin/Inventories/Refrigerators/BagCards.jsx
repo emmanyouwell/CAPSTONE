@@ -22,10 +22,12 @@ import { SuperAdmin } from "../../../../styles/Styles";
 import { dataTableStyle } from "../../../../styles/Styles";
 
 const BagCards = ({ route }) => {
-  const { item } = route.params;
+  const { item, fridge } = route.params;
+  const items = route.params.selectedItems ? route.params.selectedItems : [];
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  const [totalVolume, setTotalVolume] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -35,13 +37,31 @@ const BagCards = ({ route }) => {
   const { scheduleDetails } = useSelector((state) => state.schedules);
 
   useEffect(() => {
-    dispatch(getAllBags())
+    dispatch(getAllBags());
     if (item.pubDetails) {
       dispatch(getLettingDetails(item.pubDetails._id));
     } else if (item.privDetails) {
       dispatch(getScheduleDetails(item.privDetails._id));
     }
   }, [dispatch, item]);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      setSelectedItems([...items]);
+      setSelectionMode(true);
+    }
+  }, [items]);
+
+  useEffect(() => {
+    const selectedBags = allBags.filter((bag) =>
+      selectedItems.includes(bag._id)
+    );
+    const totals = selectedBags.reduce(
+      (total, item) => total + (Number(item.volume) || 0),
+      0
+    );
+    setTotalVolume(totals);
+  }, [selectedItems, allBags]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -115,23 +135,28 @@ const BagCards = ({ route }) => {
       <View>
         {bags.map((bag) => {
           const isSelected = selectedItems.includes(bag._id);
-  
-          return (
+          const isPasteurized = bag.status === "Pasteurized";
+
+          return (  
             <TouchableOpacity
-              style={[styles.card, isSelected && styles.selectedCard]}
+              style={[
+                styles.card,
+                isSelected && styles.selectedCard,
+                isPasteurized && styles.disabledCard,
+              ]}
               key={bag._id}
               onLongPress={() => {
-                toggleSelectionMode();
+                if (!isPasteurized) toggleSelectionMode();
               }}
               onPress={() => {
-                if (selectionMode) {
+                if (!isPasteurized && selectionMode) {
                   toggleSelectItem(bag._id);
                 }
               }}
+              disabled={isPasteurized}
             >
-              <Text style={styles.cardTitle}>
-                Date: {formatDate(bag.expressDate)}
-              </Text>
+              <Text style={styles.cardTitle}>Status: {bag.status}</Text>
+              <Text>Date: {formatDate(bag.expressDate)}</Text>
               <Text>Volume: {bag.volume} mL</Text>
               <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
             </TouchableOpacity>
@@ -140,7 +165,6 @@ const BagCards = ({ route }) => {
       </View>
     );
   };
-  
 
   return (
     <View style={SuperAdmin.container}>
@@ -168,16 +192,33 @@ const BagCards = ({ route }) => {
       </View>
       {selectionMode && (
         <View style={styles.selectionFooter}>
-          <Button
-            title="Cancel"
-            onPress={toggleSelectionMode}
-            color="#FF3B30"
-          />
-          <Button
-            title={`Next (${selectedItems.length} Selected)`}
-            onPress={handleNavigate}
-            disabled={selectedItems.length === 0}
-          />
+          <View style={styles.footerDetails}>
+            <Text style={styles.footerText}>
+              Total Volume to Pasteur: {totalVolume} mL
+            </Text>
+          </View>
+          <View style={styles.footerButtons}>
+            <Button
+              title="Cancel"
+              onPress={toggleSelectionMode}
+              color="#FF3B30"
+            />
+            <Button
+              title="Back"
+              onPress={() =>
+                navigation.navigate("InventoryCards", {
+                  selectedItems: selectedItems,
+                  fridge: fridge,
+                })
+              }
+              color="#E53777"
+            />
+            <Button
+              title={`Next (${selectedItems.length} Selected)`}
+              onPress={handleNavigate}
+              disabled={selectedItems.length === 0}
+            />
+          </View>
         </View>
       )}
     </View>
@@ -209,31 +250,51 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: "#f9f9f9",
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  selectedCard: {
-    backgroundColor: "#D1E7FF",
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  selectionFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 16,
-    borderTopWidth: 1,
+    backgroundColor: "#f0f8ff",
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 5,
+    borderWidth: 1,
     borderColor: "#ccc",
   },
+  selectedCard: {
+    borderColor: "#4CAF50",
+    backgroundColor: "#e8f5e9",
+  },
+  disabledCard: {
+    backgroundColor: "#e0e0e0",
+    borderColor: "#9e9e9e",
+    opacity: 0.6,
+  },
+  cardTitle: {
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  selectionFooter: {
+    flexDirection: "column",
+    backgroundColor: "#f5f5f5",
+    padding: 16,
+    borderTopWidth: 2,
+    borderColor: "#007AFF",
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  footerDetails: {
+    paddingVertical: 8,
+    alignItems: "center",
+    backgroundColor: "#e3f2fd",
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  footerText: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#007AFF",
+  },
+  footerButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  }
 });
 
 export default BagCards;

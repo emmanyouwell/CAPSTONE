@@ -26,9 +26,6 @@ router.route('/schedule/:id')
 router.route('/me/schedules/:id')
     .get(isAuthenticatedUser, getDonorSchedules);
 
-router.route('/schedule-status/:id')
-    .put(isAuthenticatedUser, checkScheduleBagStatus);
-
 // Route to request a pickup schedule
 router.route('/request-schedule')
     .post(requestSchedule);

@@ -101,7 +101,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     const collection = await Collection.findById(
       unpasteurizedDetails.collectionId
     );
-
+    
     if (collection.pubDetails) {
       const letting = await Letting.findById(collection.pubDetails);
       if (!letting) {
@@ -146,7 +146,8 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     } else {
       return next(new ErrorHandler("No public or private details", 400));
     }
-
+    collection.status = 'Stored';
+    await collection.save()
     inventoryData.unpasteurizedDetails = unpast;
   } else {
     return next(new ErrorHandler("Invalid fridge type", 400));
@@ -155,6 +156,10 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const inventory = await Inventory.create(inventoryData);
 
   if (fridge.fridgeType === "Pasteurized" && pasteurizedDetails) {
+    await Bags.updateMany(
+      { _id: { $in: pasteurizedDetails.items } },
+      { $set: { status: "Pasteurized" } }
+    );
     for (let i = 0; i < pasteurizedDetails.bottleQty; i++) {
       const bottleDetails = { bottleNumber: i + 1, status: "Available" };
       inventory.pasteurizedDetails.bottles.push(bottleDetails);
@@ -356,3 +361,54 @@ exports.reserveInventoryForRequest = catchAsyncErrors(
     });
   }
 );
+
+// Controller to check all inventories and update their status
+exports.updateAllInventoriesStatus = catchAsyncErrors(async (req, res, next) => {
+  try {
+      const inventories = await Inventory.find({ 'unpasteurizedDetails.collectionId': { $exists: true } }).populate('unpasteurizedDetails.collectionId');
+
+      if (!inventories.length) {
+        return next(
+          new ErrorHandler(
+            "No Inventories",
+            400
+          ));
+      }
+
+      let updatedCount = 0;
+      for (const inventory of inventories) {
+          const collection = inventory.unpasteurizedDetails.collectionId;
+          let bags = [];
+
+          if (collection.pubDetails) {
+              const letting = await Letting.findById(collection.pubDetails).populate('attendance.bags');
+              if (letting) {
+                  bags = [
+                      ...letting.attendance.flatMap(attendee => attendee.bags),
+                      ...letting.attendance.flatMap(attendee => attendee.additionalBags)
+                  ];
+              }
+          } else if (collection.privDetails) {
+              const schedule = await Schedule.findById(collection.privDetails).populate('donorDetails.bags');
+              if (schedule) {
+                  bags = schedule.donorDetails.bags;
+              }
+          }
+
+          if (bags.length) {
+              const allPasteurized = bags.every(bag => bag.status === 'Pasteurized');
+              if (allPasteurized) {
+                  inventory.status = 'Unavailable';
+                  await inventory.save();
+                  updatedCount++;
+              }
+          }
+      }
+
+      return res.status(200).json({ message: `${updatedCount} inventories checked and updated successfully.` });
+
+  } catch (error) {
+      return res.status(500).json({ error: error.message });
+  }
+});
+

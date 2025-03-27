@@ -22,7 +22,7 @@ export const getDevices = createAsyncThunk(
             withCredentials: true
         }
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/notifications`
+            let urlString = `http://192.168.1.24:4000/api/v1/notifications`
 
             const response = await axios.get(urlString, config);
 
@@ -54,7 +54,7 @@ export const addDevice = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/notifications/save-token`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/notifications/save-token`, req, config)
 
             return response.data;
 
@@ -85,7 +85,7 @@ export const sendNotification = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/send-notification`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/send-notification`, req, config)
             
             return response.data;
 
