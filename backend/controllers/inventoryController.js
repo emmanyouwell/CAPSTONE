@@ -9,7 +9,7 @@ const ErrorHandler = require("../utils/errorHandler");
 
 // Get All Patients => /api/v1/inventories
 exports.allInventories = catchAsyncErrors(async (req, res, next) => {
-  const inventories = await Inventory.find()
+  const inventories = await Inventory.find({status: "Available"})
     .populate("fridge")
     .populate({
       path: "unpasteurizedDetails.collectionId",
