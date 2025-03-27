@@ -70,7 +70,7 @@ exports.createLetting = catchAsyncErrors(async (req, res, next) => {
     start: new Date(req.body.start), // This stores in UTC
     end: new Date(req.body.end), // This stores in UTC
   };
-
+ 
   const letting = await Letting.create({
     ...req.body,
     actDetails,
@@ -161,7 +161,7 @@ exports.deleteletting = catchAsyncErrors(async (req, res, next) => {
 
 // Create Milk Letting Event
 exports.createEvent = catchAsyncErrors(async (req, res) => {
-  const { activity, venue, actDetails, admin, description } = req.body;
+  const { activity, venue, actDetails, admin, description, status } = req.body;
 
   try {
     const newEvent = await Letting.create({
@@ -170,6 +170,7 @@ exports.createEvent = catchAsyncErrors(async (req, res) => {
       actDetails,
       admin,
       description,
+      status
     });
     res
       .status(201)
