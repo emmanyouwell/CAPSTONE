@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const { 
+const {
     allFridges,
     createFridge,
     getFridgeDetails,
     updateFridge,
-    deleteFridge
+    deleteFridge,
+    openFridge
 } = require('../controllers/fridgeController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -20,5 +21,7 @@ router.route('/fridge/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateFridge)
     .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), deleteFridge);
 
+router.route('/fridge/open/:id')
+    .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), openFridge);
 
 module.exports = router;

@@ -103,17 +103,42 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     );
 
     if (collection.pubDetails) {
-      const letting = await Letting.findById(collection.pubDetails);
+      const letting = await Letting.findById(collection.pubDetails).populate({
+        path: "attendance.bags",
+        select: "expressDate"
+      })
+        .populate({
+          path: "attendance.additionalBags",
+          select: "expressDate"
+        });
       if (!letting) {
         return next(new ErrorHandler("Letting not found", 404));
       }
-      unpast.expressDateStart = letting.actDetails.start;
-      unpast.expressDateEnd = letting.actDetails.end;
+      if (letting) {
+        // Extract and flatten all bags and additionalBags from attendance
+        const allBags = letting.attendance.flatMap(att => [
+          ...(att.bags || []),
+          ...(att.additionalBags || [])
+        ]);
 
+        // Filter out any objects without expressDate
+        const validBags = allBags.filter(bag => bag.expressDate);
+
+        // Sort by expressDate
+        validBags.sort((a, b) => new Date(a.expressDate) - new Date(b.expressDate));
+
+        // Get earliest and latest expressDate
+        unpast.expressDateStart = earliestExpressDate = validBags.length > 0 ? validBags[0].expressDate : null;
+        unpast.expressDateEnd = latestExpressDate = validBags.length > 0 ? validBags[validBags.length - 1].expressDate : null;
+
+      }
       const expiration = new Date(letting.actDetails.start);
       expiration.setDate(expiration.getDate() + 14);
 
       unpast.expiration = expiration.getTime();
+
+      await Collection.findByIdAndUpdate(unpasteurizedDetails.collectionId, { $set: { status: "Stored" } }, { new: true });
+
     } else if (collection.privDetails) {
       const schedule = await Schedule.findById(collection.privDetails);
       if (!schedule) {
