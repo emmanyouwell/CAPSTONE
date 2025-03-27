@@ -10,6 +10,7 @@ import {
   Alert,
   Button,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -31,6 +32,7 @@ const Refrigerator = ({ route }) => {
   const items = route.params ? route.params.selectedItems : [];
   const [selectedItems, setSelectedItems] = useState(items);
   const [totalVolume, setTotalVolume] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
 
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -61,7 +63,7 @@ const Refrigerator = ({ route }) => {
   }, [selectedItems, allBags]);
 
   const handleNavigate = (fridge) => {
-    if (fridge.fridgeType === 'Pasteurized') {
+    if (fridge.fridgeType === "Pasteurized") {
       navigation.navigate("PasteurCards", { fridge, request });
     } else {
       navigation.navigate("InventoryCards", {
@@ -110,6 +112,14 @@ const Refrigerator = ({ route }) => {
       .catch((err) => console.log(err));
   };
 
+  const handleRefresh = () => {
+    setRefreshing(true);
+    dispatch(getAllBags());
+    dispatch(getFridges())
+      .then(() => setRefreshing(false))
+      .catch(() => setRefreshing(false));
+  };
+
   const handleAddMilk = () => {
     const selectedBags = allBags.filter((bag) =>
       selectedItems.includes(bag._id)
@@ -152,7 +162,7 @@ const Refrigerator = ({ route }) => {
     : [];
 
   return (
-    <ScrollView style={SuperAdmin.container}>
+    <View style={SuperAdmin.container}>
       <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
       {request ? (
         <>
@@ -193,53 +203,63 @@ const Refrigerator = ({ route }) => {
       ) : (
         <>
           <Text style={styles.screenTitle}>Refrigerator Management</Text>
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={() => navigation.navigate("AddFridge")}
-            >
-              <Text style={styles.buttonText}>
-                <MaterialIcons name="add" size={16} color="white" /> Add Fridge
-              </Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Pasteurized Fridges</Text>
-            <View style={styles.tableContainer}>
-              {pasteurizedFridges.length > 0 ? (
-                <FlatList
-                  data={pasteurizedFridges}
-                  renderItem={({ item }) => renderFridgeCard(item)}
-                  keyExtractor={(item) => item._id}
-                  vertical
-                  style={styles.cardContainer}
-                />
-              ) : (
-                <Text style={styles.noFridgeText}>
-                  No Pasteurized Fridges Available
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+              />
+            }
+          >
+            <View style={styles.section}>
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => navigation.navigate("AddFridge")}
+              >
+                <Text style={styles.buttonText}>
+                  <MaterialIcons name="add" size={16} color="white" /> Add
+                  Fridge
                 </Text>
-              )}
+              </TouchableOpacity>
             </View>
-          </View>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Pasteurized Fridges</Text>
+              <View style={styles.tableContainer}>
+                {pasteurizedFridges.length > 0 ? (
+                  <FlatList
+                    data={pasteurizedFridges}
+                    renderItem={({ item }) => renderFridgeCard(item)}
+                    keyExtractor={(item) => item._id}
+                    vertical
+                    style={styles.cardContainer}
+                  />
+                ) : (
+                  <Text style={styles.noFridgeText}>
+                    No Pasteurized Fridges Available
+                  </Text>
+                )}
+              </View>
+            </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Unpasteurized Fridges</Text>
-            <View style={styles.tableContainer}>
-              {unpasteurizedFridges.length > 0 ? (
-                <FlatList
-                  data={unpasteurizedFridges}
-                  renderItem={({ item }) => renderFridgeCard(item)}
-                  keyExtractor={(item) => item._id}
-                  vertical
-                  style={styles.cardContainer}
-                />
-              ) : (
-                <Text style={styles.noFridgeText}>
-                  No Unpasteurized Fridges Available
-                </Text>
-              )}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Unpasteurized Fridges</Text>
+              <View style={styles.tableContainer}>
+                {unpasteurizedFridges.length > 0 ? (
+                  <FlatList
+                    data={unpasteurizedFridges}
+                    renderItem={({ item }) => renderFridgeCard(item)}
+                    keyExtractor={(item) => item._id}
+                    vertical
+                    style={styles.cardContainer}
+                  />
+                ) : (
+                  <Text style={styles.noFridgeText}>
+                    No Unpasteurized Fridges Available
+                  </Text>
+                )}
+              </View>
             </View>
-          </View>
+          </ScrollView>
 
           {selectedItems && selectedItems.length > 0 && (
             <View style={styles.selectionFooter}>
@@ -262,7 +282,7 @@ const Refrigerator = ({ route }) => {
           )}
         </>
       )}
-    </ScrollView>
+    </View>
   );
 };
 

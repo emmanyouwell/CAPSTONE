@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  allCollections,
   getCollectionDetails,
   recordPrivateRecord,
   recordPublicRecord,
@@ -8,6 +9,7 @@ import {
 export const collectionSlice = createSlice({
   name: "collection",
   initialState: {
+    collections: [],
     message: "",
     loading: false,
     error: null,
@@ -17,6 +19,18 @@ export const collectionSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(allCollections.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(allCollections.fulfilled, (state, action) => {
+        state.loading = false;
+        state.collections = action.payload.collections;
+      })
+      .addCase(allCollections.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
       .addCase(recordPublicRecord.pending, (state, action) => {
         state.loading = true;
       })

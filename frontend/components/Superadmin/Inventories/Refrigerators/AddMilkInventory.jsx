@@ -43,8 +43,7 @@ const AddMilkInventory = ({ route, navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
 
   const [donors, setDonors] = useState([]);
-  const [showPasteurizationDatePicker, setShowPasteurizationDatePicker] =
-    useState(false);
+  const [showPasteurizationDatePicker, setShowPasteurizationDatePicker] = useState(false);
 
   useEffect(() => {
     dispatch(getFridges());
@@ -137,6 +136,11 @@ const AddMilkInventory = ({ route, navigation }) => {
           "Error",
           "Please fill out all fields for pasteurized milk."
         );
+        return;
+      }
+
+      if (bottleQty > 20) {
+        Alert.alert("Error", "Maximum of 20 bottle quantity");
         return;
       }
 

@@ -38,6 +38,7 @@ import EditFridge from "./components/Superadmin/Inventories/Refrigerators/EditFr
 import AddMilkInventory from "./components/Superadmin/Inventories/Refrigerators/AddMilkInventory";
 import EditMilkInventory from "./components/Superadmin/Inventories/Refrigerators/EditMilkInventory";
 import BagCards from "./components/Superadmin/Inventories/Refrigerators/BagCards";
+import StoreCollections from "./components/Superadmin/Inventories/Refrigerators/StoreCollections";
 
 // Milk Letting Screens
 import MilkLetting from "./screens/Superadmin/MilkLetting";
@@ -257,6 +258,7 @@ const MainStack = () => {
         <Stack.Screen name="EditFridge" component={EditFridge} />
         <Stack.Screen name="AddMilkInventory" component={AddMilkInventory} />
         <Stack.Screen name="EditMilkInventory" component={EditMilkInventory} />
+        <Stack.Screen name="StoreCollections" component={StoreCollections} />
 
         <Stack.Screen name="superadmin_equipment" component={Equipment} />
         <Stack.Screen name="AddEquipment" component={AddEquipment} />

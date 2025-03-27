@@ -95,3 +95,33 @@ export const getCollectionDetails = createAsyncThunk(
         }
     }
 )
+
+// Get Collection Details
+export const allCollections = createAsyncThunk(
+    'collection/allCollections',
+    async (_, thunkAPI) => {
+
+        const token = await getToken();
+        
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/collections`, config)
+
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
