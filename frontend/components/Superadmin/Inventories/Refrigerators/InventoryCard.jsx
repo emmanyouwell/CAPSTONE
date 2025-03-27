@@ -164,7 +164,7 @@ const Inventory = ({ route }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.addButton}
-            onPress={() => navigation.navigate("AddMilkInventory", fridge)}
+            onPress={() => navigation.navigate("StoreCollections", fridge)}
           >
             <Text style={styles.buttonText}>
               <MaterialIcons name="add" size={16} color="white" /> Add

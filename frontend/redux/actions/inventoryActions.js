@@ -13,7 +13,7 @@ export const getInventories = createAsyncThunk(
         if (!token) {
             throw new Error('No token available');
         }
-
+        console.log("Token: ", token)
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -22,13 +22,7 @@ export const getInventories = createAsyncThunk(
             withCredentials: true
         }
         try {
-            let urlString = ''
-            if (query){
-                urlString = `http://192.168.1.24:4000/api/v1/inventories?search=${query}`
-            }
-            else {
-                urlString = `http://192.168.1.24:4000/api/v1/inventories`
-            }
+            const urlString = `http://192.168.1.24:4000/api/v1/inventories`
             console.log("URL: ", urlString)
             const response = await axios.get(urlString, config);
             return response.data;
