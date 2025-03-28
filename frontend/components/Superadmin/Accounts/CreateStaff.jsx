@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { SuperAdmin } from '../../../styles/Styles';
 import { Formik } from 'formik';
@@ -18,9 +18,18 @@ const CreateStaff = ({navigation}) => {
     }
     // Validation schema using Yup
     const validationSchema = Yup.object().shape({
-        name: Yup.string()
-            .required('Name is required')
-            .min(3, 'Name must be at least 3 characters'),
+        first: Yup.string()
+            .required('First name is required')
+            .min(3, 'First name must be at least 3 characters'),
+        middle: Yup.string()
+            .required('Middle name is required')
+            .min(3, 'Middel name must be at least 3 characters'),
+        last: Yup.string()
+            .required('Last name is required')
+            .min(3, 'Last name must be at least 3 characters'),
+        employeeID: Yup.string()
+            .required('Employee ID Number is required')
+            .matches(/^[0-9]+$/, 'Phone number must only contain digits'),
         email: Yup.string()
             .email('Invalid email address')
             .required('Email is required'),
@@ -48,36 +57,69 @@ const CreateStaff = ({navigation}) => {
             <Text style={SuperAdmin.headerText}>Create Staff</Text>
             <Formik
                 initialValues={{
-                    name: '',
+                    employeeID: '',
+                    first: '',
+                    middle: '',
+                    last: '',
                     email: '',
-                    password: '',
                     phone: '',
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values) => {
-                    console.log('Form Submitted', values);
+                    
                     const formData = {
-                        name: values.name,
+                        firstName: values.first, 
+                        middleName: values.middle, 
+                        lastName: values.last,
+                        employeeID: Number(values.employeeID),
                         email: values.email,
-                        password: values.password,
-                        phone: values.phone,
+                        phoneNumber: values.phone,
                         role: 'Staff',
                     }
+                    console.log('Form Submitted', formData);
                     // Handle form submission logic here
                     dispatch(registerUser(formData));
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
-                    <View style={styles.container}>
-                        <Text style={styles.label}>Name</Text>
+                    <ScrollView style={styles.container}>
+                        <Text style={styles.label}>First Name</Text>
                         <TextInput
                             style={styles.input}
-                            placeholder="Enter your name"
-                            onChangeText={handleChange('name')}
-                            onBlur={handleBlur('name')}
-                            value={values.name}
+                            placeholder="Enter your first name"
+                            onChangeText={handleChange('first')}
+                            onBlur={handleBlur('first')}
+                            value={values.first}
                         />
-                        {touched.name && errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+                        {touched.first && errors.first && <Text style={styles.errorText}>{errors.first}</Text>}
+                        <Text style={styles.label}>Middle Name</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter your middle name"
+                            onChangeText={handleChange('middle')}
+                            onBlur={handleBlur('middle')}
+                            value={values.middle}
+                        />
+                        {touched.middle && errors.middle && <Text style={styles.errorText}>{errors.middle}</Text>}
+                        <Text style={styles.label}>Last Name</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter your last name"
+                            onChangeText={handleChange('last')}
+                            onBlur={handleBlur('last')}
+                            value={values.last}
+                        />
+                        {touched.last && errors.last && <Text style={styles.errorText}>{errors.last}</Text>}
+                        <Text style={styles.label}>Employee ID</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter your employee ID number"
+                            keyboardType="phone-pad"
+                            onChangeText={handleChange('employeeID')}
+                            onBlur={handleBlur('employeeID')}
+                            value={values.employeeID}
+                        />
+                        {touched.employeeID && errors.employeeID && <Text style={styles.errorText}>{errors.employeeID}</Text>}
 
                         <Text style={styles.label}>Email</Text>
                         <TextInput
@@ -90,17 +132,6 @@ const CreateStaff = ({navigation}) => {
                         />
                         {touched.email && errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-                        <Text style={styles.label}>Password</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your password"
-                            secureTextEntry
-                            onChangeText={handleChange('password')}
-                            onBlur={handleBlur('password')}
-                            value={values.password}
-                        />
-                        {touched.password && errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-
                         <Text style={styles.label}>Phone</Text>
                         <TextInput
                             style={styles.input}
@@ -111,11 +142,13 @@ const CreateStaff = ({navigation}) => {
                             value={values.phone}
                         />
                         {touched.phone && errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
-
+                        <View style={styles.container}>
                         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                             <Text style={styles.buttonText}>Register</Text>
                         </TouchableOpacity>
-                    </View>
+                        </View>
+                        
+                    </ScrollView>
                 )}
             </Formik>
         </View>
