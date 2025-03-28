@@ -37,7 +37,7 @@ const requestSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Pending", "Reserved", "Done"],
+    enum: ["Pending", "Reserved", "Done", "Canceled"],
     default: "Pending",
   },
   volumeRequested: {
