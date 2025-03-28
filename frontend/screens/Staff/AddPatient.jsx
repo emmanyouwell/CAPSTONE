@@ -31,8 +31,6 @@ const AddPatient = ({ navigation }) => {
         },
         phone: '',
         motherName: '',
-        patientType: 'Inpatient',
-        hospital: 'Taguig-Pateros District Hospital',
     });
     console.log("home_address: ", JSON.stringify(formData.home_address))
 

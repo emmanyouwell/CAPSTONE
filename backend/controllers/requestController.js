@@ -24,26 +24,26 @@ exports.allRequests = catchAsyncErrors(async (req, res, next) => {
 // Create request => /api/v1/requests
 exports.createRequest = catchAsyncErrors(async (req, res, next) => {
     try {
-        // let images = []
-        // if (typeof req.body.images === 'string') {
-        //     images.push(req.body.images)
-        // } else {
-        //     images = req.body.images
-        // }
+        let images = []
+        if (typeof req.body.images === 'string') {
+            images.push(req.body.images)
+        } else {
+            images = req.body.images
+        }
         
-        // let imagesLinks = [];
+        let imagesLinks = [];
         
-        // for (let i = 0; i < images.length; i++) {
-        //     const result = await cloudinary.v2.uploader.upload(images[i], {
-        //         folder: 'requests'
-        //     });      
-        //     imagesLinks.push({
-        //         public_id: result.public_id,
-        //         url: result.secure_url
-        //     });
-        // }
+        for (let i = 0; i < images.length; i++) {
+            const result = await cloudinary.v2.uploader.upload(images[i], {
+                folder: 'requests'
+            });      
+            imagesLinks.push({
+                public_id: result.public_id,
+                url: result.secure_url
+            });
+        }
         
-        // req.body.images = imagesLinks
+        req.body.images = imagesLinks
 
         const patient = await Patient.findById(req.body.patient);
         if (!patient) {
@@ -100,40 +100,36 @@ exports.getRequestDetails = catchAsyncErrors(async (req, res, next) => {
 exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
     const data = req.body;
     try {
-        // let request = await Request.findById(req.params.id);
-        // if (!request) {
-        //     return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`));
-        // }
-
-        // let images = [];
-        // if (Array.isArray(req.body.images)) {
-        //     images = req.body.images.map(image => 
-        //         typeof image === 'object' && image.url ? image.url : image
-        //     );
-        // } else if (typeof req.body.images === 'string') {
-        //     images.push(req.body.images);
-        // }
-
-        // if (images.length > 0) {
-        //     for (let i = 0; i < request.images.length; i++) {
-        //         await cloudinary.v2.uploader.destroy(request.images[i].public_id);
-        //     }
-        //     let imagesLinks = [];
-        //     for (let i = 0; i < images.length; i++) {
-        //         const result = await cloudinary.v2.uploader.upload(images[i], {
-        //             folder: 'requests',
-        //         });
-        
-        //         imagesLinks.push({
-        //             public_id: result.public_id,
-        //             url: result.secure_url,
-        //         });
-        //     }
-        //     req.body.images = imagesLinks;
-        // }
         let request = await Request.findById(req.params.id);
         if (!request) {
             return next(new ErrorHandler(`Request is not found with this id: ${req.params.id}`));
+        }
+
+        let images = [];
+        if (Array.isArray(req.body.images)) {
+            images = req.body.images.map(image => 
+                typeof image === 'object' && image.url ? image.url : image
+            );
+        } else if (typeof req.body.images === 'string') {
+            images.push(req.body.images);
+        }
+
+        if (images.length > 0) {
+            for (let i = 0; i < request.images.length; i++) {
+                await cloudinary.v2.uploader.destroy(request.images[i].public_id);
+            }
+            let imagesLinks = [];
+            for (let i = 0; i < images.length; i++) {
+                const result = await cloudinary.v2.uploader.upload(images[i], {
+                    folder: 'requests',
+                });
+        
+                imagesLinks.push({
+                    public_id: result.public_id,
+                    url: result.secure_url,
+                });
+            }
+            req.body.images = imagesLinks;
         }
 
         const patient = await Patient.findById(data.patient);
