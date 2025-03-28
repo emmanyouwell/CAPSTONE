@@ -9,6 +9,7 @@ const {
     deleteRequest,
     updateRequestStatus,
     assignInventoryToRequest,
+    myRequests,
 } = require('../controllers/requestController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -26,6 +27,9 @@ router.route('/request-status/:id')
 
 router.route('/assign-inventory/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), assignInventoryToRequest)
+
+router.route('/staff/:id/requests')
+    .get(isAuthenticatedUser, authorizeRoles('Staff'), myRequests)
 
 
 module.exports = router;

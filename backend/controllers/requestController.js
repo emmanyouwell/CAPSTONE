@@ -253,3 +253,21 @@ exports.assignInventoryToRequest = catchAsyncErrors(async (req, res) => {
         });
     }
 });
+
+// Get staff request => /api/v1/staff/:id/requests
+exports.myRequests = catchAsyncErrors(async (req, res, next) => {
+
+    const requests = await Request.find({requestedBy: req.params.id})
+        .populate('patient', 'name patientType')
+        .populate('requestedBy', 'name employeeID')
+        .populate('tchmb.approvedBy', 'name email role')
+        .populate('tchmb.ebm', 'pasteurizedDetails');
+
+    const count = requests.length;
+
+    res.status(200).json({
+        success: true,
+        count,
+        requests
+    })
+})
