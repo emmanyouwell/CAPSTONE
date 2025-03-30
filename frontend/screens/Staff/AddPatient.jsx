@@ -32,7 +32,6 @@ const AddPatient = ({ navigation }) => {
         phone: '',
         motherName: '',
     });
-    console.log("home_address: ", JSON.stringify(formData.home_address))
 
     useEffect(() => {
         startTransition(() => {
@@ -74,9 +73,9 @@ const AddPatient = ({ navigation }) => {
     };
 
     const handleSubmit = () => {
-        const { name, home_address, phone, hospital, patientType, motherName } = formData;
+        const { name, home_address, phone, motherName } = formData;
 
-        if (!name || !home_address || !phone || !hospital || !patientType || !motherName) {
+        if (!name || !home_address || !phone || !motherName) {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
         }

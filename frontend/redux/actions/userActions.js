@@ -15,14 +15,14 @@ export const loginUser = createAsyncThunk(
       withCredentials: true
     };
     try {
-      console.log(`http://192.168.1.24:4000/api/v1/login`);
       let url = `http://192.168.1.24:4000/api/v1/login`;
       if (isEmp) {
         url = `http://192.168.1.24:4000/api/v1/login/?emp=true`;
       }
+      console.log("Login url: ", url);
       const response = await axios.post(url, credentials, config);
 
-      await authenticate(response.data, () => { });
+      await authenticate(response.data, () => { });``
       return response.data;
 
     } catch (error) {
@@ -93,7 +93,7 @@ export const registerUser = createAsyncThunk(
   'user/registerUser',
 
   async (userData, thunkAPI) => {
-    console.log("Registering User");
+    console.log("Registering User: ", userData);
     const config = {
       headers: {
         "Content-Type": "application/json",

@@ -95,6 +95,9 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     // Check if password matches
     const isPasswordMatched = await user.comparePassword(password);
     if (!isPasswordMatched) {
+        if (emp) {
+            return res.status(401).json({ success: false, message: "Invalid employee id or password" });
+        }
         return res.status(401).json({ success: false, message: "Invalid email or password" });
     }
 

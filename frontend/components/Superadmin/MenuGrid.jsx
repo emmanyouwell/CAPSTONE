@@ -30,6 +30,7 @@ const adminItems = [
 const staffItems = [
   { id: '1', title: 'New Patient', route: 'AddPatient', image: require('../../assets/image/donor-records.png') },
   { id: '2', title: 'Add Request', route: 'AddRequest', image: require('../../assets/image/recipient-records.png') },
+  { id: '3', title: 'Requested', route: 'Requested', image: require('../../assets/image/resources-management.png') },
 ];
 
 const MenuGrid = () => {
