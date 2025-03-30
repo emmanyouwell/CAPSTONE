@@ -23,7 +23,7 @@ const adminItems = [
   { id: '4', title: 'Resources Management', route: 'superadmin_articles', image: require('../../assets/image/resources-management.png') },
   { id: '5', title: 'Schedules', route: 'superadmin_schedules', image: require('../../assets/image/calendar.png') },
   { id: '6', title: 'Announcement Creation', image: require('../../assets/image/announcement-creation.png') },
-  { id: '7', title: 'Milk Requesting', route: 'MilkRequest', image: require('../../assets/image/resources-management.png') },
+  { id: '7', title: 'Milk Requesting', route: 'RequestOpt', image: require('../../assets/image/resources-management.png') },
   { id: '8', title: 'Milk Letting', route: 'superadmin_milkLetting', image: require('../../assets/image/resources-management.png') },
 ];
 

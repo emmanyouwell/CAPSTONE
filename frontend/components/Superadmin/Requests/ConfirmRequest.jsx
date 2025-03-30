@@ -95,7 +95,7 @@ const ConfirmRequest = ({ route, navigation }) => {
             }
 
             Alert.alert("Success", "Request Completed");
-            navigation.navigate('MilkRequest');
+            navigation.navigate('RequestOpt');
         } catch (err) {
             Alert.alert("Error", "Failed to complete the operation.");
             console.error(err);
