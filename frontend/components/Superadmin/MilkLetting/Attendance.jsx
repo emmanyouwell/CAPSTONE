@@ -172,11 +172,11 @@ const Attendance = ({ route, navigation }) => {
       });
   };
 
-  const handleDateChange = (event, selectedDate, field) => {
-    const date = selectedDate || form[field];
-    setForm({ ...form, [field]: date.toISOString().split("T")[0] });
-    if (field === "birthday") setShowBirthday(false);
-  };
+  // const handleDateChange = (event, selectedDate, field) => {
+  //   const date = selectedDate || form[field];
+  //   setForm({ ...form, [field]: date.toISOString().split("T")[0] });
+  //   if (field === "birthday") setShowBirthday(false);
+  // };
 
   const onMenuPress = () => {
     navigation.openDrawer();
@@ -188,6 +188,34 @@ const Attendance = ({ route, navigation }) => {
         navigation.replace("login");
       })
       .catch((err) => console.log(err));
+  };
+
+  const handleDateChange = (event, date, field) => {
+    if (date) {
+      const formattedDate = date.toISOString().split("T")[0];
+      setForm((prevForm) => ({
+        ...prevForm,
+        [field]: formattedDate,
+        age: calculateAge(date),
+      }));
+      setShowBirthday(false);
+    }
+  };
+
+  const calculateAge = (birthDate) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
   };
 
   const renderFormFields = () => {
@@ -210,12 +238,6 @@ const Attendance = ({ route, navigation }) => {
             placeholder="Last Name"
             onChangeText={(value) => setForm({ ...form, last_name: value })}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Age"
-            keyboardType="numeric"
-            onChangeText={(value) => setForm({ ...form, age: Number(value) })}
-          />
           <Text style={styles.subTitle}>Birthday</Text>
           <TouchableOpacity
             onPress={() => setShowBirthday(true)}
@@ -235,6 +257,13 @@ const Attendance = ({ route, navigation }) => {
               }
             />
           )}
+          <TextInput
+            style={styles.input}
+            placeholder="Age"
+            keyboardType="numeric"
+            value={form.age ? String(form.age) : ""}
+            editable={false}
+          />
         </View>
 
         <View style={styles.section}>
@@ -380,7 +409,9 @@ const Attendance = ({ route, navigation }) => {
 
         {step === 7 && (
           <View style={styles.navButtons}>
-            <Text style={styles.title}>Want to continue or new attendance?</Text>
+            <Text style={styles.title}>
+              Want to continue or new attendance?
+            </Text>
             <TouchableOpacity style={styles.button} onPress={() => setStep(3)}>
               <Text style={styles.buttonText}>Continue</Text>
             </TouchableOpacity>
