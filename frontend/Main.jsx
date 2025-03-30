@@ -55,6 +55,7 @@ import EditEquipment from "./components/Superadmin/Inventories/Equipment/EditEqu
 
 //Request Screens
 import RequestOpt from "./screens/Superadmin/RequestOpt";
+import RefRequest from "./screens/Superadmin/Inventories/RefRequest";
 import Inpatients from "./components/Superadmin/Requests/Inpatients";
 import Outpatients from "./components/Superadmin/Requests/Outpatients";
 import ConfirmRequest from "./components/Superadmin/Requests/ConfirmRequest";
@@ -277,6 +278,7 @@ const MainStack = () => {
         <Stack.Screen name="ConfirmRequest" component={ConfirmRequest} />
         <Stack.Screen name="EditRequest" component={EditRequest} />
         <Stack.Screen name="RequestOpt" component={RequestOpt} />
+        <Stack.Screen name="RefRequest" component={RefRequest} />
         
         {/* {Request Staff Navigation} */}
         <Stack.Screen name="AddPatient" component={AddPatient} />

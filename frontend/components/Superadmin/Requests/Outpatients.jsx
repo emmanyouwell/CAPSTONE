@@ -55,7 +55,7 @@ const Outpatients = ({ navigation }) => {
       {
         text: "Reserve",
         style: "destructive",
-        onPress: () => console.log("Reserve: ", item),
+        onPress: () => navigation.navigate("EditRequest", { request: item })
       },
     ]);
   };
