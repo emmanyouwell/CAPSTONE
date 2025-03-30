@@ -70,10 +70,12 @@ const Requests = ({ data }) => {
           onPress={() => {
             console.log("Item: ", item)
             Alert.alert(
-              "Clicked",
-              `Clicked Request`,
+              "Information",
+              `See request details?`,
               [
                 { text: "Cancel", style: "cancel" },
+                { text: "", style: "cancel" },
+                { text: "Okay", onPress: () => navigation.navigate("RequestDetails", {request: item}) },
               ]
             )}
           }

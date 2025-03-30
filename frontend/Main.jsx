@@ -59,6 +59,7 @@ import ConfirmRequest from "./components/Superadmin/Requests/ConfirmRequest";
 import AddPatient from "./screens/Staff/AddPatient";
 import AddRequest from "./screens/Staff/AddRequest";
 import Requested from "./screens/Staff/Requested";
+import RequestDetails from "./screens/Staff/RequestDetails";
 import Articles from "./screens/Superadmin/Articles";
 import AddArticles from "./components/Superadmin/Articles/AddArticles";
 import EditRequest from "./components/Superadmin/Requests/EditRequest";
@@ -269,11 +270,13 @@ const MainStack = () => {
         <Stack.Screen name="MilkRequest" component={MilkRequest} />
         <Stack.Screen name="ConfirmRequest" component={ConfirmRequest} />
         <Stack.Screen name="EditRequest" component={EditRequest} />
-        <Stack.Screen name="EditStaffRequest" component={EditStaffRequest} />
+        
         {/* {Request Staff Navigation} */}
         <Stack.Screen name="AddPatient" component={AddPatient} />
         <Stack.Screen name="AddRequest" component={AddRequest} />
         <Stack.Screen name="Requested" component={Requested} />
+        <Stack.Screen name="EditStaffRequest" component={EditStaffRequest} />
+        <Stack.Screen name="RequestDetails" component={RequestDetails} />
 
         {/* {Charts Navigation} */}
         <Stack.Screen name="MilkPerMonth" component={MilkPerMonth} />

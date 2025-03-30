@@ -16,7 +16,7 @@ import { SuperAdmin } from '../../styles/Styles';
 import { getStaffRequests } from '../../redux/actions/requestActions';
 import Requests from '../../components/Staff/Requests';
 
-const Equipment = ({ navigation }) => {
+const Requested = ({ navigation }) => {
     const dispatch = useDispatch();
     const { userDetails } = useSelector((state) => state.users);
     const { request, loading, error } = useSelector((state) => state.requests);
@@ -153,4 +153,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Equipment;
+export default Requested;
