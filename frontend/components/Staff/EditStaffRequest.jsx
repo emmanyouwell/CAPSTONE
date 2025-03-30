@@ -18,60 +18,61 @@ import * as FileSystem from "expo-file-system";
 import DropDownPicker from "react-native-dropdown-picker";
 import Header from "../../components/Superadmin/Header";
 import { logoutUser } from "../../redux/actions/userActions";
-import {getRecipients} from "../../redux/actions/recipientActions";
-import { addRequest } from "../../redux/actions/requestActions";
-import { getDevices, sendNotification } from "../../redux/actions/notifActions";
+import { getRecipients } from "../../redux/actions/recipientActions";
+import { updateRequest } from "../../redux/actions/requestActions";
 import { SuperAdmin } from "../../styles/Styles";
-import { getUser } from "../../utils/helper";
 import moment from "moment";
 
-const AddRequest = ({ navigation, route }) => {
+const EditStaffRequest = ({ navigation, route }) => {
+  const { request } = route.params;
   const dispatch = useDispatch();
-  const newPatient = route.params?.newPatient || null;
-  const staff = route.params?.staff || "";
-  const [userDetails, setUserDetails] = useState(null);
-  const [images, setImages] = useState([]);
+  const { userDetails } = useSelector((state) => state.users);
+  const [images, setImages] = useState(request.images || []);
   const [formData, setFormData] = useState({
-    patient: newPatient?._id || null,
-    location: "",
-    diagnosis: "",
-    reason: "",
-    doctor: "",
+    patient: request?.patient?._id || null,
+    location:
+      request.patient.patientType === "Outpatient"
+        ? request.hospital
+        : request.department,
+    diagnosis: request?.diagnosis || "",
+    reason: request?.reason || "",
+    doctor: request?.doctor || "",
+    volume: request?.volumeRequested?.volume?.toString() || "",
+    days: request?.volumeRequested?.days?.toString() || "",
   });
   const [open, setOpen] = useState(false);
   const [patientItems, setPatientItems] = useState([]);
   const [outPatient, setOutPatient] = useState(false);
-  const { devices } = useSelector((state) => state.devices);
 
   useEffect(() => {
-    dispatch(getDevices());
+    dispatch(getRecipients({ search: "", page: 1, pageSize: 100 }))
+      .then((response) => {
+        const patientList = response.payload?.patients?.map((patient) => ({
+          label: `${patient.name} (${patient.home_address.street}, ${patient.home_address.brgy}, ${patient.home_address.city} | ${patient.phone})`,
+          value: patient._id,
+        }));
+        setPatientItems(patientList || []);
+      })
+      .catch((error) => console.error("Error fetching patients:", error));
   }, [dispatch]);
 
   useEffect(() => {
-    if (!newPatient) {
-      dispatch(getRecipients({ search: "", page: 1, pageSize: 100 }))
-        .then((response) => {
-          const patientList = response.payload?.patients?.map((patient) => ({
-            label: `${patient.name} (${patient.home_address.street}, ${patient.home_address.brgy}, ${patient.home_address.city} | ${patient.phone})`,
-            value: patient._id,
-          }));
-          setPatientItems(patientList || []);
-        })
-        .catch((error) => console.error("Error fetching patients:", error));
-    } else {
-      setPatientItems([{ label: newPatient.name, value: newPatient._id }]);
-    }
-  }, [dispatch, newPatient]);
+    setOutPatient(request.patient.patientType === "Outpatient");
 
-  useEffect(() => {
-    startTransition(() => {
-      const fetchUserDetails = async () => {
-        const user = await getUser();
-        setUserDetails(user);
-      };
-      fetchUserDetails();
-    });
-  }, []);
+    setFormData((prev) => ({
+      ...prev,
+      patient: request?.patient?._id || null,
+      location:
+        request.patient.patientType === "Outpatient"
+          ? request.hospital
+          : request.department,
+      diagnosis: request?.diagnosis || "",
+      reason: request?.reason || "",
+      doctor: request?.doctor || "",
+      volume: request?.volumeRequested?.volume?.toString() || "",
+      days: request?.volumeRequested?.days?.toString() || "",
+    }));
+  }, [request]);
 
   const onMenuPress = () => {
     navigation.openDrawer();
@@ -87,39 +88,43 @@ const AddRequest = ({ navigation, route }) => {
     setFormData({ ...formData, [key]: value });
   };
 
+  const handleRemoveImage = (index) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+  };
+
   const handlePickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
         "Permission Denied",
-        "You need to grant camera roll permissions to upload images."
+        "You need to grant camera roll permissions."
       );
       return;
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+      base64: true, // Ensure Base64 is included
     });
 
     if (!result.canceled) {
-      const base64Images = await Promise.all(
-        result.assets.map(async (asset) => {
-          const base64 = await FileSystem.readAsStringAsync(asset.uri, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-          return `data:image/jpeg;base64,${base64}`;
-        })
-      );
-
-      setImages((prevImages) => [...prevImages, ...base64Images]);
+      setImages((prevImages) => [
+        ...prevImages,
+        ...result.assets.map((asset) => ({
+          url: `data:image/jpeg;base64,${asset.base64}`, // Proper Base64 format
+          local: true,
+        })),
+      ]);
     }
   };
 
   const handleSubmit = () => {
     const { patient, location, diagnosis, reason, doctor, volume, days } =
       formData;
-    const patientType = outPatient ? 'Outpatient' : 'Inpatient';
+    const patientType = outPatient ? "Outpatient" : "Inpatient";
     if (
       !patient ||
       !location ||
@@ -133,9 +138,10 @@ const AddRequest = ({ navigation, route }) => {
       return;
     }
 
-    const requestedBy = staff ? staff : userDetails?._id;
+    const requestedBy = request ? request.requestedBy._id : userDetails?._id;
 
     const requestData = {
+      id: request._id,
       date: moment().format("YYYY-MM-DD"),
       patient,
       patientType,
@@ -144,39 +150,14 @@ const AddRequest = ({ navigation, route }) => {
       reason,
       doctor,
       requestedBy,
-      volumeRequested: {volume: Number(volume) , days: Number(days)},
+      volumeRequested: { volume: Number(volume), days: Number(days) },
       images,
     };
-    
-    dispatch(addRequest(requestData))
+    console.log("Request New Data: ", requestData);
+    dispatch(updateRequest(requestData))
       .then((res) => {
-          if (devices) {
-            for (const device of devices) {
-              if (
-                (device.token && device.user.role === "Admin") ||
-                device.user.role === "SuperAdmin"
-              ) {
-                const notifData = {
-                  token: device.token,
-                  title: "New Request for Milk",
-                  body: `A nurse issued a new request for milk with the volume of ${res.payload.request.volumeRequested.volume} mL per day for ${res.payload.request.volumeRequested.days} days. Open TCHMB Portal App to see more details`,
-                };
-                dispatch(sendNotification(notifData))
-                  .then((response) => {
-                    console.log(
-                      "Notification Status: ",
-                      response.payload.data.status
-                    );
-                  })
-                  .catch((error) => {
-                    console.error("Error sending notification:", error);
-                    Alert.alert("Error", "Sending Notification");
-                  });
-              }
-            }
-          }
-          Alert.alert("Success", "Request added successfully!");
-          navigation.navigate("superadmin_dashboard");
+        Alert.alert("Success", "Request Updated");
+        navigation.goBack();
       })
       .catch((error) => {
         console.error("Error adding request:", error);
@@ -208,8 +189,7 @@ const AddRequest = ({ navigation, route }) => {
               placeholder="Select Patient"
               style={styles.dropdown}
               dropDownContainerStyle={styles.dropdownContainer}
-              disabled={!!newPatient}
-              searchable={true} // Enable the searchable functionality
+              searchable={true}
               searchPlaceholder="Search for a patient..."
             />
           </View>
@@ -304,12 +284,19 @@ const AddRequest = ({ navigation, route }) => {
 
             {images.length > 0 && (
               <View style={styles.imagePreviewContainer}>
-                {images.map((uri, index) => (
-                  <Image
-                    key={index}
-                    source={{ uri }}
-                    style={styles.imagePreview}
-                  />
+                {images.map((image, index) => (
+                  <View key={index} style={styles.imageWrapper}>
+                    <Image
+                      source={{ uri: image.url }}
+                      style={styles.imagePreview}
+                    />
+                    <TouchableOpacity
+                      style={styles.removeImageButton}
+                      onPress={() => handleRemoveImage(index)}
+                    >
+                      <Text style={styles.removeImageText}>X</Text>
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             )}
@@ -404,6 +391,31 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     margin: 4,
   },
+  imageWrapper: {
+    position: "relative",
+    margin: 4,
+  },
+  imagePreview: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  removeImageButton: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    backgroundColor: "rgb(255, 255, 255)",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  removeImageText: {
+    color: "red",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
   radioContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -434,4 +446,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddRequest;
+export default EditStaffRequest;

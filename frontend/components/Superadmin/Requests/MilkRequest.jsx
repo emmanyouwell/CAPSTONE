@@ -6,8 +6,7 @@ import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
 import { getRequests } from '../../../redux/actions/requestActions';
 
-const MilkRequest = ({ route, navigation }) => {
-    const items = route.params ? route.params.selectedInventories : [];
+const MilkRequest = ({ navigation }) => {
     const dispatch = useDispatch();
     const { request, loading, error } = useSelector((state) => state.requests);
     const [refreshing, setRefreshing] = useState(false);
@@ -40,7 +39,7 @@ const MilkRequest = ({ route, navigation }) => {
     };
 
     const renderCard = (req) => {
-        const { status, patient, volume, doctor, images} = req;
+        const { patient, volume, doctor, images} = req;
         return (
             <TouchableOpacity
                 key={req._id}
@@ -57,7 +56,6 @@ const MilkRequest = ({ route, navigation }) => {
                 }
             >
                 <Text style={styles.cardTitle}>Date: {formatDate(req.date)}</Text>
-                <Text>Status: {status}</Text>
                 <Text>Patient: {patient.name}</Text>
                 <Text>Type: {patient.patientType}</Text>
                 <Text>Requested Volume: {volume} mL</Text>

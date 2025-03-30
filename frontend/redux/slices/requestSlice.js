@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addRequest, getRequests, getRequestDetails, updateRequest, deleteRequest } from '../actions/requestActions';
+import { addRequest, getRequests, getRequestDetails, updateRequest, deleteRequest, getStaffRequests } from '../actions/requestActions';
 
 export const requestSlice = createSlice({
   name: 'request',
@@ -77,6 +77,19 @@ export const requestSlice = createSlice({
       .addCase(deleteRequest.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      
+      .addCase(getStaffRequests.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getStaffRequests.fulfilled, (state, action) => {
+        state.loading = false;
+        state.request = action.payload.requests;
+        state.count = action.payload.count;
+      })
+      .addCase(getStaffRequests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
       });
       
   },

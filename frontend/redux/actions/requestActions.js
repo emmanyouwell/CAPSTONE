@@ -164,3 +164,35 @@ export const getRequestDetails = createAsyncThunk(
         }
     }
 )
+
+// Get request Details
+export const getStaffRequests = createAsyncThunk(
+    'request/getStaffRequests',
+    async (id, thunkAPI) => {
+
+        const token = await getToken();
+        console.log('Token Retrieved:', token);
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/staff/${id}/requests`, config)
+            console.log("Response: ", response.data)
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
