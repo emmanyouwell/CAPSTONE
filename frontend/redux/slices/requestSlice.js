@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addRequest, getRequests, getRequestDetails, updateRequest, deleteRequest, getStaffRequests } from '../actions/requestActions';
+import { addRequest, getRequests, getRequestDetails, updateRequest, deleteRequest, getStaffRequests, updateVolumeRequested } from '../actions/requestActions';
 
 export const requestSlice = createSlice({
   name: 'request',
@@ -13,6 +13,9 @@ export const requestSlice = createSlice({
     isDeleted: false,
   },
   reducers: {
+    resetRequestDetails: (state) => {
+      state.requestDetails = {};
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -90,9 +93,21 @@ export const requestSlice = createSlice({
       .addCase(getStaffRequests.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload; 
+      })
+
+      .addCase(updateVolumeRequested.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updateVolumeRequested.fulfilled, (state, action) => {
+        state.loading = false;
+        state.requestDetails = action.payload.request;
+      })
+      .addCase(updateVolumeRequested.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
       });
       
   },
 });
-
+export const { resetRequestDetails } = requestSlice.actions;
 export default requestSlice.reducer;

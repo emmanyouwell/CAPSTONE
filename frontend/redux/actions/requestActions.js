@@ -196,3 +196,33 @@ export const getStaffRequests = createAsyncThunk(
         }
     }
 )
+
+// Update request
+export const updateVolumeRequested = createAsyncThunk(
+    'request/updateVolumeRequested',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/request/${req.id}/volume`, req, config)
+
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

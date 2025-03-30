@@ -137,26 +137,25 @@ exports.updateRequest = catchAsyncErrors(async (req, res, next) => {
       }
     }
 
-    console.log("Received images:", data.images);
-    console.log("New images to upload:", newImages);
-
     // Upload new images to Cloudinary
     let uploadedImages = [];
-    for (let imageUri of newImages) {
-      if (!imageUri.startsWith("data:image")) {
-        console.log("Skipping invalid image format:", imageUri);
-        continue;
+    if (newImages.length > 0) {
+      for (let imageUri of newImages) {
+        if (!imageUri.startsWith("data:image")) {
+          console.log("Skipping invalid image format:", imageUri);
+          continue;
+        }
+  
+        const result = await cloudinary.v2.uploader.upload(imageUri, {
+          folder: "requests",
+        });
+        uploadedImages.push({
+          public_id: result.public_id,
+          url: result.secure_url,
+        });
       }
-
-      const result = await cloudinary.v2.uploader.upload(imageUri, {
-        folder: "requests",
-      });
-      uploadedImages.push({
-        public_id: result.public_id,
-        url: result.secure_url,
-      });
     }
-
+    
     // Merge existing and newly uploaded images
     data.images = [...existingImages, ...uploadedImages];
 
@@ -304,3 +303,26 @@ exports.myRequests = catchAsyncErrors(async (req, res, next) => {
     requests,
   });
 });
+
+// Update Requested Volume => /api/v1/request/:id/volume
+exports.updateVolumeRequested = catchAsyncErrors( async (req, res, next) => {
+    const { volume , days } = req.body;
+
+    const request = await Request.findById(req.params.id)
+
+    if (!request) {
+      return next(
+        new ErrorHandler(`Request is not found with this id: ${req.params.id}`)
+      );
+    }
+    
+    request.volumeRequested.volume = volume;
+    request.volumeRequested.days = days;
+    await request.save()
+    
+    res.status(200).json({
+        success: true,
+        request
+    })
+
+})
