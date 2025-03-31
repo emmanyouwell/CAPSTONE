@@ -26,7 +26,6 @@ const BagCards = ({ route }) => {
   const items = route.params.selectedItems ? route.params.selectedItems : [];
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
   const [totalVolume, setTotalVolume] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -37,7 +36,6 @@ const BagCards = ({ route }) => {
   const { scheduleDetails } = useSelector((state) => state.schedules);
 
   useEffect(() => {
-    dispatch(getAllBags());
     if (item.pubDetails) {
       dispatch(getLettingDetails(item.pubDetails._id));
     } else if (item.privDetails) {
@@ -130,21 +128,21 @@ const BagCards = ({ route }) => {
     );
   }
 
-  const renderCard = (bags, donor) => {
+  const renderSchedCard = (bags, donor, id) => {
     return (
-      <View>
+      <View key={id}>
         {bags.map((bag) => {
           const isSelected = selectedItems.includes(bag._id);
           const isPasteurized = bag.status === "Pasteurized";
-
-          return (  
+  
+          return (
             <TouchableOpacity
+              key={bag._id} 
               style={[
                 styles.card,
                 isSelected && styles.selectedCard,
                 isPasteurized && styles.disabledCard,
               ]}
-              key={bag._id}
               onLongPress={() => {
                 if (!isPasteurized) toggleSelectionMode();
               }}
@@ -164,7 +162,73 @@ const BagCards = ({ route }) => {
         })}
       </View>
     );
-  };
+  };  
+
+  const renderLettingCard = (addBags, bags, donor, id) => {
+    return (
+      <View key={id}>
+        {bags.map((bag) => {
+          const isSelected = selectedItems.includes(bag._id);
+          const isPasteurized = bag.status === "Pasteurized";
+  
+          return (
+            <TouchableOpacity
+              key={bag._id} 
+              style={[
+                styles.card,
+                isSelected && styles.selectedCard,
+                isPasteurized && styles.disabledCard,
+              ]}
+              onLongPress={() => {
+                if (!isPasteurized) toggleSelectionMode();
+              }}
+              onPress={() => {
+                if (!isPasteurized && selectionMode) {
+                  toggleSelectItem(bag._id);
+                  console.log("Pressed Bag: ", bag)
+                }
+              }}
+              disabled={isPasteurized}
+            >
+              <Text style={styles.cardTitle}>Status: {bag.status}</Text>
+              <Text>Date: {formatDate(bag.expressDate)}</Text>
+              <Text>Volume: {bag.volume} mL</Text>
+              <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
+            </TouchableOpacity>
+          );
+        })}
+        {addBags?.map((bag) => {
+          const isSelected = selectedItems.includes(bag._id);
+          const isPasteurized = bag.status === "Pasteurized";
+          
+          return (
+            <TouchableOpacity
+              key={bag._id} 
+              style={[
+                styles.card,
+                isSelected && styles.selectedCard,
+                isPasteurized && styles.disabledCard,
+              ]}
+              onLongPress={() => {
+                if (!isPasteurized) toggleSelectionMode();
+              }}
+              onPress={() => {
+                if (!isPasteurized && selectionMode) {
+                  toggleSelectItem(bag._id);
+                }
+              }}
+              disabled={isPasteurized}
+            >
+              <Text style={styles.cardTitle}>Status: {bag.status}</Text>
+              <Text>Date: {formatDate(bag.expressDate)}</Text>
+              <Text>Volume: {bag.volume} mL</Text>
+              <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
+  };  
 
   return (
     <View style={SuperAdmin.container}>
@@ -180,11 +244,14 @@ const BagCards = ({ route }) => {
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         >
-          {lettingDetails?.attendance?.map((attendee) =>
+          {/* {lettingDetails?.attendance?.map((attendee) =>
             renderCard(attendee.bags, attendee.donor)
-          )}
+          )} */}
+          {lettingDetails?.attendance?.map((attendee) => {
+            return renderLettingCard(attendee?.additionalBags, attendee.bags, attendee.donor, attendee._id)
+          })}
           {scheduleDetails?.donorDetails?.bags &&
-            renderCard(
+            renderSchedCard(
               scheduleDetails.donorDetails.bags,
               scheduleDetails.donorDetails.donorId
             )}
