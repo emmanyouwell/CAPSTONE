@@ -95,11 +95,11 @@ exports.getLettingDetails = catchAsyncErrors(async (req, res, next) => {
     })
     .populate({
       path: "attendance.bags",
-      select: "volume expressDate",
+      select: "volume expressDate status",
     })
     .populate({
       path: "attendance.additionalBags",
-      select: "volume expressDate",
+      select: "volume expressDate status",
     });
   if (!letting) {
     return next(
