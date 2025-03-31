@@ -10,12 +10,11 @@ import {
   RefreshControl,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 import Header from "../../Header";
 import { logoutUser } from "../../../../redux/actions/userActions";
 import { checkInventories, getInventories } from "../../../../redux/actions/inventoryActions";
-import { getAllBags } from "../../../../redux/actions/bagActions";
 import { SuperAdmin } from "../../../../styles/Styles";
 import { dataTableStyle } from "../../../../styles/Styles";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -23,7 +22,9 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 const Inventory = ({ route }) => {
   const { fridge } = route.params;
   const items = route.params.selectedItems ? route.params.selectedItems : [];
+  const volLimit = route.params ? route.params.volLimit : 0;
   const [selectedItems, setSelectedItems] = useState(items);
+  const [limit, setLimit] = useState(0);
   const [totalVolume, setTotalVolume] = useState(0);
 
   const dispatch = useDispatch();
@@ -38,14 +39,16 @@ const Inventory = ({ route }) => {
   useEffect(() => {
     dispatch(getInventories());
     dispatch(checkInventories());
-    dispatch(getAllBags());
   }, [dispatch]);
 
   useEffect(() => {
-    if (items.length > 0) {
-      setSelectedItems(items);
-    }
-  }, [items]);
+      if (items.length > 0) {
+        setSelectedItems(items);
+      }
+      if(volLimit){
+        setLimit(volLimit);
+      }
+    }, [items, volLimit]);
 
   useEffect(() => {
     const selectedBags = allBags.filter((bag) =>
@@ -85,6 +88,7 @@ const Inventory = ({ route }) => {
             item: inv.unpasteurizedDetails.collectionId,
             fridge: fridge,
             selectedItems: selectedItems,
+            volLimit: limit
           })
         }
       >
@@ -202,6 +206,7 @@ const Inventory = ({ route }) => {
                   request: null,
                   selectedItems: selectedItems,
                   fridge: fridge,
+                  volLimit: limit
                 })
               }
               color="#E53777"

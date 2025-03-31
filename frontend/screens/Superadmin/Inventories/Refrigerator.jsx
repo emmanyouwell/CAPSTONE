@@ -27,11 +27,11 @@ import { SuperAdmin } from "../../../styles/Styles";
 
 const screenHeight = Dimensions.get("window").height;
 const Refrigerator = ({ route }) => {
-  const request = route.params ? route.params.request : null;
-
   const items = route.params ? route.params.selectedItems : [];
+  const volLimit = route.params ? route.params.volLimit : 0;
   const [selectedItems, setSelectedItems] = useState(items);
   const [totalVolume, setTotalVolume] = useState(0);
+  const [limit, setLimit] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
   const dispatch = useDispatch();
@@ -49,7 +49,10 @@ const Refrigerator = ({ route }) => {
     if (items.length > 0) {
       setSelectedItems(items);
     }
-  }, [items]);
+    if (volLimit) {
+      setLimit(volLimit);
+    }
+  }, [items, volLimit]);
 
   useEffect(() => {
     const selectedBags = allBags.filter((bag) =>
@@ -64,11 +67,12 @@ const Refrigerator = ({ route }) => {
 
   const handleNavigate = (fridge) => {
     if (fridge.fridgeType === "Pasteurized") {
-      navigation.navigate("PasteurCards", { fridge, request });
+      navigation.navigate("PasteurCards", { fridge });
     } else {
       navigation.navigate("InventoryCards", {
         fridge,
         selectedItems: selectedItems,
+        volLimit: limit,
       });
     }
   };
@@ -164,53 +168,14 @@ const Refrigerator = ({ route }) => {
   return (
     <View style={SuperAdmin.container}>
       <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
-      {request ? (
-        <>
-          <View style={styles.section}>
-            <Text style={styles.screenTitle}>Select Pasteurized Fridges</Text>
-            {pasteurizedFridges.length > 0 ? (
-              <FlatList
-                data={pasteurizedFridges}
-                renderItem={({ item }) => renderFridgeCard(item)}
-                keyExtractor={(item) => item._id}
-                horizontal
-              />
-            ) : (
-              <Text style={styles.noFridgeText}>
-                No Pasteurized Fridges Available
-              </Text>
-            )}
-          </View>
-          <View style={styles.section}>
-            <Text style={styles.requestTitleText}>
-              Request to be completed...
-            </Text>
-            <Text style={styles.requestText}>
-              Requested Date: {formatDate(request.date)}
-            </Text>
-            <Text style={styles.requestText}>
-              Patient Name: {request.patient.name}
-            </Text>
-            <Text style={styles.requestText}>Reason: {request.reason}</Text>
-            <Text style={styles.requestText}>
-              Diagnosis: {request.diagnosis}
-            </Text>
-            <Text style={styles.requestText}>
-              Required Volume: {request.volume} mL/day
-            </Text>
-          </View>
-        </>
-      ) : (
-        <>
-          <Text style={styles.screenTitle}>Refrigerator Management</Text>
-          <ScrollView
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
-              />
-            }
-          >
+      <Text style={styles.screenTitle}>Refrigerator Management</Text>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        {selectedItems.length === 0 && (
+          <>
             <View style={styles.section}>
               <TouchableOpacity
                 style={styles.addButton}
@@ -240,47 +205,49 @@ const Refrigerator = ({ route }) => {
                 )}
               </View>
             </View>
+          </>
+        )}
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Unpasteurized Fridges</Text>
-              <View style={styles.tableContainer}>
-                {unpasteurizedFridges.length > 0 ? (
-                  <FlatList
-                    data={unpasteurizedFridges}
-                    renderItem={({ item }) => renderFridgeCard(item)}
-                    keyExtractor={(item) => item._id}
-                    vertical
-                    style={styles.cardContainer}
-                  />
-                ) : (
-                  <Text style={styles.noFridgeText}>
-                    No Unpasteurized Fridges Available
-                  </Text>
-                )}
-              </View>
-            </View>
-          </ScrollView>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Unpasteurized Fridges</Text>
+          <View style={styles.tableContainer}>
+            {unpasteurizedFridges.length > 0 ? (
+              <FlatList
+                data={unpasteurizedFridges}
+                renderItem={({ item }) => renderFridgeCard(item)}
+                keyExtractor={(item) => item._id}
+                vertical
+                style={styles.cardContainer}
+              />
+            ) : (
+              <Text style={styles.noFridgeText}>
+                No Unpasteurized Fridges Available
+              </Text>
+            )}
+          </View>
+        </View>
+      </ScrollView>
 
-          {selectedItems && selectedItems.length > 0 && (
-            <View style={styles.selectionFooter}>
-              <View style={styles.footerDetails}>
-                <Text style={styles.footerText}>
-                  Total Volume to Pasteur: {totalVolume} mL
-                </Text>
-              </View>
-              <Button
-                title="Cancel"
-                onPress={() => setSelectedItems([])}
-                color="#FF3B30"
-              />
-              <Button
-                title={`Next (${selectedItems.length} Selected)`}
-                onPress={handleAddMilk}
-                disabled={selectedItems.length === 0}
-              />
-            </View>
-          )}
-        </>
+      {selectedItems && selectedItems.length > 0 && (
+        <View style={styles.selectionFooter}>
+          <View style={styles.footerDetails}>
+            <Text style={styles.footerText}>
+              Total Volume to Pasteur: {totalVolume} mL
+            </Text>
+          </View>
+          <View style={styles.footerButtons}>
+            <Button
+              title="Cancel"
+              onPress={() => setSelectedItems([])}
+              color="#FF3B30"
+            />
+            <Button
+              title={`Next (${selectedItems.length} Selected)`}
+              onPress={handleAddMilk}
+              disabled={selectedItems.length === 0}
+            />
+          </View>
+        </View>
       )}
     </View>
   );
@@ -341,19 +308,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#999",
     marginVertical: 8,
-  },
-  requestText: {
-    textAlign: "left",
-    color: "#999",
-    marginVertical: 8,
-    fontSize: 16,
-  },
-  requestTitleText: {
-    textAlign: "center",
-    color: "#999",
-    marginVertical: 8,
-    fontWeight: "bold",
-    fontSize: 18,
   },
   center: {
     flex: 1,
