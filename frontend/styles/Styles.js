@@ -34,16 +34,6 @@ export const SuperAdminHeader = StyleSheet.create({
     padding: 10,
     backgroundColor: colors.color1, // Background color for the header
     elevation: 2, // Add shadow for Android
-    
-  },
-  stickyHeader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    backgroundColor: 'white',
-    elevation: 2,
   },
   centerContainer: {
     flexDirection: 'row',

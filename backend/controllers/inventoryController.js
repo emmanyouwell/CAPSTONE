@@ -9,7 +9,7 @@ const ErrorHandler = require("../utils/errorHandler");
 
 // Get All Patients => /api/v1/inventories
 exports.allInventories = catchAsyncErrors(async (req, res, next) => {
-  const inventories = await Inventory.find({status: "Available"})
+  const inventories = await Inventory.find({ status: "Available" })
     .populate("fridge")
     .populate({
       path: "unpasteurizedDetails.collectionId",
@@ -77,13 +77,17 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     const expiration = new Date(pasteurizedDetails.pasteurizationDate);
     expiration.setDate(expiration.getDate() + 183);
     const batchVolume =
-      pasteurizedDetails.bottleType * pasteurizedDetails.bottleQty;
+      pasteurizedDetails.bottleType * 20;
     const pastDetails = {
       ...pasteurizedDetails,
       batchVolume: batchVolume,
       expiration: expiration.getTime(),
     };
     inventoryData.pasteurizedDetails = pastDetails;
+
+
+
+
   } else if (fridge.fridgeType === "Unpasteurized") {
     if (!unpasteurizedDetails || !unpasteurizedDetails.collectionId) {
       return next(
@@ -132,12 +136,11 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
         unpast.expressDateEnd = latestExpressDate = validBags.length > 0 ? validBags[validBags.length - 1].expressDate : null;
 
       }
-      const expiration = new Date(letting.actDetails.start);
+      const expiration = new Date(earliestExpressDate);
       expiration.setDate(expiration.getDate() + 14);
 
       unpast.expiration = expiration.getTime();
 
-      await Collection.findByIdAndUpdate(unpasteurizedDetails.collectionId, { $set: { status: "Stored" } }, { new: true });
 
     } else if (collection.privDetails) {
       const schedule = await Schedule.findById(collection.privDetails);
@@ -173,6 +176,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     }
 
     inventoryData.unpasteurizedDetails = unpast;
+    await Collection.findByIdAndUpdate(unpasteurizedDetails.collectionId, { $set: { status: "Stored" } }, { new: true });
   } else {
     return next(new ErrorHandler("Invalid fridge type", 400));
   }
@@ -186,6 +190,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
       await inventory.save();
     }
   }
+
 
   res.status(201).json({
     success: true,
@@ -381,3 +386,5 @@ exports.reserveInventoryForRequest = catchAsyncErrors(
     });
   }
 );
+
+

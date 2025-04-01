@@ -5,6 +5,7 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const ErrorHandler = require('../utils/errorHandler');
 const Donor = require('../models/donor');
 const User = require('../models/user');
+const Schedule = require('../models/schedule')
 exports.createBag = catchAsyncErrors(async (req, res, next) => {
     const { userID, volume, expressDate, type } = req.body;
     console.log("body: ", req.body)
@@ -85,12 +86,24 @@ exports.getSingleBag = catchAsyncErrors(async (req, res, next) => {
 })
 
 exports.updateBag = catchAsyncErrors(async (req, res, next) => {
+    const { collectionId} = req.body
     const { id } = req.params;
+    console.log("update bag body: ", req.body)
     let bag = await Bag.findByIdAndUpdate(id, req.body, {
         new: true,
         runValidators: true,
         useFindAndModify: false
     });
+    if (collectionId) {
+        
+        const schedule = await Schedule.findById(collectionId).populate('donorDetails.bags');
+        if (!schedule) {
+            return next(new ErrorHandler('Schedule not found', 404));
+        }
+        const totalVolume = schedule.donorDetails.bags.reduce((acc, curr) => acc + curr.volume || 0, 0);
+        await Schedule.findByIdAndUpdate(collectionId, { totalVolume }, { new: true, runValidators: true, useFindAndModify: false });
+
+    }
     if (!bag) {
         return next(new ErrorHandler('Bag not found', 404));
     }
@@ -114,16 +127,16 @@ exports.deleteBag = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Get All Bags => /api/v1/Equipments
-exports.allBags = catchAsyncErrors( async (req, res, next) => {
+exports.allBags = catchAsyncErrors(async (req, res, next) => {
     const allBags = await Bag.find()
-    .populate({
-        path: "donor",
-        select: "user home_address",
-        populate: {
-            path: "user",
-            select: "name"
-        }
-    });
+        .populate({
+            path: "donor",
+            select: "user home_address",
+            populate: {
+                path: "user",
+                select: "name"
+            }
+        });
 
     const count = await Bag.countDocuments();
 
