@@ -9,6 +9,7 @@ const {
     deleteInventory,
     updateInventoryStatus,
     reserveInventoryForRequest,
+    returnBagsFromFridge,
 } = require('../controllers/inventoryController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
