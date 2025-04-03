@@ -184,142 +184,158 @@ exports.openFridge = catchAsyncErrors(async (req, res, next) => {
     let allBags
     let total = 0
     let filteredBags = []
+    let formattedInventories = []
     const fridge = await Fridge.findById(id);
-    const inventories = await Inventory.find({ fridge: id })
-        .populate({
-            path: "unpasteurizedDetails.collectionId",
-            populate: [{
-                path: "pubDetails",
-                populate: [
-                    {
-                        path: "attendance.donor",
-                        populate: {
-                            path: "user",
-                            select: "name email phone"
+    if (fridge.fridgeType === "Unpasteurized") {
+        const inventories = await Inventory.find({ fridge: id })
+            .populate({
+                path: "unpasteurizedDetails.collectionId",
+                populate: [{
+                    path: "pubDetails",
+                    populate: [
+                        {
+                            path: "attendance.donor",
+                            populate: {
+                                path: "user",
+                                select: "name email phone"
+                            },
+                            select: "_id home_address"
                         },
-                        select: "_id home_address"
-                    },
-                    {
-                        path: "attendance.bags",
-                        select: "volume expressDate status donor",
-                        populate: {
-                            path: "donor",
-                            select: "user",
+                        {
+                            path: "attendance.bags",
+                            select: "volume expressDate status donor",
                             populate: {
-                                path: "user",
-                                select: "name email phone"
+                                path: "donor",
+                                select: "user",
+                                populate: {
+                                    path: "user",
+                                    select: "name email phone"
+                                }
+                            }
+                        },
+                        {
+                            path: "attendance.additionalBags",
+                            select: "volume expressDate status donor",
+                            populate: {
+                                path: "donor",
+                                select: "user",
+                                populate: {
+                                    path: "user",
+                                    select: "name email phone"
+                                }
                             }
                         }
-                    },
-                    {
-                        path: "attendance.additionalBags",
-                        select: "volume expressDate status donor",
-                        populate: {
-                            path: "donor",
-                            select: "user",
+                    ]
+                },
+                {
+                    path: 'privDetails',
+                    populate: [
+                        {
+                            path: 'donorDetails.donorId',
+                            populate: { path: 'user', select: 'name phone' }
+                        },
+                        {
+                            path: 'donorDetails.bags',
+                            select: "volume expressDate status donor",
                             populate: {
-                                path: "user",
-                                select: "name email phone"
+                                path: "donor",
+                                select: "user",
+                                populate: {
+                                    path: "user",
+                                    select: "name email phone"
+
+                                }
                             }
                         }
-                    }
-                ]
-            },
-            {
-                path: 'privDetails',
-                populate: [
-                    {
-                        path: 'donorDetails.donorId',
-                        populate: { path: 'user', select: 'name phone' }
-                    },
-                    {
-                        path: 'donorDetails.bags',
-                        select: "volume expressDate status donor",
-                        populate: {
-                            path: "donor",
-                            select: "user",
-                            populate: {
-                                path: "user",
-                                select: "name email phone"
+                    ]
+                }]
+            })
+            .sort({ 'unpasteurizedDetails.expressDateStart': 1 })
 
-                            }
-                        }
-                    }
-                ]
-            }]
-        })
-        .sort({ 'unpasteurizedDetails.expressDateStart': 1 })
+        formattedInventories = inventories.map(inventory => {
+            const attendance = inventory?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance || [];
+            const donorDetails = inventory?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails || [];
 
-    const formattedInventories = inventories.map(inventory => {
-        const attendance = inventory?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance || [];
-        const donorDetails = inventory?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails || [];
+            // Calculate total bags from pubDetails.attendance
+            const attendanceBagsCount = attendance.reduce((sum, att) =>
+                sum + (att.bags?.length || 0) + (att.additionalBags?.length || 0), 0
+            );
 
-        // Calculate total bags from pubDetails.attendance
-        const attendanceBagsCount = attendance.reduce((sum, att) =>
-            sum + (att.bags?.length || 0) + (att.additionalBags?.length || 0), 0
-        );
+            // Calculate total volume from pubDetails.attendance
+            const attendanceVolume = attendance.reduce((sum, att) =>
+                sum + (att.bags?.reduce((acc, bag) => acc + (bag.volume || 0), 0) || 0) +
+                (att.additionalBags?.reduce((acc, bag) => acc + (bag.volume || 0), 0) || 0), 0
+            );
 
-        // Calculate total volume from pubDetails.attendance
-        const attendanceVolume = attendance.reduce((sum, att) =>
-            sum + (att.bags?.reduce((acc, bag) => acc + (bag.volume || 0), 0) || 0) +
-            (att.additionalBags?.reduce((acc, bag) => acc + (bag.volume || 0), 0) || 0), 0
-        );
+            // Ensure donorBags is an array, even if donorDetails is missing or empty
+            const donorBags = donorDetails?.bags || [];
 
-        // Ensure donorBags is an array, even if donorDetails is missing or empty
-        const donorBags = donorDetails?.bags || [];
+            const donorBagsCount = donorBags.length;
 
-        const donorBagsCount = donorBags.length;
-
-        // Calculate total volume from privDetails.donorDetails.bags
-        const donorVolume = donorBags.reduce((sum, bag) => sum + (bag.volume || 0), 0);
+            // Calculate total volume from privDetails.donorDetails.bags
+            const donorVolume = donorBags.reduce((sum, bag) => sum + (bag.volume || 0), 0);
 
 
 
-        return {
-            ...inventory.toObject(),
-            totalBags: attendanceBagsCount + donorBagsCount,  // Sum of all bags
-            totalVolume: attendanceVolume + donorVolume       // Sum of all volumes
-        };
-    });
+            return {
+                ...inventory.toObject(),
+                totalBags: attendanceBagsCount + donorBagsCount,  // Sum of all bags
+                totalVolume: attendanceVolume + donorVolume       // Sum of all volumes
+            };
+        });
 
-    if (inventories) {
-        allBags = inventories.flatMap(inv => {
-            if (inv?.unpasteurizedDetails?.collectionId?.pubDetails) {
-                return inv?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att => [...(att.bags) || [], ...(att.additionalBags || [])])
+        if (inventories) {
+            allBags = inventories.flatMap(inv => {
+                if (inv?.unpasteurizedDetails?.collectionId?.pubDetails) {
+                    return inv?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att => [...(att.bags) || [], ...(att.additionalBags || [])])
+                }
+                else if (inv?.unpasteurizedDetails?.collectionId?.privDetails) {
+                    return inv?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || []
+                }
+            })
+            filteredBags = allBags
+                .filter(bag => bag.status !== "Pasteurized") // Filter out "Pasteurized" bags
+                .sort((a, b) => new Date(a.expressDate) - new Date(b.expressDate)); // Sort by expressDate
+
+        }
+        // Loop through inventories and update status if all bags are pasteurized
+        for (const inventory of inventories) {
+            const pubBags = inventory?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att =>
+                [...(att.bags || []), ...(att.additionalBags || [])]
+            ) || [];
+
+            const privBags = inventory?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || [];
+
+            const allBags = [...pubBags, ...privBags];
+
+            // Check if all bags are "Pasteurized"
+            const allPasteurized = allBags.length > 0 && allBags.every(bag => bag.status === "Pasteurized");
+
+            if (allPasteurized) {
+                // Update the inventory status to "Unavailable"
+                await Inventory.findByIdAndUpdate(inventory._id, { status: "Unavailable" });
             }
-            else if (inv?.unpasteurizedDetails?.collectionId?.privDetails) {
-                return inv?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || []
-            }
-        })
-        filteredBags = allBags
-            .filter(bag => bag.status !== "Pasteurized") // Filter out "Pasteurized" bags
-            .sort((a, b) => new Date(a.expressDate) - new Date(b.expressDate)); // Sort by expressDate
-
-    }
-    // Loop through inventories and update status if all bags are pasteurized
-    for (const inventory of inventories) {
-        const pubBags = inventory?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att =>
-            [...(att.bags || []), ...(att.additionalBags || [])]
-        ) || [];
-
-        const privBags = inventory?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || [];
-
-        const allBags = [...pubBags, ...privBags];
-
-        // Check if all bags are "Pasteurized"
-        const allPasteurized = allBags.length > 0 && allBags.every(bag => bag.status === "Pasteurized");
-
-        if (allPasteurized) {
-            // Update the inventory status to "Unavailable"
-            await Inventory.findByIdAndUpdate(inventory._id, { status: "Unavailable" });
         }
     }
+    else if (fridge.fridgeType === "Pasteurized") {
+        const inventories = await Inventory.find({ fridge: id })
+            .populate({
+                path: "pasteurizedDetails.donors",
+                populate: {
+                    path: "user",
+                    select: "name"
+                }
+            })
+            .sort({ 'pasteurizedDetails.pasteurizationDate': 1 })
+        formattedInventories = inventories
+    }
+
 
     res.status(200).json({
         success: true,
         fridge,
         inventories: formattedInventories,
-        allBags: filteredBags,
+        allBags: filteredBags || [],
         // total
     })
 })
