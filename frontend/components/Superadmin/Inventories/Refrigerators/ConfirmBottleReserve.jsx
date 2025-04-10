@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,22 +7,32 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import ImageViewing from "react-native-image-viewing";
-import Header from "../../components/Superadmin/Header";
-import { logoutUser } from "../../redux/actions/userActions";
-import { SuperAdmin, colors } from "../../styles/Styles";
+import Header from "../../Header";
+import { logoutUser } from "../../../../redux/actions/userActions";
+import { SuperAdmin, colors } from "../../../../styles/Styles";
+import { reserveInventory } from "../../../../redux/actions/inventoryActions";
 
-const RequestDetails = ({ navigation, route }) => {
-  const { request } = route.params;
+const ConfirmBottleReserve = ({ navigation, route }) => {
+  const { ebm, request } = route.params;
+  const dispatch = useDispatch();
+  const totalBottles = ebm?.reduce((total, e) => {
+    return total + (e.bottle.end - e.bottle.start + 1);
+  }, 0);
+  const totalVolume = ebm?.reduce((total, e) => {
+    return total + e.volDischarge;
+  }, 0);
 
   const [isVisible, setIsVisible] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
-  const [imageIndex, setImageIndex] = useState(0); // Track which image is opened
+  const [imageIndex, setImageIndex] = useState(0);
 
   const openImageViewer = (index) => {
     setSelectedImages(request.images.map((img) => ({ uri: img.url })));
-    setImageIndex(index); // Set the clicked image index
+    setImageIndex(index);
     setIsVisible(true);
   };
 
@@ -38,11 +48,36 @@ const RequestDetails = ({ navigation, route }) => {
       .catch((err) => console.log(err));
   };
 
+  const handleConfirm = () => {
+    if (!request) {
+      Alert.alert("Error", "Request is required");
+      return;
+    }
+    if (ebm.length === 0) {
+      Alert.alert("Error", "EBM is required");
+      return;
+    }
+    const data = {
+      id: request._id,
+      ebmData: ebm,
+    };
+    dispatch(reserveInventory(data))
+      .then(() => {
+        Alert.alert("Success", "Bottles Reserved");
+        if(request.patient.patientType === 'Inpatient'){
+          navigation.navigate('Inpatients')
+        } else {
+          navigation.navigate('Outpatients')
+        }
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <SafeAreaView style={SuperAdmin.container}>
       <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.screenTitle}>Request Details</Text>
+        <Text style={styles.screenTitle}>Confirm Reservation</Text>
         {request.patient.patientType === "Inpatient" && (
           <View style={styles.card}>
             <Text style={styles.label}>Department:</Text>
@@ -88,7 +123,6 @@ const RequestDetails = ({ navigation, route }) => {
           </View>
         ))}
 
-        {/* Attached Images */}
         <Text style={styles.sectionTitle}>Attached Images</Text>
         <View style={styles.imageContainer}>
           {request.images.map((img, index) => (
@@ -101,28 +135,43 @@ const RequestDetails = ({ navigation, route }) => {
           ))}
         </View>
 
-        {/* Full-Screen Image Viewer */}
         <ImageViewing
           images={selectedImages}
-          imageIndex={imageIndex} // Use the dynamically set index
+          imageIndex={imageIndex}
           visible={isVisible}
           onRequestClose={() => setIsVisible(false)}
         />
 
         {/* TCHMB Details */}
-        <Text style={styles.sectionTitle}>TCHMB Details</Text>
-        <View style={styles.card}>
-          <Text style={styles.label}>EBM Pool:</Text>
-          {request.tchmb.ebm.length > 0 &&(<Text style={styles.value}>
-            {request.tchmb.ebm.length} pools available
-          </Text>)}
+        <Text style={styles.sectionTitle}>Reservation Details</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Bottles</Text>
+          {ebm?.map((e, index) => (
+            <View key={index} style={styles.ebmCard}>
+              <Text style={styles.ebmBottle}>
+                Bottles {e.bottle.start} - {e.bottle.end}
+              </Text>
+              <Text>Batch: {e.batch}</Text>
+              <Text>Pool: {e.pool}</Text>
+              <Text>Bottle Type: {e.bottleType}</Text>
+            </View>
+          ))}
+          <Text style={styles.totalVolume}>Total Bottles: {totalBottles}</Text>
+          <Text style={styles.totalVolume}>Total Volume: {totalVolume} mL</Text>
         </View>
       </ScrollView>
+      <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+        <Text style={styles.buttonText}>Confirm Reservation</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    alignItems: "center",
+  },
   scrollContainer: {
     padding: 16,
   },
@@ -174,6 +223,35 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.color1_dark,
   },
+  ebmCard: {
+    backgroundColor: "#e3f2fd",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+  ebmBottle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  totalVolume: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 8,
+  },
+  confirmButton: {
+    backgroundColor: "#4CAF50",
+    padding: 16,
+    alignItems: "center",
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
-export default RequestDetails;
+export default ConfirmBottleReserve;

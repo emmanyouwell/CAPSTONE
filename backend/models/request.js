@@ -54,23 +54,25 @@ const requestSchema = new mongoose.Schema({
     type: String,
   },
   tchmb: {
-    ebm: {
-      invId: [{
-        type: ObjectId,
-        ref: 'Inventory'
-      }],
-      batch: [Number],
-      pool: [Number],
-      bottle: [
-        {
-          start: { type: Number },
-          end: { type: Number }
-        }
-      ],
-      volDischarge: {
-        type: Number
-      }
-    },
+    ebm: [
+      {
+        invId: {
+          type: ObjectId,
+          ref: "Inventory",
+          required: true
+        },
+        bottleType: Number,
+        batch: Number,
+        pool: Number,
+        bottle: {
+          start: Number,
+          end: Number,
+        },
+        volDischarge: {
+          type: Number,
+        },
+      },
+    ],
     transport: {
       type: String,
     },
@@ -83,11 +85,11 @@ const requestSchema = new mongoose.Schema({
     {
       public_id: {
         type: String,
-        required: true
-      }, 
+        required: true,
+      },
       url: {
         type: String,
-        required: true
+        required: true,
       },
     },
   ],

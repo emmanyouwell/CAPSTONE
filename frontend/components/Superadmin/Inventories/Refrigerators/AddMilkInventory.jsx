@@ -25,8 +25,7 @@ const AddMilkInventory = ({ route, navigation }) => {
     ? { fridgeType: "Pasteurized" }
     : route.params;
 
-  const items = route.params.selectedBags ? route.params.selectedBags : [];
-  console.log("Items in Add Inventory: ", items)
+  const items = route.params.selectedBags ? route.params.selectedBags : []; 
   const totalVolume = items.reduce((total, item) => {
     return total + (Number(item.volume) || 0);
   }, 0);
@@ -153,10 +152,9 @@ const AddMilkInventory = ({ route, navigation }) => {
         donors: donors,
         items: items,
       };
-
+      console.log(newData);
       try {
         dispatch(addInventory(newData));
-        console.log(newData);
         Alert.alert("Success", "Inventory has been added successfully.");
 
         navigation.goBack();

@@ -54,7 +54,6 @@ const EditRequest = ({ navigation, route }) => {
       days: Number(days),
     };
 
-    console.log("Updated Request Data: ", updatedRequest);
     dispatch(updateVolumeRequested(updatedRequest)).then((res) => {
       Alert.alert("Success", "Request Confirmed Successfully");
       navigation.navigate("RefRequest", {
@@ -93,6 +92,9 @@ const EditRequest = ({ navigation, route }) => {
               <Text style={styles.requestText}>Reason: {request.reason}</Text>
               <Text style={styles.requestText}>
                 Diagnosis: {request.diagnosis}
+              </Text>
+              <Text style={styles.requestText}>
+                Staff Requested: {request.requestedBy?.name.last}, {request.requestedBy?.name.first}
               </Text>
               <Text style={styles.requestText}>
                 Requested Volume: {request.volumeRequested.volume} ml

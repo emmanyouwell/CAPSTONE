@@ -27,9 +27,9 @@ const Inpatients = ({ navigation }) => {
   useEffect(() => {
     dispatch(getRequests());
   }, [dispatch]);
-
+  
   const filteredRequest = request.filter(
-    (req) => req.patient && req.patient.patientType === 'Inpatient'
+    (req) => req.patient && req.patient.patientType === 'Inpatient' && req.status === 'Pending' || req.status === 'Reserved'
   );
 
   const handleRefresh = () => {
@@ -63,7 +63,7 @@ const Inpatients = ({ navigation }) => {
   const renderRightActions = (item) => (
     <View style={styles.actionsContainer}>
       <TouchableOpacity
-        style={[styles.actionButton, styles.editButton]}
+        style={styles.actionButton}
         onPress={() => handleReserve(item)}
       >
         <MaterialIcons name="add-box" size={30} color="white" />
@@ -73,11 +73,18 @@ const Inpatients = ({ navigation }) => {
 
   const renderCard = (req) => {
     const { patient, volume, doctor, images } = req;
+    const isReserved = req.status === 'Reserved';
+  
     return (
-      <Swipeable renderRightActions={() => renderRightActions(req)}>
+      <Swipeable renderRightActions={() =>
+        isReserved ? null : renderRightActions(req)
+      }>
         <TouchableOpacity
           key={req._id}
-          style={styles.card}
+          style={[
+            styles.card,
+            { borderColor: isReserved ? "#E53777" : "#FFA500", borderWidth: 2 }
+          ]}
           onPress={() =>
             Alert.alert("Information", `Do you want to see other details?`, [
               { text: "Cancel", style: "cancel" },
@@ -90,7 +97,10 @@ const Inpatients = ({ navigation }) => {
             ])
           }
         >
-          <Text style={styles.cardTitle}>Date: {formatDate(req.date)}</Text>
+          <Text style={[styles.cardTitle, { color: isReserved ? "#E53777" : "#FFA500" }]}>
+            Status: {req.status}
+          </Text>
+          <Text>Date: {formatDate(req.date)}</Text>
           <Text>Patient: {patient.name}</Text>
           <Text>Type: {patient.patientType}</Text>
           <Text>Requested Volume: {volume} mL</Text>
@@ -106,6 +116,7 @@ const Inpatients = ({ navigation }) => {
       </Swipeable>
     );
   };
+  
 
   return (
     <View style={SuperAdmin.container}>
@@ -211,8 +222,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 80,
     height: "100%",
-  },
-  editButton: {
     backgroundColor: "#E53777",
   },
 });

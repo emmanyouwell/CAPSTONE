@@ -5,6 +5,7 @@ import {
   deleteInventory,
   getInventories,
   getInventoryDetails,
+  reserveInventory,
   updateInventory,
 } from "../actions/inventoryActions";
 
@@ -18,6 +19,7 @@ export const inventorySlice = createSlice({
     inventoryDetails: {},
     isUpdated: false,
     isDeleted: false,
+    reserveMessage: "",
     message: "",
   },
   reducers: {
@@ -98,6 +100,18 @@ export const inventorySlice = createSlice({
         state.message = action.payload.message;
       })
       .addCase(checkInventories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(reserveInventory.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(reserveInventory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.reserveMessage = action.payload.message;
+      })
+      .addCase(reserveInventory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
