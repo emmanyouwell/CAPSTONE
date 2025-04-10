@@ -29,7 +29,7 @@ const Inpatients = ({ navigation }) => {
   }, [dispatch]);
   
   const filteredRequest = request.filter(
-    (req) => req.patient && req.patient.patientType === 'Inpatient' && req.status === 'Pending' || req.status === 'Reserved'
+    (req) => req.patient && req.patient.patientType === 'Inpatient'
   );
 
   const handleRefresh = () => {
