@@ -16,6 +16,13 @@ import { SuperAdmin, colors } from "../../styles/Styles";
 const RequestDetails = ({ navigation, route }) => {
   const { request } = route.params;
 
+  const totalBottles = request.tchmb.ebm?.reduce((total, e) => {
+    return total + (e.bottle.end - e.bottle.start + 1);
+  }, 0);
+  const totalVolume = request.tchmb.ebm?.reduce((total, e) => {
+    return total + e.volDischarge;
+  }, 0);
+
   const [isVisible, setIsVisible] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
   const [imageIndex, setImageIndex] = useState(0); // Track which image is opened
@@ -111,11 +118,20 @@ const RequestDetails = ({ navigation, route }) => {
 
         {/* TCHMB Details */}
         <Text style={styles.sectionTitle}>TCHMB Details</Text>
-        <View style={styles.card}>
-          <Text style={styles.label}>EBM Pool:</Text>
-          {request.tchmb.ebm.length > 0 &&(<Text style={styles.value}>
-            {request.tchmb.ebm.length} pools available
-          </Text>)}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Bottles</Text>
+          {request.tchmb.ebm?.map((e, index) => (
+            <View key={index} style={styles.ebmCard}>
+              <Text style={styles.ebmBottle}>
+                Bottles {e.bottle.start} - {e.bottle.end}
+              </Text>
+              <Text>Batch: {e.batch}</Text>
+              <Text>Pool: {e.pool}</Text>
+              <Text>Bottle Type: {e.bottleType}</Text>
+            </View>
+          ))}
+          <Text style={styles.totalVolume}>Total Bottles: {totalBottles}</Text>
+          <Text style={styles.totalVolume}>Total Volume: {totalVolume} mL</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -173,6 +189,22 @@ const styles = StyleSheet.create({
     margin: 5,
     borderWidth: 2,
     borderColor: colors.color1_dark,
+  },
+  ebmCard: {
+    backgroundColor: "#e3f2fd",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 8,
+  },
+  ebmBottle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  totalVolume: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 8,
   },
 });
 
