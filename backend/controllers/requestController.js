@@ -308,7 +308,7 @@ exports.myRequests = catchAsyncErrors(async (req, res, next) => {
 exports.updateVolumeRequested = catchAsyncErrors( async (req, res, next) => {
     const { volume , days } = req.body;
 
-    const request = await Request.findById(req.params.id)
+    const request = await Request.findById(req.params.id).populate('patient').populate('requestedBy');
 
     if (!request) {
       return next(

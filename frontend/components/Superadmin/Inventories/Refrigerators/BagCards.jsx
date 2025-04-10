@@ -32,15 +32,12 @@ const BagCards = ({ route }) => {
   const [limit, setLimit] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [tempVolume, setTempVolume] = useState(0);
-  const [lastBagId, setLastBagId] = useState("");
   const [refreshing, setRefreshing] = useState(false);
 
   const { allBags, loading, error } = useSelector((state) => state.bags);
   const { lettingDetails } = useSelector((state) => state.lettings);
   const { scheduleDetails } = useSelector((state) => state.schedules);
-  console.log("Temp: ", tempVolume);
-  console.log("Last Bag Id: ", lastBagId)
+
   useEffect(() => {
     if (item.pubDetails) {
       dispatch(getLettingDetails(item.pubDetails._id));
@@ -54,7 +51,7 @@ const BagCards = ({ route }) => {
       setSelectedItems([...items]);
       setSelectionMode(true);
     }
-    if(volLimit){
+    if (volLimit) {
       setLimit(volLimit);
     }
   }, [items, volLimit]);
@@ -67,43 +64,17 @@ const BagCards = ({ route }) => {
       (total, item) => total + (Number(item.volume) || 0),
       0
     );
-    if (limit > 0 && totals > limit) {
-      const excessVolume = totals - limit;
-      alertExceedLimit(excessVolume);
-      setTotalVolume(limit)
-    } else {
-      setTotalVolume(totals);
-    }
+    setTotalVolume(totals);
   }, [selectedItems, allBags]);
 
-  const alertExceedLimit = (excessVolume) => {
+  const alertBelowLimit = (volume) => {
     Alert.alert(
-      "Volume Limit Exceeded",
-      `The total volume exceeds the limit by ${excessVolume} mL. Do you want to cut the excess?`,
-      [
-        {
-          text: "No",
-          onPress: () => {
-            // Remove the last selected bag
-            const updatedSelectedItems = [...selectedItems];
-            updatedSelectedItems.pop();
-
-            setSelectedItems(updatedSelectedItems);
-          },
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => {
-            setTempVolume(Number(excessVolume));
-          },
-        },
-      ]
+      "Milk volume not met!",
+      `The total milk volume needed to pasteurize is not yet reached. Please select more milk bags!`,
     );
   };
 
   const handleToggleVolume = (vol) => {
-    console.log(`${vol} ml limit`);
     setLimit(Number(vol));
     toggleSelectionMode();
   };
@@ -126,7 +97,6 @@ const BagCards = ({ route }) => {
   };
 
   const toggleSelectItem = (id) => {
-    setLastBagId(id);
     if (selectedItems.includes(id)) {
       setSelectedItems(selectedItems.filter((itemId) => itemId !== id));
     } else {
@@ -137,6 +107,7 @@ const BagCards = ({ route }) => {
   const handleRefresh = () => {
     setRefreshing(true);
     dispatch(getAllBags());
+    setTotalVolume(0);
     if (item.pubDetails) {
       dispatch(getLettingDetails(item.pubDetails._id))
         .then(() => setRefreshing(false))
@@ -149,10 +120,16 @@ const BagCards = ({ route }) => {
   };
 
   const handleNavigate = () => {
+    if(totalVolume < limit){
+      alertBelowLimit(totalVolume)
+      return
+    };
     const selectedBags = allBags.filter((bag) =>
       selectedItems.includes(bag._id)
     );
-    navigation.navigate("AddMilkInventory", { selectedBags });
+    navigation.navigate("AddMilkInventory", {
+      selectedBags,
+    });
   };
 
   const onLogoutPress = () => {
@@ -212,7 +189,7 @@ const BagCards = ({ route }) => {
                   toggleSelectItem(bag._id);
                 }
               }}
-              disabled={isPasteurized}
+              disabled={isPasteurized || totalVolume === limit}
             >
               <Text style={styles.cardTitle}>Status: {bag.status}</Text>
               <Text>Date: {formatDate(bag.expressDate)}</Text>
@@ -323,7 +300,7 @@ const BagCards = ({ route }) => {
         <View style={styles.selectionFooter}>
           <View style={styles.footerDetails}>
             <Text style={styles.footerText}>
-              Total Volume to Pasteur: {totalVolume} mL
+              Total Volume to Pasteur: {totalVolume}/{limit} mL
             </Text>
           </View>
           <View style={styles.footerButtons}>
@@ -338,7 +315,7 @@ const BagCards = ({ route }) => {
                 navigation.navigate("InventoryCards", {
                   selectedItems: selectedItems,
                   fridge: fridge,
-                  volLimit: limit
+                  volLimit: limit,
                 })
               }
               color="#E53777"

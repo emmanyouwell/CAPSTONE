@@ -185,3 +185,33 @@ export const getAllBags = createAsyncThunk(
         }
     }
 );
+
+
+export const updateTemp = createAsyncThunk(
+    'bag/updateTemp',
+    async (req, thunkAPI) => {
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        };
+
+        try {
+            let urlString = `http://192.168.1.24:4000/api/v1/bag/${req.id}`;
+           
+            const response = await axios.post(urlString, req, config);
+
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+);
