@@ -29,7 +29,7 @@ const Inpatients = ({ navigation }) => {
   }, [dispatch]);
   
   const filteredRequest = request.filter(
-    (req) => req.patient && req.patient.patientType === 'Inpatient'
+    (req) => req.patient && req.patient.patientType === 'Inpatient' && req.status !== 'Done' && req.status !== 'Canceled'
   );
 
   const handleRefresh = () => {
@@ -72,7 +72,7 @@ const Inpatients = ({ navigation }) => {
   );
 
   const renderCard = (req) => {
-    const { patient, volume, doctor, images } = req;
+    const { patient, volumeRequested, doctor, images } = req;
     const isReserved = req.status === 'Reserved';
   
     return (
@@ -103,7 +103,8 @@ const Inpatients = ({ navigation }) => {
           <Text>Date: {formatDate(req.date)}</Text>
           <Text>Patient: {patient.name}</Text>
           <Text>Type: {patient.patientType}</Text>
-          <Text>Requested Volume: {volume} mL</Text>
+          <Text>Requested Volume: {volumeRequested.volume} mL/day</Text>
+          <Text>Days: {volumeRequested.days}</Text>
           <Text>Prescribed By: {doctor}</Text>
           {images && images.length > 0 ? (
             <Image source={{ uri: images[0].url }} style={styles.image} />
