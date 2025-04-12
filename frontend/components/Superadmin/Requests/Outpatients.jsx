@@ -29,7 +29,7 @@ const Outpatients = ({ navigation }) => {
   }, [dispatch]);
   
   const filteredRequest = request.filter(
-    (req) => req.patient && req.patient.patientType === 'Outpatient'
+    (req) => req.patient && req.patient.patientType === 'Outpatient' && req.status !== 'Done' && req.status !== 'Canceled'
   );
 
   const handleRefresh = () => {
@@ -60,24 +60,42 @@ const Outpatients = ({ navigation }) => {
     ]);
   };
 
+  const handleDispense = (item) => {
+    Alert.alert("Reserve Milk", "Reserve milk for this request?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Reserve",
+        style: "destructive",
+        onPress: () => navigation.navigate("EditRequest", { request: item })
+      },
+    ]);
+  };
+
   const renderRightActions = (item) => (
     <View style={styles.actionsContainer}>
-      <TouchableOpacity
+      {item.status === 'Pending' ? (<TouchableOpacity
         style={styles.actionButton}
         onPress={() => handleReserve(item)}
       >
         <MaterialIcons name="add-box" size={30} color="white" />
+      </TouchableOpacity>) : (
+        <TouchableOpacity
+        style={styles.actionButton}
+        onPress={() => handleDispense(item)}
+      >
+        <MaterialIcons name="add-box" size={30} color="white" />
       </TouchableOpacity>
+      )}
     </View>
   );
 
   const renderCard = (req) => {
-    const { patient, volume, doctor, images } = req;
+    const { patient, volumeRequested, doctor, images } = req;
     const isReserved = req.status === 'Reserved';
   
     return (
       <Swipeable renderRightActions={() =>
-        isReserved ? null : renderRightActions(req)
+        renderRightActions(req)
       }>
         <TouchableOpacity
           key={req._id}
@@ -103,7 +121,8 @@ const Outpatients = ({ navigation }) => {
           <Text>Date: {formatDate(req.date)}</Text>
           <Text>Patient: {patient.name}</Text>
           <Text>Type: {patient.patientType}</Text>
-          <Text>Requested Volume: {volume} mL</Text>
+          <Text>Requested Volume: {volumeRequested.volume} mL/day</Text>
+          <Text>Days: {volumeRequested.days}</Text>
           <Text>Prescribed By: {doctor}</Text>
           {images && images.length > 0 ? (
             <Image source={{ uri: images[0].url }} style={styles.image} />
