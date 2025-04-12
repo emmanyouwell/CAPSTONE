@@ -354,7 +354,7 @@ const PasteurCards = ({ route }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.confirmButton}
+            style={styles.fridgeButton}
             onPress={ () => navigation.navigate('RefRequest', { request: request, prevEbm: ebm })}
           >
             <Text style={styles.buttonText}>
@@ -362,7 +362,7 @@ const PasteurCards = ({ route }) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.confirmButton}
+            style={styles.cancel}
             onPress={ () => {setEbm([])}}
           >
             <Text style={styles.buttonText}>
@@ -500,6 +500,22 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     backgroundColor: "#4CAF50",
+    padding: 16,
+    alignItems: "center",
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  fridgeButton: {
+    backgroundColor: "#007AFF",
+    padding: 16,
+    alignItems: "center",
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  cancel: {
+    backgroundColor: "red",
     padding: 16,
     alignItems: "center",
     borderRadius: 8,
