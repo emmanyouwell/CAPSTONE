@@ -318,50 +318,60 @@ exports.updateInventoryStatus = catchAsyncErrors(async (req, res, next) => {
 exports.reserveInventoryForRequest = catchAsyncErrors(
   async (req, res, next) => {
     const { ebmData } = req.body;
+
     try {
-  
       if (!Array.isArray(ebmData) || ebmData.length === 0) {
         return next(new ErrorHandler("EBM data are required.", 400));
       }
-  
+
       for (const ebm of ebmData) {
         const { invId, bottle } = ebm;
-  
+
         const inventory = await Inventory.findById(invId);
         if (!inventory) {
           return next(new ErrorHandler("Inventory not found", 404));
         }
-  
+
         const { start, end } = bottle;
-  
+
         // Update bottle statuses to Reserved within the selected range
-        inventory.pasteurizedDetails.bottles = inventory.pasteurizedDetails.bottles.map((bot) => {
-          if (
-            bot.bottleNumber >= start &&
-            bot.bottleNumber <= end &&
-            bot.status === "Available"
-          ) {
-            return { ...bot.toObject(), status: "Reserved" };
-          }
-          return bot;
-        });
-  
-        await inventory.save(); 
+        inventory.pasteurizedDetails.bottles =
+          inventory.pasteurizedDetails.bottles.map((bot) => {
+            if (
+              bot.bottleNumber >= start &&
+              bot.bottleNumber <= end &&
+              bot.status === "Available"
+            ) {
+              return { ...bot.toObject(), status: "Reserved" };
+            }
+            return bot;
+          });
+
+        // Check if all bottles are now reserved
+        const allReserved = inventory.pasteurizedDetails.bottles.every(
+          (bot) => bot.status === "Reserved"
+        );
+
+        if (allReserved) {
+          inventory.status = "Reserved";
+        }
+
+        await inventory.save();
       }
-  
+
       const updatedRequest = await Request.findByIdAndUpdate(
         req.params.id,
         { $push: { "tchmb.ebm": { $each: ebmData } } },
-        { new: true },
+        { new: true }
       );
-      
+
       if (!updatedRequest) {
         return next(new ErrorHandler("Request not found.", 404));
       }
 
-      updatedRequest.status = 'Reserved'
-      await updatedRequest.save()
-  
+      updatedRequest.status = "Reserved";
+      await updatedRequest.save();
+
       res.status(200).json({
         message: "Inventory updated and EBM added to request successfully.",
         updatedRequest,

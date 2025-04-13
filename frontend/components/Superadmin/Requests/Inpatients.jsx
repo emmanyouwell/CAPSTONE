@@ -27,9 +27,17 @@ const Inpatients = ({ navigation }) => {
   useEffect(() => {
     dispatch(getRequests());
   }, [dispatch]);
-  
+
   const filteredRequest = request.filter(
-    (req) => req.patient && req.patient.patientType === 'Inpatient' && req.status !== 'Done' && req.status !== 'Canceled'
+    (req) =>
+      req.patient &&
+      req.patient.patientType === "Inpatient" &&
+      req.status !== "Done" &&
+      req.status !== "Canceled"
+  );
+
+  const reservedRequest = filteredRequest.filter(
+    (req) => req.status === "Reserved" && req.tchmb.ebm.length > 0
   );
 
   const handleRefresh = () => {
@@ -52,10 +60,11 @@ const Inpatients = ({ navigation }) => {
   const handleReserve = (item) => {
     Alert.alert("Reserve Milk", "Reserve milk for this request?", [
       { text: "Cancel", style: "cancel" },
+      { text: "", style: "cancel" },
       {
         text: "Reserve",
         style: "destructive",
-        onPress: () => navigation.navigate("EditRequest", { request: item })
+        onPress: () => navigation.navigate("EditRequest", { request: item }),
       },
     ]);
   };
@@ -73,17 +82,17 @@ const Inpatients = ({ navigation }) => {
 
   const renderCard = (req) => {
     const { patient, volumeRequested, doctor, images } = req;
-    const isReserved = req.status === 'Reserved';
-  
+    const isReserved = req.status === "Reserved";
+
     return (
-      <Swipeable renderRightActions={() =>
-        isReserved ? null : renderRightActions(req)
-      }>
+      <Swipeable
+        renderRightActions={() => (isReserved ? null : renderRightActions(req))}
+      >
         <TouchableOpacity
           key={req._id}
           style={[
             styles.card,
-            { borderColor: isReserved ? "#E53777" : "#FFA500", borderWidth: 2 }
+            { borderColor: isReserved ? "#E53777" : "#FFA500", borderWidth: 2 },
           ]}
           onPress={() =>
             Alert.alert("Information", `Do you want to see other details?`, [
@@ -97,7 +106,12 @@ const Inpatients = ({ navigation }) => {
             ])
           }
         >
-          <Text style={[styles.cardTitle, { color: isReserved ? "#E53777" : "#FFA500" }]}>
+          <Text
+            style={[
+              styles.cardTitle,
+              { color: isReserved ? "#E53777" : "#FFA500" },
+            ]}
+          >
             Status: {req.status}
           </Text>
           <Text>Date: {formatDate(req.date)}</Text>
@@ -117,7 +131,6 @@ const Inpatients = ({ navigation }) => {
       </Swipeable>
     );
   };
-  
 
   return (
     <View style={SuperAdmin.container}>
@@ -143,6 +156,15 @@ const Inpatients = ({ navigation }) => {
           )}
         </SafeAreaView>
       </ScrollView>
+      {reservedRequest.length > 0 && (
+        <TouchableOpacity
+          style={[styles.confirmButton, loading && styles.disabledButton]}
+          onPress={() => console.log(reservedRequest)}
+          disabled={loading}
+        >
+          <Text style={styles.confirmButtonText}>Dispense Milk</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -223,7 +245,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: 80,
     height: "100%",
-    backgroundColor: "#E53777",
+    backgroundColor: "#FFA500",
+  },
+  confirmButton: {
+    backgroundColor: "#4CAF50",
+    padding: 16,
+    alignItems: "center",
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  confirmButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

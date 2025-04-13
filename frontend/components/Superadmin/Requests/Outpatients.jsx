@@ -27,9 +27,13 @@ const Outpatients = ({ navigation }) => {
   useEffect(() => {
     dispatch(getRequests());
   }, [dispatch]);
-  
+
   const filteredRequest = request.filter(
-    (req) => req.patient && req.patient.patientType === 'Outpatient' && req.status !== 'Done' && req.status !== 'Canceled'
+    (req) =>
+      req.patient &&
+      req.patient.patientType === "Outpatient" &&
+      req.status !== "Done" &&
+      req.status !== "Canceled"
   );
 
   const handleRefresh = () => {
@@ -52,56 +56,58 @@ const Outpatients = ({ navigation }) => {
   const handleReserve = (item) => {
     Alert.alert("Reserve Milk", "Reserve milk for this request?", [
       { text: "Cancel", style: "cancel" },
+      { text: "", style: "cancel" },
       {
         text: "Reserve",
         style: "destructive",
-        onPress: () => navigation.navigate("EditRequest", { request: item })
+        onPress: () => navigation.navigate("EditRequest", { request: item }),
       },
     ]);
   };
 
   const handleDispense = (item) => {
-    Alert.alert("Reserve Milk", "Reserve milk for this request?", [
+    Alert.alert("Dispense Milk", "Do you want to dispense the milk", [
       { text: "Cancel", style: "cancel" },
+      { text: "", style: "cancel" },
       {
-        text: "Reserve",
+        text: "Dispense",
         style: "destructive",
-        onPress: () => navigation.navigate("EditRequest", { request: item })
+        onPress: () => console.log("Dispensed Milk: ", item),
       },
     ]);
   };
 
   const renderRightActions = (item) => (
     <View style={styles.actionsContainer}>
-      {item.status === 'Pending' ? (<TouchableOpacity
-        style={styles.actionButton}
-        onPress={() => handleReserve(item)}
-      >
-        <MaterialIcons name="add-box" size={30} color="white" />
-      </TouchableOpacity>) : (
+      {item.status === "Pending" ? (
         <TouchableOpacity
-        style={styles.actionButton}
-        onPress={() => handleDispense(item)}
-      >
-        <MaterialIcons name="add-box" size={30} color="white" />
-      </TouchableOpacity>
+          style={styles.actionButton}
+          onPress={() => handleReserve(item)}
+        >
+          <MaterialIcons name="add-box" size={30} color="white" />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          style={styles.dispenseButton}
+          onPress={() => handleDispense(item)}
+        >
+          <MaterialIcons name="done-outline" size={30} color="white" />
+        </TouchableOpacity>
       )}
     </View>
   );
 
   const renderCard = (req) => {
     const { patient, volumeRequested, doctor, images } = req;
-    const isReserved = req.status === 'Reserved';
-  
+    const isReserved = req.status === "Reserved";
+    console.log(images);
     return (
-      <Swipeable renderRightActions={() =>
-        renderRightActions(req)
-      }>
+      <Swipeable renderRightActions={() => renderRightActions(req)}>
         <TouchableOpacity
           key={req._id}
           style={[
             styles.card,
-            { borderColor: isReserved ? "#E53777" : "#FFA500", borderWidth: 2 }
+            { borderColor: isReserved ? "#E53777" : "#FFA500", borderWidth: 2 },
           ]}
           onPress={() =>
             Alert.alert("Information", `Do you want to see other details?`, [
@@ -115,7 +121,12 @@ const Outpatients = ({ navigation }) => {
             ])
           }
         >
-          <Text style={[styles.cardTitle, { color: isReserved ? "#E53777" : "#FFA500" }]}>
+          <Text
+            style={[
+              styles.cardTitle,
+              { color: isReserved ? "#E53777" : "#FFA500" },
+            ]}
+          >
             Status: {req.status}
           </Text>
           <Text>Date: {formatDate(req.date)}</Text>
@@ -135,7 +146,6 @@ const Outpatients = ({ navigation }) => {
       </Swipeable>
     );
   };
-  
 
   return (
     <View style={SuperAdmin.container}>
@@ -237,6 +247,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   actionButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    width: 80,
+    height: "100%",
+    backgroundColor: "#FFA500",
+  },
+  dispenseButton: {
     justifyContent: "center",
     alignItems: "center",
     width: 80,

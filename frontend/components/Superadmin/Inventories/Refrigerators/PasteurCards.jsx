@@ -39,7 +39,7 @@ const PasteurCards = ({ route }) => {
   const [endBottle, setEndBottle] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedInventory, setSelectedInventory] = useState(null);
-  console.log("Prev Ebm: ", otherEBM);
+
   useEffect(() => {
     dispatch(getInventories());
   }, [dispatch]);
@@ -140,7 +140,9 @@ const PasteurCards = ({ route }) => {
 
   const filteredInventories = inventory.filter(
     (inv) =>
-      inv.fridge && inv.fridge._id === fridge._id && inv.status === "Available"
+      inv.fridge &&
+      inv.fridge._id === fridge._id &&
+      inv.status !== "Unavailable"
   );
 
   const bottlesSelected = ebm?.reduce((total, e) => {
@@ -164,18 +166,33 @@ const PasteurCards = ({ route }) => {
         key={inv._id}
         style={styles.card}
         onPress={() => handleOpenModal(inv)}
-        disabled={!request}
+        disabled={!request || inv.status === "Reserved"}
       >
         <Text style={styles.cardTitle}>{formatDate(inv.inventoryDate)}</Text>
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>{inv.status}</Text>
-        </View>
+        {inv.status === "Available" ? (
+          <View style={styles.statusBadge}>
+            <Text style={styles.statusText}>{inv.status}</Text>
+          </View>
+        ) : (
+          <View style={styles.statusBadge2}>
+            <Text style={styles.statusText}>{inv.status}</Text>
+          </View>
+        )}
         {details && fridge.fridgeType === "Pasteurized" ? (
           <>
             <Text style={styles.cardText}>Batch: {details.batch}</Text>
             <Text style={styles.cardText}>Pool: {details.pool}</Text>
+            {inv.status === "Available" ? (
+              <Text style={styles.cardText}>
+                Bottles Available: {minBottle} - {maxBottle}
+              </Text>
+            ) : (
+              <Text style={styles.cardText}>
+                Bottles: {details.bottles.length}
+              </Text>
+            )}
             <Text style={styles.cardText}>
-              Bottles Available: {minBottle} - {maxBottle}
+              Bottle Type: {details.bottleType} mL
             </Text>
             <Text style={styles.cardText}>
               Expiration: {formatDate(details.expiration)}
@@ -355,19 +372,22 @@ const PasteurCards = ({ route }) => {
 
           <TouchableOpacity
             style={styles.fridgeButton}
-            onPress={ () => navigation.navigate('RefRequest', { request: request, prevEbm: ebm })}
+            onPress={() =>
+              navigation.navigate("RefRequest", {
+                request: request,
+                prevEbm: ebm,
+              })
+            }
           >
-            <Text style={styles.buttonText}>
-              Select from another fridge
-            </Text>
+            <Text style={styles.buttonText}>Select from another fridge</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cancel}
-            onPress={ () => {setEbm([])}}
+            onPress={() => {
+              setEbm([]);
+            }}
           >
-            <Text style={styles.buttonText}>
-              Cancel
-            </Text>
+            <Text style={styles.buttonText}>Cancel</Text>
           </TouchableOpacity>
         </>
       )}
@@ -424,6 +444,14 @@ const styles = StyleSheet.create({
   },
   statusBadge: {
     backgroundColor: "#4CAF50",
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 6,
+    alignSelf: "flex-start",
+    marginBottom: 6,
+  },
+  statusBadge2: {
+    backgroundColor: "#E53777",
     paddingVertical: 4,
     paddingHorizontal: 10,
     borderRadius: 6,
@@ -555,7 +583,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   tableContainer: {
-    height: screenHeight / 3,
+    height: screenHeight / 2.5,
     borderColor: "rgba(5,0,3,0.5)",
     borderWidth: 2,
     borderLeftWidth: 0,
