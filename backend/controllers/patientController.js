@@ -69,7 +69,7 @@ exports.createPatient = catchAsyncErrors(async (req, res, next) => {
 // Get specific Patient details => /api/v1/patient/:id
 exports.getPatientDetails = catchAsyncErrors(async (req, res, next) => {
     const patient = await Patient.findById(req.params.id)
-    .populate([{path:'requested', select: 'volumeRequested'}, {path:'staff', select: 'name'}]);
+    .populate([{path:'requested'}, {path:'staff', select: 'name'}]);
 
     if (!patient) {
         return next(new ErrorHandler(`Patient is not found with this id: ${req.params.id}`))
