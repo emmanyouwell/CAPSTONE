@@ -44,7 +44,7 @@ const letting = require('./routes/letting');
 const collection = require('./routes/collection');
 const bag = require('./routes/bag')
 const checkEvents = require('./schedule/eventChecker');
-
+const metrics = require('./routes/metrics');
 // API routes
 app.use('/api/v1', user);
 app.use('/api/v1', event);
@@ -60,6 +60,7 @@ app.use('/api/v1', schedule);
 app.use('/api/v1', letting);
 app.use('/api/v1', collection);
 app.use('/api/v1', bag);
+app.use('/api/v1', metrics)
 
 // Middleware to handle errors
 app.use(errorMiddleware);
