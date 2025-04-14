@@ -226,3 +226,62 @@ export const updateVolumeRequested = createAsyncThunk(
         }
     }
 )
+
+// Dispense inpatient request bottles
+export const inpatientDispense = createAsyncThunk(
+    'request/inpatientDispense',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+        console.log("action: ", req)
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/inpatient-dispense`, req, config)
+
+            return response.data;
+
+        } catch (error) {   
+            console.log("Error: ", error.message)
+            return thunkAPI.rejectWithValue(error.response?.data?.message);
+        }
+    }
+)
+
+export const outpatientDispense = createAsyncThunk(
+    'request/outpatientDispense',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/outpatient-dispense`, req, config)
+
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

@@ -9,24 +9,43 @@ import {
   Alert,
   RefreshControl,
   SafeAreaView,
+  Modal,
   Image,
+  TextInput,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { Swipeable } from "react-native-gesture-handler";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import DropDownPicker from 'react-native-dropdown-picker';
 import Header from "../Header";
 import { logoutUser } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
-import { getRequests } from "../../../redux/actions/requestActions";
+import { getRequests, inpatientDispense } from "../../../redux/actions/requestActions";
+import { resetMessage } from "../../../redux/slices/requestSlice";
 
 const Inpatients = ({ navigation }) => {
   const dispatch = useDispatch();
-  const { request, loading, error } = useSelector((state) => state.requests);
+  const { request, loading, error, message } = useSelector((state) => state.requests);
+  const { userDetails } = useSelector((state) => state.users);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [transport, setTransport] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [useOtherTransport, setUseOtherTransport] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [items, setItems] = useState([
+    { label: "Insulated Bag w/ Ice Pack", value: "Insulated Bag w/ Ice Pack" },
+    { label: "Cooler w/ Ice Pack", value: "Cooler w/ Ice Pack" },
+    { label: "Styro box w/ Ice Pack", value: "Styro box w/ Ice Pack" },
+  ]);
 
   useEffect(() => {
     dispatch(getRequests());
   }, [dispatch]);
+
+  if (message) {
+    Alert.alert("Success", message);
+  }
 
   const filteredRequest = request.filter(
     (req) =>
@@ -43,6 +62,7 @@ const Inpatients = ({ navigation }) => {
   const handleRefresh = () => {
     setRefreshing(true);
     dispatch(getRequests()).finally(() => setRefreshing(false));
+    dispatch(resetMessage());
   };
 
   const onMenuPress = () => {
@@ -55,6 +75,15 @@ const Inpatients = ({ navigation }) => {
         navigation.replace("login");
       })
       .catch((err) => console.log(err));
+  };
+
+  const handleConfirm = () => {
+    const data = {
+      request: reservedRequest,
+      transport,
+      approvedBy: userDetails._id
+    }
+    dispatch(inpatientDispense(data)).then(() => setModalVisible(false))
   };
 
   const handleReserve = (item) => {
@@ -86,10 +115,10 @@ const Inpatients = ({ navigation }) => {
 
     return (
       <Swipeable
+        key={req._id}
         renderRightActions={() => (isReserved ? null : renderRightActions(req))}
       >
         <TouchableOpacity
-          key={req._id}
           style={[
             styles.card,
             { borderColor: isReserved ? "#E53777" : "#FFA500", borderWidth: 2 },
@@ -159,12 +188,74 @@ const Inpatients = ({ navigation }) => {
       {reservedRequest.length > 0 && (
         <TouchableOpacity
           style={[styles.confirmButton, loading && styles.disabledButton]}
-          onPress={() => console.log(reservedRequest)}
+          onPress={() => setModalVisible(true)}
           disabled={loading}
         >
           <Text style={styles.confirmButtonText}>Dispense Milk</Text>
         </TouchableOpacity>
       )}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Transportation method</Text>
+
+            {!useOtherTransport ? (
+              <DropDownPicker
+                open={open}
+                value={transport}
+                items={items}
+                setOpen={setOpen}
+                setValue={setTransport}
+                setItems={setItems}
+                placeholder="Select Transportation Method"
+                style={styles.dropdown}
+                dropDownContainerStyle={styles.dropdownContainer}
+              />
+            ) : (
+              <TextInput
+                style={styles.input}
+                placeholder="Other method"
+                value={transport}
+                onChangeText={setTransport}
+              />
+            )}
+            <View style={styles.radioContainer}>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => setUseOtherTransport(!useOtherTransport)}
+              >
+                <View style={styles.radioCircle}>
+                  {useOtherTransport && <View style={styles.radioSelected} />}
+                </View>
+                <Text style={styles.radioLabel}>Other methods</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.reserveButton}
+              onPress={() => handleConfirm()}
+            >
+              <Text style={styles.buttonText}>Confirm</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => {
+                setModalVisible(false);
+                setTransport("");
+              }}
+            >
+              <Text style={styles.cancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -214,7 +305,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   image: {
-    width: 100,
+    width: 250,
     height: 100,
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
@@ -256,6 +347,84 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   confirmButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  reserveButton: {
+    backgroundColor: "#007AFF",
+    padding: 12,
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  cancelButton: {
+    backgroundColor: "#ddd",
+    padding: 12,
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
+  },
+  cancelText: {
+    color: "#333",
+  },
+  radioContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  radioButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  radioCircle: {
+    height: 15,
+    width: 15,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#000",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  radioSelected: {
+    height: 10,
+    width: 10,
+    borderRadius: 5,
+    backgroundColor: "#000",
+  },
+  radioLabel: {
+    fontSize: 15,
+  },
+  buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
