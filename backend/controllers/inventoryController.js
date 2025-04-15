@@ -1,4 +1,5 @@
 const Inventory = require("../models/inventory");
+const Request = require("../models/request");
 const Fridge = require("../models/fridge");
 const Collection = require("../models/collection");
 const Schedule = require("../models/schedule");
@@ -174,7 +175,8 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     } else {
       return next(new ErrorHandler("No public or private details", 400));
     }
-
+    collection.status = "Stored";
+    await collection.save();
     inventoryData.unpasteurizedDetails = unpast;
     await Collection.findByIdAndUpdate(unpasteurizedDetails.collectionId, { $set: { status: "Stored" } }, { new: true });
   } else {
@@ -184,11 +186,21 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const inventory = await Inventory.create(inventoryData);
 
   if (fridge.fridgeType === "Pasteurized" && pasteurizedDetails) {
-    for (let i = 0; i < pasteurizedDetails.bottleQty; i++) {
-      const bottleDetails = { bottleNumber: i + 1, status: "Available" };
-      inventory.pasteurizedDetails.bottles.push(bottleDetails);
-      await inventory.save();
-    }
+    const updateBagsPromise = Bags.updateMany(
+      { _id: { $in: pasteurizedDetails.items } },
+      { $set: { status: "Pasteurized" } }
+    );
+
+    const bottleDetails = Array.from(
+      { length: pasteurizedDetails.bottleQty },
+      (_, i) => ({
+        bottleNumber: i + 1,
+        status: "Available",
+      })
+    );
+    inventory.pasteurizedDetails.bottles.push(...bottleDetails);
+
+    await Promise.all([updateBagsPromise, inventory.save()]);
   }
 
 
@@ -202,7 +214,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 exports.getInventoryDetails = catchAsyncErrors(async (req, res, next) => {
   const inventory = await Inventory.findById(req.params.id)
     .populate("fridge")
-    .populate("unpasteurizedDetails.donor");
+    .populate("unpasteurizedDetails");
 
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
@@ -335,55 +347,128 @@ exports.updateInventoryStatus = catchAsyncErrors(async (req, res, next) => {
 // Reserve Inventory for Request => /api/v1/inventories/:id/reserve
 exports.reserveInventoryForRequest = catchAsyncErrors(
   async (req, res, next) => {
-    const { bottlesToReserve } = req.body;
+    const { ebmData } = req.body;
 
-    // Find inventory
-    const inventory = await Inventory.findById(req.params.id);
-    if (!inventory) {
-      return next(new ErrorHandler("Inventory not found", 404));
-    }
+    try {
+      if (!Array.isArray(ebmData) || ebmData.length === 0) {
+        return next(new ErrorHandler("EBM data are required.", 400));
+      }
 
-    if (
-      !inventory.pasteurizedDetails ||
-      !inventory.pasteurizedDetails.bottles
-    ) {
-      return next(
-        new ErrorHandler(
-          "This inventory does not contain pasteurized details",
-          400
-        )
+      for (const ebm of ebmData) {
+        const { invId, bottle } = ebm;
+
+        const inventory = await Inventory.findById(invId);
+        if (!inventory) {
+          return next(new ErrorHandler("Inventory not found", 404));
+        }
+
+        const { start, end } = bottle;
+
+        // Update bottle statuses to Reserved within the selected range
+        inventory.pasteurizedDetails.bottles =
+          inventory.pasteurizedDetails.bottles.map((bot) => {
+            if (
+              bot.bottleNumber >= start &&
+              bot.bottleNumber <= end &&
+              bot.status === "Available"
+            ) {
+              return { ...bot.toObject(), status: "Reserved" };
+            }
+            return bot;
+          });
+
+        // Check if all bottles are now reserved
+        const allReserved = inventory.pasteurizedDetails.bottles.every(
+          (bot) => bot.status === "Reserved"
+        );
+
+        if (allReserved) {
+          inventory.status = "Reserved";
+        }
+
+        await inventory.save();
+      }
+
+      const updatedRequest = await Request.findByIdAndUpdate(
+        req.params.id,
+        { $push: { "tchmb.ebm": { $each: ebmData } } },
+        { new: true }
       );
+
+      if (!updatedRequest) {
+        return next(new ErrorHandler("Request not found.", 404));
+      }
+
+      updatedRequest.status = "Reserved";
+      await updatedRequest.save();
+
+      res.status(200).json({
+        message: "Inventory updated and EBM added to request successfully.",
+        updatedRequest,
+      });
+    } catch (error) {
+      console.error("Error in reserving inventory for request:", error);
+      res.status(500).json({ message: "Server error", error: error.message });
     }
+  }
+);
 
-    const availableBottles = inventory.pasteurizedDetails.bottles.filter(
-      (bottle) => bottle.status === "Available"
-    );
+// Controller to check all inventories and update their status
+exports.updateAllInventoriesStatus = catchAsyncErrors(
+  async (req, res, next) => {
+    try {
+      const inventories = await Inventory.find({
+        "unpasteurizedDetails.collectionId": { $exists: true },
+      }).populate("unpasteurizedDetails.collectionId");
 
-    if (availableBottles.length < bottlesToReserve) {
-      return next(
-        new ErrorHandler(
-          `Not enough available bottles. Only ${availableBottles.length} is available.`,
-          400
-        )
-      );
+      if (!inventories.length) {
+        return next(new ErrorHandler("No Inventories", 400));
+      }
+
+      let updatedCount = 0;
+      for (const inventory of inventories) {
+        const collection = inventory.unpasteurizedDetails.collectionId;
+        let bags = [];
+
+        if (collection.pubDetails) {
+          const letting = await Letting.findById(
+            collection.pubDetails
+          ).populate("attendance.bags");
+          if (letting) {
+            bags = [
+              ...letting.attendance.flatMap((attendee) => attendee.bags),
+              ...letting.attendance.flatMap(
+                (attendee) => attendee.additionalBags
+              ),
+            ];
+          }
+        } else if (collection.privDetails) {
+          const schedule = await Schedule.findById(
+            collection.privDetails
+          ).populate("donorDetails.bags");
+          if (schedule) {
+            bags = schedule.donorDetails.bags;
+          }
+        }
+
+        if (bags.length) {
+          const allPasteurized = bags.every(
+            (bag) => bag.status === "Pasteurized"
+          );
+          if (allPasteurized) {
+            inventory.status = "Unavailable";
+            await inventory.save();
+            updatedCount++;
+          }
+        }
+      }
+
+      return res.status(200).json({
+        message: `${updatedCount} inventories checked and updated successfully.`,
+      });
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
     }
-
-    // Reserve the specified number of bottles
-    for (let i = 0; i < bottlesToReserve; i++) {
-      availableBottles[i].status = "Reserved";
-    }
-
-    if (availableBottles.length === 0) {
-      inventory.status = "Unavailable";
-    }
-
-    await inventory.save();
-
-    res.status(200).json({
-      success: true,
-      message: `${bottlesToReserve} bottles have been reserved successfully.`,
-      updatedInventory: inventory,
-    });
   }
 );
 

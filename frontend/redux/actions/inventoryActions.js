@@ -9,12 +9,11 @@ export const getInventories = createAsyncThunk(
     async (query, thunkAPI) => {
         
         const token = await getToken();
-        console.log('Token Retrieved:', token);
 
         if (!token) {
             throw new Error('No token available');
         }
-
+        console.log("Token: ", token)
         const config = {
             headers: {
                 'Content-Type': 'application/json',
@@ -23,13 +22,8 @@ export const getInventories = createAsyncThunk(
             withCredentials: true
         }
         try {
-            let urlString = ''
-            if (query){
-                urlString = `${REACT_APP_API_URL}/api/v1/inventories?search=${query}`
-            }
-            else {
-                urlString = `${REACT_APP_API_URL}/api/v1/inventories`
-            }
+            const urlString = `http://192.168.1.24:4000/api/v1/inventories`
+            console.log("URL: ", urlString)
             const response = await axios.get(urlString, config);
             return response.data;
 
@@ -59,7 +53,7 @@ export const addInventory = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/inventories`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/inventories`, req, config)
 
             return response.data;
 
@@ -89,7 +83,7 @@ export const updateInventory = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/inventory/${req.id}`, req, config)
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/inventory/${req.id}`, req, config)
             console.log("Updated Inventory: ", req.id)
             return response.data;
 
@@ -120,7 +114,7 @@ export const deleteInventory = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/inventory/${id}`, config)
+            const response = await axios.delete(`http://192.168.1.24:4000/api/v1/inventory/${id}`, config)
 
             return response.data;
 
@@ -152,8 +146,67 @@ export const getInventoryDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/inventory/${id}`, config)
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/inventory/${id}`, config)
             console.log("Response: ", response.data)
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Get All Inventory
+export const checkInventories = createAsyncThunk(
+    'inventory/checkInventories',
+    async (_, thunkAPI) => {
+        
+        const token = await getToken();
+        
+        if (!token) {
+            throw new Error('No token available');
+        }
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/check-inventories`, config)
+            
+            return response.data;
+
+        } catch (error) {
+            console.log("Error: ", error)
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Update inventory
+export const reserveInventory = createAsyncThunk(
+    'inventory/reserveInventory',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/reserved-bottle/${req.id}`, req, config)
+
             return response.data;
 
         } catch (error) {

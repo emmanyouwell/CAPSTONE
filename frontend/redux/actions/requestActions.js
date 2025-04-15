@@ -24,10 +24,10 @@ export const getRequests = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `${REACT_APP_API_URL}/api/v1/requests?search=${query}`
+                urlString = `http://192.168.1.24:4000/api/v1/requests?search=${query}`
             }
             else {
-                urlString = `${REACT_APP_API_URL}/api/v1/requests`
+                urlString = `http://192.168.1.24:4000/api/v1/requests`
             }
             
             const response = await axios.get(urlString, config);
@@ -60,7 +60,7 @@ export const addRequest = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/requests`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/requests`, req, config)
  
             return response.data;
 
@@ -91,7 +91,7 @@ export const updateRequest = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/request/${req.id}`, req, config)
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/request/${req.id}`, req, config)
 
             return response.data;
 
@@ -122,7 +122,7 @@ export const deleteRequest = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/request/${id}`, config)
+            const response = await axios.delete(`http://192.168.1.24:4000/api/v1/request/${id}`, config)
 
             return response.data;
 
@@ -154,8 +154,129 @@ export const getRequestDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/request/${id}`, config)
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/request/${id}`, config)
             console.log("Response: ", response.data)
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Get request Details
+export const getStaffRequests = createAsyncThunk(
+    'request/getStaffRequests',
+    async (id, thunkAPI) => {
+
+        const token = await getToken();
+        console.log('Token Retrieved:', token);
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/staff/${id}/requests`, config)
+            console.log("Response: ", response.data)
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Update request
+export const updateVolumeRequested = createAsyncThunk(
+    'request/updateVolumeRequested',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/request/${req.id}/volume`, req, config)
+
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Dispense inpatient request bottles
+export const inpatientDispense = createAsyncThunk(
+    'request/inpatientDispense',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+        console.log("action: ", req)
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/inpatient-dispense`, req, config)
+
+            return response.data;
+
+        } catch (error) {   
+            console.log("Error: ", error.message)
+            return thunkAPI.rejectWithValue(error.response?.data?.message);
+        }
+    }
+)
+
+export const outpatientDispense = createAsyncThunk(
+    'request/outpatientDispense',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/outpatient-dispense`, req, config)
+
             return response.data;
 
         } catch (error) {

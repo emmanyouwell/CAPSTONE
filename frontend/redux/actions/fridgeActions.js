@@ -25,10 +25,10 @@ export const getFridges = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `${REACT_APP_API_URL}/api/v1/fridges?search=${query}`
+                urlString = `http://192.168.1.24:4000/api/v1/fridges?search=${query}`
             }
             else {
-                urlString = `${REACT_APP_API_URL}/api/v1/fridges`
+                urlString = `http://192.168.1.24:4000/api/v1/fridges`
             }
 
             const response = await axios.get(urlString, config);
@@ -38,6 +38,7 @@ export const getFridges = createAsyncThunk(
             return response.data;
 
         } catch (error) {
+            console.log("Error: ", error)
             return thunkAPI.rejectWithValue(error.message);
         }
     }
@@ -64,7 +65,7 @@ export const addFridges = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/fridges`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/fridges`, req, config)
 
             return response.data;
 
@@ -95,7 +96,7 @@ export const updateFridge = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/fridge/${req.id}`, req, config)
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/fridge/${req.id}`, req, config)
             console.log(response)
             return response.data;
 
@@ -126,7 +127,7 @@ export const deleteFridges = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/fridge/${id}`, config)
+            const response = await axios.delete(`http://192.168.1.24:4000/api/v1/fridge/${id}`, config)
 
             return response.data;
 
@@ -158,7 +159,7 @@ export const getFridgeDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/fridge/${id}`, config)
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/fridge/${id}`, config)
             console.log("Response: ", response.data)
             return response.data;
 

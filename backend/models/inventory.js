@@ -18,7 +18,7 @@ const inventorySchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["Unavailable", "Pending", "Available"],
+    enum: ["Unavailable", "Pending", "Available", "Reserved"],
     default: "Available",
     required: true,
   },

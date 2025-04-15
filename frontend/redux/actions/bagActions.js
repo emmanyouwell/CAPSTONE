@@ -21,7 +21,7 @@ export const createBag = createAsyncThunk(
         };
 
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/bag`;
+            let urlString = `http://192.168.1.24:4000/api/v1/bag`;
            
 
             const response = await axios.post(urlString, req, config);
@@ -51,7 +51,7 @@ export const getBags = createAsyncThunk(
         };
 
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/bag/donor/${req}`;
+            let urlString = `http://192.168.1.24:4000/api/v1/bag/donor/${req}`;
            
 
             const response = await axios.get(urlString, config);
@@ -81,7 +81,7 @@ export const getSingleBag = createAsyncThunk(
         };
 
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/bag/${req}`;
+            let urlString = `http://192.168.1.24:4000/api/v1/bag/${req}`;
            
 
             const response = await axios.get(urlString, config);
@@ -112,7 +112,7 @@ export const updateBag = createAsyncThunk(
         };
 
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/bag/${req.id}`;
+            let urlString = `http://192.168.1.24:4000/api/v1/bag/${req.id}`;
            
 
             const response = await axios.put(urlString, req, config);
@@ -143,7 +143,7 @@ export const deleteBag = createAsyncThunk(
         };
 
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/bag/${req}`;
+            let urlString = `http://192.168.1.24:4000/api/v1/bag/${req}`;
            
 
             const response = await axios.delete(urlString, config);
@@ -175,9 +175,39 @@ export const getAllBags = createAsyncThunk(
         };
 
         try {
-            const urlString = `${REACT_APP_API_URL}/api/v1/bags`;
+            const urlString = `http://192.168.1.24:4000/api/v1/bags`;
 
             const response = await axios.get(urlString, config);
+
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+);
+
+
+export const updateTemp = createAsyncThunk(
+    'bag/updateTemp',
+    async (req, thunkAPI) => {
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        };
+
+        try {
+            let urlString = `http://192.168.1.24:4000/api/v1/bag/${req.id}`;
+           
+            const response = await axios.post(urlString, req, config);
 
             return response.data;
         } catch (error) {

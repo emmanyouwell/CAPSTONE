@@ -23,7 +23,7 @@ export const getEvents = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/events`, config)
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/events`, config)
             
             return response.data;
 
@@ -56,7 +56,7 @@ export const addEvents = createAsyncThunk(
         try {
 
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/events`, req, config)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/events`, req, config)
 
             return response.data;
 
@@ -86,7 +86,7 @@ export const editEvents = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/event/${req.id}`, req, config)
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/event/${req.id}`, req, config)
 
             return response.data;
 
@@ -116,7 +116,7 @@ export const deleteEvents = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/event/${id}`, config)
+            const response = await axios.delete(`http://192.168.1.24:4000/api/v1/event/${id}`, config)
 
             return response.data;
 
@@ -147,7 +147,7 @@ export const getEventDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/event/${id}`, config)
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/event/${id}`, config)
             
             return response.data;
 

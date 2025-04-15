@@ -18,18 +18,18 @@ import Header from "../../../../components/Superadmin/Header";
 import { logoutUser } from "../../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../../styles/Styles";
 import { getFridges } from "../../../../redux/actions/fridgeActions";
+import { addInventory } from "../../../../redux/actions/inventoryActions";
 
 const AddMilkInventory = ({ route, navigation }) => {
   const fridge = route.params.selectedBags
     ? { fridgeType: "Pasteurized" }
     : route.params;
 
-  const items = route.params.selectedBags ? route.params.selectedBags : [];
-
+  const items = route.params.selectedBags ? route.params.selectedBags : []; 
   const totalVolume = items.reduce((total, item) => {
     return total + (Number(item.volume) || 0);
   }, 0);
-  //   console.log("Items: ", items);
+
   const dispatch = useDispatch();
   const [bottleType, setBottleType] = useState(null);
   const [formData, setFormData] = useState(() => ({}));
@@ -42,8 +42,7 @@ const AddMilkInventory = ({ route, navigation }) => {
   const [fridgeItems, setFridgeItems] = useState([]);
 
   const [donors, setDonors] = useState([]);
-  const [showPasteurizationDatePicker, setShowPasteurizationDatePicker] =
-    useState(false);
+  const [showPasteurizationDatePicker, setShowPasteurizationDatePicker] = useState(false);
 
   useEffect(() => {
     dispatch(getFridges());
@@ -139,6 +138,11 @@ const AddMilkInventory = ({ route, navigation }) => {
         return;
       }
 
+      if (bottleQty > 20) {
+        Alert.alert("Error", "Maximum of 20 bottle quantity");
+        return;
+      }
+
       newData.pasteurizedDetails = {
         pasteurizationDate,
         batch,
@@ -146,22 +150,14 @@ const AddMilkInventory = ({ route, navigation }) => {
         bottleQty,
         bottleType,
         donors: donors,
+        items: items,
       };
-
+      console.log(newData);
       try {
-        // dispatch(addInventory(newData));
-        console.log(newData);
+        dispatch(addInventory(newData));
         Alert.alert("Success", "Inventory has been added successfully.");
 
-        // if (items && items.length > 0) {
-        //     for (const item of items) {
-        //         const updatedItem = { ...item, status: "Unavailable", id: item._id };
-        //         dispatch(updateInventory(updatedItem));
-        //         console.log(`Updated item ${item._id} to Unavailable`);
-        //     }
-        // }
-
-        // navigation.goBack();
+        navigation.goBack();
       } catch (error) {
         Alert.alert(
           "Error",

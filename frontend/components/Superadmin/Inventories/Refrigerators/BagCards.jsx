@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Button,
+  Alert,
   RefreshControl,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,10 +23,13 @@ import { SuperAdmin } from "../../../../styles/Styles";
 import { dataTableStyle } from "../../../../styles/Styles";
 
 const BagCards = ({ route }) => {
-  const { item } = route.params;
+  const { item, fridge } = route.params;
+  const items = route.params.selectedItems ? route.params.selectedItems : [];
+  const volLimit = route.params ? route.params.volLimit : 0;
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
+  const [totalVolume, setTotalVolume] = useState(0);
+  const [limit, setLimit] = useState(0);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -35,7 +39,6 @@ const BagCards = ({ route }) => {
   const { scheduleDetails } = useSelector((state) => state.schedules);
 
   useEffect(() => {
-    dispatch(getAllBags())
     if (item.pubDetails) {
       dispatch(getLettingDetails(item.pubDetails._id));
     } else if (item.privDetails) {
@@ -43,14 +46,50 @@ const BagCards = ({ route }) => {
     }
   }, [dispatch, item]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      return () => {
-        dispatch(resetLettingDetails());
-        dispatch(resetScheduleDetails());
-      };
-    }, [dispatch])
-  );
+  useEffect(() => {
+    if (items.length > 0) {
+      setSelectedItems([...items]);
+      setSelectionMode(true);
+    }
+    if (volLimit) {
+      setLimit(volLimit);
+    }
+  }, [items, volLimit]);
+
+  useEffect(() => {
+    const selectedBags = allBags.filter((bag) =>
+      selectedItems.includes(bag._id)
+    );
+    const totals = selectedBags.reduce(
+      (total, item) => total + (Number(item.volume) || 0),
+      0
+    );
+    setTotalVolume(totals);
+  }, [selectedItems, allBags]);
+
+  const alertBelowLimit = (volume) => {
+    Alert.alert(
+      "Milk volume not met!",
+      `The total milk volume needed to pasteurize is not yet reached. Please select more milk bags!`,
+    );
+  };
+
+  const handleToggleVolume = (vol) => {
+    setLimit(Number(vol));
+    toggleSelectionMode();
+  };
+
+  const showToggleSelectionOption = () => {
+    Alert.alert(
+      "2000ml or 4000ml",
+      "How many milk (ml) do you want to pasteurize?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "2000", onPress: () => handleToggleVolume(2000) },
+        { text: "4000", onPress: () => handleToggleVolume(4000) },
+      ]
+    );
+  };
 
   const toggleSelectionMode = () => {
     setSelectionMode(!selectionMode);
@@ -68,6 +107,7 @@ const BagCards = ({ route }) => {
   const handleRefresh = () => {
     setRefreshing(true);
     dispatch(getAllBags());
+    setTotalVolume(0);
     if (item.pubDetails) {
       dispatch(getLettingDetails(item.pubDetails._id))
         .then(() => setRefreshing(false))
@@ -80,10 +120,16 @@ const BagCards = ({ route }) => {
   };
 
   const handleNavigate = () => {
+    if(totalVolume < limit){
+      alertBelowLimit(totalVolume)
+      return
+    };
     const selectedBags = allBags.filter((bag) =>
       selectedItems.includes(bag._id)
     );
-    navigation.navigate("AddMilkInventory", { selectedBags });
+    navigation.navigate("AddMilkInventory", {
+      selectedBags,
+    });
   };
 
   const onLogoutPress = () => {
@@ -93,6 +139,16 @@ const BagCards = ({ route }) => {
       })
       .catch((err) => console.log(err));
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        dispatch(resetLettingDetails());
+        dispatch(resetScheduleDetails());
+        setLimit(0);
+      };
+    }, [dispatch])
+  );
 
   if (loading) {
     return (
@@ -110,28 +166,33 @@ const BagCards = ({ route }) => {
     );
   }
 
-  const renderCard = (bags, donor) => {
+  const renderSchedCard = (bags, donor, id) => {
     return (
-      <View>
+      <View key={id}>
         {bags.map((bag) => {
           const isSelected = selectedItems.includes(bag._id);
-  
+          const isPasteurized = bag.status === "Pasteurized";
+
           return (
             <TouchableOpacity
-              style={[styles.card, isSelected && styles.selectedCard]}
               key={bag._id}
+              style={[
+                styles.card,
+                isSelected && styles.selectedCard,
+                isPasteurized && styles.disabledCard,
+              ]}
               onLongPress={() => {
-                toggleSelectionMode();
+                if (!isPasteurized) showToggleSelectionOption();
               }}
               onPress={() => {
-                if (selectionMode) {
+                if (!isPasteurized && selectionMode) {
                   toggleSelectItem(bag._id);
                 }
               }}
+              disabled={isPasteurized || totalVolume === limit}
             >
-              <Text style={styles.cardTitle}>
-                Date: {formatDate(bag.expressDate)}
-              </Text>
+              <Text style={styles.cardTitle}>Status: {bag.status}</Text>
+              <Text>Date: {formatDate(bag.expressDate)}</Text>
               <Text>Volume: {bag.volume} mL</Text>
               <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
             </TouchableOpacity>
@@ -140,7 +201,71 @@ const BagCards = ({ route }) => {
       </View>
     );
   };
-  
+
+  const renderLettingCard = (addBags, bags, donor, id) => {
+    return (
+      <View key={id}>
+        {bags.map((bag) => {
+          const isSelected = selectedItems.includes(bag._id);
+          const isPasteurized = bag.status === "Pasteurized";
+
+          return (
+            <TouchableOpacity
+              key={bag._id}
+              style={[
+                styles.card,
+                isSelected && styles.selectedCard,
+                isPasteurized && styles.disabledCard,
+              ]}
+              onLongPress={() => {
+                if (!isPasteurized) showToggleSelectionOption();
+              }}
+              onPress={() => {
+                if (!isPasteurized && selectionMode) {
+                  toggleSelectItem(bag._id);
+                }
+              }}
+              disabled={isPasteurized}
+            >
+              <Text style={styles.cardTitle}>Status: {bag.status}</Text>
+              <Text>Date: {formatDate(bag.expressDate)}</Text>
+              <Text>Volume: {bag.volume} mL</Text>
+              <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
+            </TouchableOpacity>
+          );
+        })}
+        {addBags?.map((bag) => {
+          const isSelected = selectedItems.includes(bag._id);
+          const isPasteurized = bag.status === "Pasteurized";
+
+          return (
+            <TouchableOpacity
+              key={bag._id}
+              style={[
+                styles.card,
+                isSelected && styles.selectedCard,
+                isPasteurized && styles.disabledCard,
+              ]}
+              onLongPress={() => {
+                if (!isPasteurized) showToggleSelectionOption();
+              }}
+              onPress={() => {
+                if (!isPasteurized && selectionMode) {
+                  toggleSelectItem(bag._id);
+                }
+              }}
+              disabled={isPasteurized}
+            >
+              <Text style={styles.cardTitle}>Status: {bag.status}</Text>
+              <Text>Date: {formatDate(bag.expressDate)}</Text>
+              <Text>Volume: {bag.volume} mL</Text>
+              <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
+  };
 
   return (
     <View style={SuperAdmin.container}>
@@ -156,11 +281,16 @@ const BagCards = ({ route }) => {
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         >
-          {lettingDetails?.attendance?.map((attendee) =>
-            renderCard(attendee.bags, attendee.donor)
-          )}
+          {lettingDetails?.attendance?.map((attendee) => {
+            return renderLettingCard(
+              attendee?.additionalBags,
+              attendee.bags,
+              attendee.donor,
+              attendee._id
+            );
+          })}
           {scheduleDetails?.donorDetails?.bags &&
-            renderCard(
+            renderSchedCard(
               scheduleDetails.donorDetails.bags,
               scheduleDetails.donorDetails.donorId
             )}
@@ -168,16 +298,34 @@ const BagCards = ({ route }) => {
       </View>
       {selectionMode && (
         <View style={styles.selectionFooter}>
-          <Button
-            title="Cancel"
-            onPress={toggleSelectionMode}
-            color="#FF3B30"
-          />
-          <Button
-            title={`Next (${selectedItems.length} Selected)`}
-            onPress={handleNavigate}
-            disabled={selectedItems.length === 0}
-          />
+          <View style={styles.footerDetails}>
+            <Text style={styles.footerText}>
+              Total Volume to Pasteur: {totalVolume}/{limit} mL
+            </Text>
+          </View>
+          <View style={styles.footerButtons}>
+            <Button
+              title="Cancel"
+              onPress={toggleSelectionMode}
+              color="#FF3B30"
+            />
+            <Button
+              title="Back"
+              onPress={() =>
+                navigation.navigate("InventoryCards", {
+                  selectedItems: selectedItems,
+                  fridge: fridge,
+                  volLimit: limit,
+                })
+              }
+              color="#E53777"
+            />
+            <Button
+              title={`Next (${selectedItems.length} Selected)`}
+              onPress={handleNavigate}
+              disabled={selectedItems.length === 0}
+            />
+          </View>
         </View>
       )}
     </View>
@@ -209,30 +357,50 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: "#f9f9f9",
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: "#f0f8ff",
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
   selectedCard: {
-    backgroundColor: "#D1E7FF",
+    borderColor: "#4CAF50",
+    backgroundColor: "#e8f5e9",
+  },
+  disabledCard: {
+    backgroundColor: "#e0e0e0",
+    borderColor: "#9e9e9e",
+    opacity: 0.6,
   },
   cardTitle: {
-    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
+    fontSize: 16,
   },
   selectionFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
+    backgroundColor: "#f5f5f5",
     padding: 16,
-    borderTopWidth: 1,
-    borderColor: "#ccc",
+    borderTopWidth: 2,
+    borderColor: "#007AFF",
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  footerDetails: {
+    paddingVertical: 8,
+    alignItems: "center",
+    backgroundColor: "#e3f2fd",
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  footerText: {
+    fontWeight: "bold",
+    fontSize: 16,
+    color: "#007AFF",
+  },
+  footerButtons: {
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
 });
 

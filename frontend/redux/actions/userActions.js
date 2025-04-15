@@ -15,14 +15,14 @@ export const loginUser = createAsyncThunk(
       withCredentials: true
     };
     try {
-      console.log(`${REACT_APP_API_URL}/api/v1/login`);
-      let url = `${REACT_APP_API_URL}/api/v1/login`;
+      let url = `http://192.168.1.24:4000/api/v1/login`;
       if (isEmp) {
-        url = `${REACT_APP_API_URL}/api/v1/login/?emp=true`;
+        url = `http://192.168.1.24:4000/api/v1/login/?emp=true`;
       }
+      console.log("Login url: ", url);
       const response = await axios.post(url, credentials, config);
 
-      await authenticate(response.data, () => { });
+      await authenticate(response.data, () => { });``
       return response.data;
 
     } catch (error) {
@@ -37,7 +37,7 @@ export const logoutUser = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await axios.get(
-        `${REACT_APP_API_URL}/api/v1/logout`,
+        `http://192.168.1.24:4000/api/v1/logout`,
         {},
         {
           headers: {
@@ -76,7 +76,7 @@ export const getUserDetails = createAsyncThunk(
     try {
       console.log("Getting user details");
       const response = await axios.get(
-        `${REACT_APP_API_URL}/api/v1/me`,
+        `http://192.168.1.24:4000/api/v1/me`,
         config
       );
 
@@ -93,7 +93,7 @@ export const registerUser = createAsyncThunk(
   'user/registerUser',
 
   async (userData, thunkAPI) => {
-    console.log("Registering User");
+    console.log("Registering User: ", userData);
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export const registerUser = createAsyncThunk(
     };
     try {
 
-      const response = await axios.post(`${REACT_APP_API_URL}/api/v1/register`, userData, config);
+      const response = await axios.post(`http://192.168.1.24:4000/api/v1/register`, userData, config);
       await authenticate(response.data, () => { });
       return response;
 

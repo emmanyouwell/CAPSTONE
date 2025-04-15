@@ -146,3 +146,19 @@ exports.allBags = catchAsyncErrors(async (req, res, next) => {
         allBags
     })
 })
+
+exports.updateTemp = catchAsyncErrors(async (req, res, next) => {
+    const { id } = req.params;
+    const bag = await Bag.findById(id);
+    if (!bag) {
+        return next(new ErrorHandler('Bag not found', 404));
+    }
+
+    bag.temp = req.body.temp;
+    await bag.save()
+
+    res.status(200).json({
+        success: true,
+        bag
+    });
+})

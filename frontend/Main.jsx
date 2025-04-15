@@ -38,6 +38,8 @@ import EditFridge from "./components/Superadmin/Inventories/Refrigerators/EditFr
 import AddMilkInventory from "./components/Superadmin/Inventories/Refrigerators/AddMilkInventory";
 import EditMilkInventory from "./components/Superadmin/Inventories/Refrigerators/EditMilkInventory";
 import BagCards from "./components/Superadmin/Inventories/Refrigerators/BagCards";
+import ConfirmBottleReserve from "./components/Superadmin/Inventories/Refrigerators/ConfirmBottleReserve";
+import StoreCollections from "./components/Superadmin/Inventories/Refrigerators/StoreCollections";
 
 // Milk Letting Screens
 import MilkLetting from "./screens/Superadmin/MilkLetting";
@@ -53,13 +55,22 @@ import AddEquipment from "./components/Superadmin/Inventories/Equipment/AddEquip
 import EditEquipment from "./components/Superadmin/Inventories/Equipment/EditEquipment";
 
 //Request Screens
-import MilkRequest from "./components/Superadmin/Requests/MilkRequest";
+import RequestOpt from "./screens/Superadmin/RequestOpt";
+import RefRequest from "./screens/Superadmin/Inventories/RefRequest";
+import Inpatients from "./components/Superadmin/Requests/Inpatients";
+import Outpatients from "./components/Superadmin/Requests/Outpatients";
 import ConfirmRequest from "./components/Superadmin/Requests/ConfirmRequest";
+import RequestDetails from "./screens/Staff/RequestDetails";
 import AddPatient from "./screens/Staff/AddPatient";
 import AddRequest from "./screens/Staff/AddRequest";
+import Requested from "./screens/Staff/Requested";
+import EditRequest from "./components/Superadmin/Requests/EditRequest";
+import EditStaffRequest from "./components/Staff/EditStaffRequest";
+
+// Articles
 import Articles from "./screens/Superadmin/Articles";
 import AddArticles from "./components/Superadmin/Articles/AddArticles";
-import EditRequest from "./components/Superadmin/Requests/EditRequest";
+
 
 //Charts Screens
 import MilkPerMonth from "./components/Superadmin/Metrics/MilkPerMonth";
@@ -252,22 +263,31 @@ const MainStack = () => {
         <Stack.Screen name="InventoryCards" component={InventoryCards} />
         <Stack.Screen name="PasteurCards" component={PasteurCards} />
         <Stack.Screen name="BagCards" component={BagCards} />
+        <Stack.Screen name="ConfirmBottleReserve" component={ConfirmBottleReserve} />
         <Stack.Screen name="FridgeDetails" component={FridgeDetails} />
         <Stack.Screen name="AddFridge" component={AddFridge} />
         <Stack.Screen name="EditFridge" component={EditFridge} />
         <Stack.Screen name="AddMilkInventory" component={AddMilkInventory} />
         <Stack.Screen name="EditMilkInventory" component={EditMilkInventory} />
+        <Stack.Screen name="StoreCollections" component={StoreCollections} />
 
         <Stack.Screen name="superadmin_equipment" component={Equipment} />
         <Stack.Screen name="AddEquipment" component={AddEquipment} />
         <Stack.Screen name="EditEquipment" component={EditEquipment} />
         {/* {Request Admins Navigation} */}
-        <Stack.Screen name="MilkRequest" component={MilkRequest} />
+        <Stack.Screen name="Inpatients" component={Inpatients} />
+        <Stack.Screen name="Outpatients" component={Outpatients} />
         <Stack.Screen name="ConfirmRequest" component={ConfirmRequest} />
         <Stack.Screen name="EditRequest" component={EditRequest} />
+        <Stack.Screen name="RequestOpt" component={RequestOpt} />
+        <Stack.Screen name="RefRequest" component={RefRequest} />
+        
         {/* {Request Staff Navigation} */}
         <Stack.Screen name="AddPatient" component={AddPatient} />
         <Stack.Screen name="AddRequest" component={AddRequest} />
+        <Stack.Screen name="Requested" component={Requested} />
+        <Stack.Screen name="EditStaffRequest" component={EditStaffRequest} />
+        <Stack.Screen name="RequestDetails" component={RequestDetails} />
 
         {/* {Charts Navigation} */}
         <Stack.Screen name="MilkPerMonth" component={MilkPerMonth} />

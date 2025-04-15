@@ -8,7 +8,10 @@ const {
     updateRequest,
     deleteRequest,
     updateRequestStatus,
-    assignInventoryToRequest,
+    myRequests,
+    updateVolumeRequested,
+    inpatientDispense,
+    outpatientDispense
 } = require('../controllers/requestController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -21,11 +24,19 @@ router.route('/request/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), updateRequest)
     .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), deleteRequest);
 
+router.route('/request/:id/volume')
+    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateVolumeRequested);
+
 router.route('/request-status/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateRequestStatus)
 
-router.route('/assign-inventory/:id')
-    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), assignInventoryToRequest)
+router.route('/staff/:id/requests')
+    .get(isAuthenticatedUser, authorizeRoles('Staff'), myRequests)
 
+router.route('/inpatient-dispense')
+    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), inpatientDispense)
+
+router.route('/outpatient-dispense')
+    .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), outpatientDispense)
 
 module.exports = router;

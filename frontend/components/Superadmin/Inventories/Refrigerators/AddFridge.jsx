@@ -11,7 +11,6 @@ import { SuperAdmin } from '../../../../styles/Styles';
 const AddFridge = () => {
     const dispatch = useDispatch(); 
     const [name, setName] = useState('');
-    const [capacity, setCapacity] = useState('');
     const [fridgeType, setFridgeType] = useState(null);
     const [open, setOpen] = useState(false);
     const [items, setItems] = useState([
@@ -32,7 +31,7 @@ const AddFridge = () => {
     };
 
     const handleSubmit = () => {
-        if (!name || !fridgeType || !capacity) {
+        if (!name || !fridgeType ) {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
         }
@@ -40,7 +39,6 @@ const AddFridge = () => {
         const newFridge = {
             name,
             fridgeType,
-            capacity: parseInt(capacity, 10),
         };
 
         dispatch(addFridges(newFridge))
@@ -48,7 +46,6 @@ const AddFridge = () => {
                 Alert.alert('Success', `Fridge "${name}" has been added successfully.`);
                 setName(''); 
                 setFridgeType(null);
-                setCapacity('');
             })
             .catch((error) => {
                 Alert.alert('Error', 'Failed to add fridge. Please try again.');
@@ -84,15 +81,6 @@ const AddFridge = () => {
                         dropDownContainerStyle={styles.dropdownContainer}
                     />
                 </View>
-
-                {/* Capacity Input */}
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter capacity in mL"
-                    value={capacity}
-                    onChangeText={setCapacity}
-                    keyboardType="numeric"
-                />
 
                 {/* Submit Button */}
                 <TouchableOpacity style={styles.button} onPress={handleSubmit}>

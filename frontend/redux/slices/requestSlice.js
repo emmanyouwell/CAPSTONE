@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { addRequest, getRequests, getRequestDetails, updateRequest, deleteRequest } from '../actions/requestActions';
+import { addRequest, getRequests, getRequestDetails, updateRequest, deleteRequest, getStaffRequests, updateVolumeRequested, inpatientDispense, outpatientDispense } from '../actions/requestActions';
 
 export const requestSlice = createSlice({
   name: 'request',
@@ -11,8 +11,16 @@ export const requestSlice = createSlice({
     requestDetails: {},
     isUpdated: false,
     isDeleted: false,
+    message: null,
   },
   reducers: {
+    resetRequestDetails: (state) => {
+      state.requestDetails = {};
+    },
+    resetMessage: (state) => {
+      state.message = null;
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -77,9 +85,58 @@ export const requestSlice = createSlice({
       .addCase(deleteRequest.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      
+      .addCase(getStaffRequests.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getStaffRequests.fulfilled, (state, action) => {
+        state.loading = false;
+        state.request = action.payload.requests;
+        state.count = action.payload.count;
+      })
+      .addCase(getStaffRequests.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
+      })
+
+      .addCase(updateVolumeRequested.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updateVolumeRequested.fulfilled, (state, action) => {
+        state.loading = false;
+        state.requestDetails = action.payload.request;
+      })
+      .addCase(updateVolumeRequested.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
+      })
+      
+      .addCase(inpatientDispense.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(inpatientDispense.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(inpatientDispense.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
+      })
+      
+      .addCase(outpatientDispense.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(outpatientDispense.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(outpatientDispense.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
       });
       
   },
 });
-
+export const { resetRequestDetails, resetMessage } = requestSlice.actions;
 export default requestSlice.reducer;

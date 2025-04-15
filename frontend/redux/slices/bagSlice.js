@@ -1,17 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  getDonors,
-  getMilkPerMonth,
-  updateDonor,
-  getDonorsPerMonth,
-} from "../actions/donorActions";
-import {
   createBag,
   deleteBag,
   getAllBags,
   getBags,
   getSingleBag,
   updateBag,
+  updateTemp,
 } from "../actions/bagActions";
 export const bagSlice = createSlice({
   name: "donor",
@@ -23,6 +18,7 @@ export const bagSlice = createSlice({
     totalVolume: 0,
     totalBags: 0,
     totalPages: 0,
+    tempUpdated: false,
     oldestExpressDate: null,
     latestExpressDate: null,
     isUpdated: false,
@@ -99,6 +95,17 @@ export const bagSlice = createSlice({
         state.allBags = action.payload.allBags;
       })
       .addCase(getAllBags.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateTemp.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateTemp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tempUpdated = action.payload.success;
+      })
+      .addCase(updateTemp.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
