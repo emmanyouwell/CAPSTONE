@@ -105,9 +105,6 @@ const Attendance = ({ route, navigation }) => {
     });
   };
 
-  const handleNewDonor = () => setStep(2);
-
-  const handlePastDonor = () => setStep(3);
   const handleEligibility = (eligible) => (eligible ? setStep(4) : setStep(1));
 
   const handleNewRecord = () => {
@@ -137,7 +134,7 @@ const Attendance = ({ route, navigation }) => {
     dispatch(newPublicDonor(data))
       .then(() => {
         Alert.alert("Success", "Data Saved");
-        setStep(3);
+        setStep(7);
       })
       .catch((err) => Alert.alert("Error", err.message));
   };
@@ -175,11 +172,11 @@ const Attendance = ({ route, navigation }) => {
       });
   };
 
-  const handleDateChange = (event, selectedDate, field) => {
-    const date = selectedDate || form[field];
-    setForm({ ...form, [field]: date.toISOString().split("T")[0] });
-    if (field === 'birthday') setShowBirthday(false);
-  };
+  // const handleDateChange = (event, selectedDate, field) => {
+  //   const date = selectedDate || form[field];
+  //   setForm({ ...form, [field]: date.toISOString().split("T")[0] });
+  //   if (field === "birthday") setShowBirthday(false);
+  // };
 
   const onMenuPress = () => {
     navigation.openDrawer();
@@ -191,6 +188,34 @@ const Attendance = ({ route, navigation }) => {
         navigation.replace("login");
       })
       .catch((err) => console.log(err));
+  };
+
+  const handleDateChange = (event, date, field) => {
+    if (date) {
+      const formattedDate = date.toISOString().split("T")[0];
+      setForm((prevForm) => ({
+        ...prevForm,
+        [field]: formattedDate,
+        age: calculateAge(date),
+      }));
+      setShowBirthday(false);
+    }
+  };
+
+  const calculateAge = (birthDate) => {
+    const today = new Date();
+    const birth = new Date(birthDate);
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birth.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
   };
 
   const renderFormFields = () => {
@@ -213,12 +238,6 @@ const Attendance = ({ route, navigation }) => {
             placeholder="Last Name"
             onChangeText={(value) => setForm({ ...form, last_name: value })}
           />
-          <TextInput
-            style={styles.input}
-            placeholder="Age"
-            keyboardType="numeric"
-            onChangeText={(value) => setForm({ ...form, age: Number(value) })}
-          />
           <Text style={styles.subTitle}>Birthday</Text>
           <TouchableOpacity
             onPress={() => setShowBirthday(true)}
@@ -233,9 +252,18 @@ const Attendance = ({ route, navigation }) => {
               value={new Date()}
               mode="date"
               display="default"
-              onChange={(event, date) => handleDateChange(event, date, 'birthday')}
+              onChange={(event, date) =>
+                handleDateChange(event, date, "birthday")
+              }
             />
           )}
+          <TextInput
+            style={styles.input}
+            placeholder="Age"
+            keyboardType="numeric"
+            value={form.age ? String(form.age) : ""}
+            editable={false}
+          />
         </View>
 
         <View style={styles.section}>
@@ -348,7 +376,7 @@ const Attendance = ({ route, navigation }) => {
               style={styles.button}
               onPress={() => {
                 setDonorType("New Donor");
-                handleNewDonor();
+                setStep(2);
               }}
             >
               <Text style={styles.buttonText}>New Donor</Text>
@@ -358,7 +386,7 @@ const Attendance = ({ route, navigation }) => {
               style={styles.button}
               onPress={() => {
                 setDonorType("Old Donor");
-                handlePastDonor();
+                setStep(3);
               }}
             >
               <Text style={styles.buttonText}>Old Donor</Text>
@@ -366,7 +394,35 @@ const Attendance = ({ route, navigation }) => {
           </View>
         )}
 
-        {step === 2 && renderFormFields()}
+        {step === 2 && (
+          <View style={styles.navButtons}>
+            <Text style={styles.title}>Filled the form?</Text>
+            <TouchableOpacity style={styles.button} onPress={() => setStep(3)}>
+              <Text style={styles.buttonText}>Yes</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.button} onPress={() => setStep(6)}>
+              <Text style={styles.buttonText}>No</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {step === 7 && (
+          <View style={styles.navButtons}>
+            <Text style={styles.title}>
+              Want to continue or new attendance?
+            </Text>
+            <TouchableOpacity style={styles.button} onPress={() => setStep(3)}>
+              <Text style={styles.buttonText}>Continue</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.button} onPress={() => setStep(1)}>
+              <Text style={styles.buttonText}>New Attendance</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {step === 6 && renderFormFields()}
 
         {step === 3 && (
           <View style={styles.navButtons}>
@@ -407,15 +463,16 @@ const Attendance = ({ route, navigation }) => {
                 <Text style={styles.subTitle}>Last Breast Milk Donation:</Text>
                 <TouchableOpacity
                   onPress={() => setLastDonationOpen(true)}
-                  style={{...styles.input, flex: 1, justifyContent: "center"}}
+                  style={{ ...styles.input, flex: 1, justifyContent: "center" }}
                 >
                   <Text>
-                    {selectedDate ? selectedDate.toLocaleString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      
-                    }) : "Select Express Date"}
+                    {selectedDate
+                      ? selectedDate.toLocaleString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "Select Express Date"}
                   </Text>
                 </TouchableOpacity>
 
@@ -428,7 +485,6 @@ const Attendance = ({ route, navigation }) => {
                   onConfirm={(date) => {
                     setOpen(false);
                     setSelectedDate(date);
-                    
                   }}
                   onCancel={() => setLastDonationOpen(false)}
                 />
@@ -482,7 +538,9 @@ const Attendance = ({ route, navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate("FinalizeLetting", { item: item })}
+              onPress={() =>
+                navigation.navigate("FinalizeLetting", { item: item })
+              }
             >
               <Text style={styles.buttonText}>No</Text>
             </TouchableOpacity>

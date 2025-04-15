@@ -38,17 +38,17 @@ exports.recordPublicDonation = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("No matching donors found for this event."));
     }
 
-    res.status(200).json({
-      success: true,
-      message: "Donation recorded successfully",
-      updatedDonors: result.modifiedCount,
-    });
-  } catch (error) {
-    res.status(500).json({
-      error: "Failed to record donation",
-      details: error.message,
-    });
-  }
+        res.status(200).json({ 
+            success: true, 
+            message: 'Donation recorded successfully',
+            updatedDonors: result.modifiedCount
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            error: 'Failed to record donation', 
+            details: error.message 
+        });
+    }
 });
 
 // Record Private Donation after Schedule Approval

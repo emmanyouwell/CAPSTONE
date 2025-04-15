@@ -14,6 +14,7 @@ const {
     getUpcomingLettings,
     newPublicDonorTally,
     updateAttendance,
+    checkLettingBagStatus,
 } = require('../controllers/lettingController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -40,7 +41,6 @@ router.route('/mark-attendance')
 // Route to finalize the Milk Letting Session
 router.route('/finalize-session')
     .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), finalizeSession);
-
 router.route('/letting-newDonor')
     .post(isAuthenticatedUser, newPublicDonor);
 router.route('/tally/newDonor')

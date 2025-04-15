@@ -1,8 +1,16 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { addInventory, deleteInventory, getInventories, getInventoryDetails, updateInventory } from '../actions/inventoryActions';
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  addInventory,
+  checkInventories,
+  deleteInventory,
+  getInventories,
+  getInventoryDetails,
+  reserveInventory,
+  updateInventory,
+} from "../actions/inventoryActions";
 
 export const inventorySlice = createSlice({
-  name: 'inventory',
+  name: "inventory",
   initialState: {
     inventory: [],
     loading: false, // Useful for async actions like login/signup
@@ -11,12 +19,17 @@ export const inventorySlice = createSlice({
     inventoryDetails: {},
     isUpdated: false,
     isDeleted: false,
+    reserveMessage: "",
+    message: "",
   },
   reducers: {
+    resetInventory: (state) => {
+      state.inventory = [];
+    },
   },
   extraReducers: (builder) => {
     builder
-      
+
       .addCase(getInventories.pending, (state, action) => {
         state.loading = true;
       })
@@ -28,7 +41,7 @@ export const inventorySlice = createSlice({
       })
       .addCase(getInventories.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; 
+        state.error = action.payload;
       })
 
       .addCase(addInventory.pending, (state, action) => {
@@ -43,7 +56,7 @@ export const inventorySlice = createSlice({
         state.error = action.payload;
       })
 
-       .addCase(updateInventory.pending, (state, action) => {
+      .addCase(updateInventory.pending, (state, action) => {
         state.loading = true;
       })
       .addCase(updateInventory.fulfilled, (state, action) => {
@@ -64,7 +77,7 @@ export const inventorySlice = createSlice({
       })
       .addCase(getInventoryDetails.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload
+        state.error = action.payload;
       })
 
       .addCase(deleteInventory.pending, (state, action) => {
@@ -77,9 +90,33 @@ export const inventorySlice = createSlice({
       .addCase(deleteInventory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
       
+      .addCase(checkInventories.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(checkInventories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(checkInventories.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(reserveInventory.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(reserveInventory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.reserveMessage = action.payload.message;
+      })
+      .addCase(reserveInventory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 
+export const { resetInventory } = inventorySlice.actions;
 export default inventorySlice.reducer;

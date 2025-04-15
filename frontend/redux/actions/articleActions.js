@@ -20,10 +20,10 @@ export const getArticles = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `${REACT_APP_API_URL}/api/v1/articles?search=${query}`
+                urlString = `http://192.168.1.24:4000/api/v1/articles?search=${query}`
             }
             else {
-                urlString = `${REACT_APP_API_URL}/api/v1/articles`
+                urlString = `http://192.168.1.24:4000/api/v1/articles`
             }
             const response = await axios.get(urlString, config);
             console.log("Response", response.data)
@@ -52,8 +52,8 @@ export const addArticles = createAsyncThunk(
         }
         try {
             console.log("sending request");
-            console.log(`${REACT_APP_API_URL}/api/v1/articles`)
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/articles`, req, config);
+            console.log(`http://192.168.1.24:4000/api/v1/articles`)
+            const response = await axios.post(`http://192.168.1.24:4000/api/v1/articles`, req, config);
             console.log("response: ", response);
             return response.data;
         }catch (error){
@@ -77,7 +77,7 @@ export const updateArticle = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/article/${req.id}`, req, config);
+            const response = await axios.put(`http://192.168.1.24:4000/api/v1/article/${req.id}`, req, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
@@ -100,7 +100,7 @@ export const deleteArticle = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/article/${id}`, config);
+            const response = await axios.delete(`http://192.168.1.24:4000/api/v1/article/${id}`, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
@@ -123,7 +123,7 @@ export const getArticleDetails = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/article/${id}`, config);
+            const response = await axios.get(`http://192.168.1.24:4000/api/v1/article/${id}`, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);

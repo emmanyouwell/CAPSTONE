@@ -9,7 +9,8 @@ const {
     deleteSchedule,
     requestSchedule,
     approveSchedule,
-    getDonorSchedules
+    getDonorSchedules,
+    checkScheduleBagStatus
 } = require('../controllers/scheduleController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -24,7 +25,6 @@ router.route('/schedule/:id')
 
 router.route('/me/schedules/:id')
     .get(isAuthenticatedUser, getDonorSchedules);
-
 
 // Route to request a pickup schedule
 router.route('/request-schedule')

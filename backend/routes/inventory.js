@@ -10,6 +10,7 @@ const {
     updateInventoryStatus,
     reserveInventoryForRequest,
     returnBagsFromFridge,
+    updateAllInventoriesStatus,
 } = require('../controllers/inventoryController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -25,6 +26,8 @@ router.route('/inventory/:id')
 
 router.route('/inventory-status/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateInventoryStatus)
+
+router.route('/check-inventories').put(updateAllInventoriesStatus)
 
 router.route('/reserved-bottle/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), reserveInventoryForRequest)

@@ -3,7 +3,7 @@ const router = express.Router();
 
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
-const { createBag, getDonorBags, getSingleBag, updateBag, deleteBag, allBags } = require('../controllers/bagController');
+const { createBag, getDonorBags, getSingleBag, updateBag, deleteBag, allBags, updateTemp } = require('../controllers/bagController');
 
 // Super Admin Routes
 router.route('/bag')
@@ -18,6 +18,7 @@ router.route('/bag/:id')
     .get(isAuthenticatedUser, getSingleBag)
     .put(isAuthenticatedUser, updateBag)
     .delete(isAuthenticatedUser, deleteBag)
+    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin, Admin'), updateTemp)
 //     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateInventory)
 //     .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), deleteInventory);
 
