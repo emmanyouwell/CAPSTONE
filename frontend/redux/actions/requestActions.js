@@ -24,10 +24,10 @@ export const getRequests = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `http://192.168.1.24:4000/api/v1/requests?search=${query}`
+                urlString = `${REACT_APP_API_URL}/api/v1/requests?search=${query}`
             }
             else {
-                urlString = `http://192.168.1.24:4000/api/v1/requests`
+                urlString = `${REACT_APP_API_URL}/api/v1/requests`
             }
             
             const response = await axios.get(urlString, config);
@@ -60,7 +60,7 @@ export const addRequest = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`http://192.168.1.24:4000/api/v1/requests`, req, config)
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/requests`, req, config)
  
             return response.data;
 
@@ -91,7 +91,7 @@ export const updateRequest = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`http://192.168.1.24:4000/api/v1/request/${req.id}`, req, config)
+            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/request/${req.id}`, req, config)
 
             return response.data;
 
@@ -122,7 +122,7 @@ export const deleteRequest = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`http://192.168.1.24:4000/api/v1/request/${id}`, config)
+            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/request/${id}`, config)
 
             return response.data;
 
@@ -154,7 +154,7 @@ export const getRequestDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`http://192.168.1.24:4000/api/v1/request/${id}`, config)
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/request/${id}`, config)
             console.log("Response: ", response.data)
             return response.data;
 
@@ -186,7 +186,7 @@ export const getStaffRequests = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`http://192.168.1.24:4000/api/v1/staff/${id}/requests`, config)
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/staff/${id}/requests`, config)
             console.log("Response: ", response.data)
             return response.data;
 
@@ -216,7 +216,7 @@ export const updateVolumeRequested = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`http://192.168.1.24:4000/api/v1/request/${req.id}/volume`, req, config)
+            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/request/${req.id}/volume`, req, config)
 
             return response.data;
 
@@ -246,7 +246,7 @@ export const inpatientDispense = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`http://192.168.1.24:4000/api/v1/inpatient-dispense`, req, config)
+            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/inpatient-dispense`, req, config)
 
             return response.data;
 
@@ -275,7 +275,7 @@ export const outpatientDispense = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`http://192.168.1.24:4000/api/v1/outpatient-dispense`, req, config)
+            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/outpatient-dispense`, req, config)
 
             return response.data;
 
