@@ -5,13 +5,13 @@ import { SuperAdmin, metricsStyle, colors } from '../../styles/Styles'
 import Cards from '../../components/Superadmin/Metrics/Cards';
 import { logoutUser } from '../../redux/actions/userActions';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMilkPerMonth, getDonorsPerMonth } from '../../redux/actions/donorActions';
+import { getMilkPerMonth, getDonorsPerMonth } from '../../redux/actions/metricActions';
 
 const Metrics = ({navigation}) => {
     const dispatch = useDispatch();
     const [refreshing, setRefreshing] = useState(false);
 
-    const { stats, loading, error, monthlyDonors } = useSelector((state) => state.donors);
+    const { stats, loading, error, monthlyDonors } = useSelector((state) => state.metrics);
     
     useEffect(() => {
         dispatch(getMilkPerMonth());
@@ -62,6 +62,7 @@ const Metrics = ({navigation}) => {
 
     const handleRefresh = () => {
         setRefreshing(true);
+        dispatch(getDonorsPerMonth())
         dispatch(getMilkPerMonth())
             .then(() => setRefreshing(false))
             .catch(() => setRefreshing(false));

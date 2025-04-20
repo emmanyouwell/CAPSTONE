@@ -246,7 +246,7 @@ export const cardStyle = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
-    
+    color: colors.color1_dark
   },
   textWrap: {
     width: 100,
