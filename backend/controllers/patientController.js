@@ -77,6 +77,12 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
     });
 
     console.log("data: ", data);
+    const home_address = {
+        street: data.street,
+        brgy: data.brgy,
+        city: data.city
+    }
+    console.log("home_address: ", home_address);
     // const patient = await Patient.create(req.body);
 
     // res.status(201).json({
