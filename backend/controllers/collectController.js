@@ -68,7 +68,6 @@ exports.recordPrivateDonation = catchAsyncErrors(async (req, res, next) => {
 
     donor.donations.push({
       donationType: "Private",
-      date: new Date(),
       schedule: scheduleId,
     });
 
