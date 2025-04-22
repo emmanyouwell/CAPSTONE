@@ -58,7 +58,18 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
 // Create Patient => /api/v1/patients
 exports.createPatient = catchAsyncErrors(async (req, res, next) => {
     console.log(req.body)
-    
+
+    const patient = await Patient.create(req.body);
+
+    res.status(201).json({
+        success: true,
+        patient
+    });
+})
+
+exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
+    console.log(req.body)
+
     // const patient = await Patient.create(req.body);
 
     // res.status(201).json({

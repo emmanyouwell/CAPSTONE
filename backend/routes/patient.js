@@ -6,7 +6,8 @@ const {
     createPatient,
     getPatientDetails,
     updatePatient,
-    deletePatient
+    deletePatient,
+    tallyCreatePatient,
 } = require('../controllers/patientController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -19,6 +20,8 @@ router.route('/patient/:id')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin', 'Staff'), getPatientDetails)
     .put(isAuthenticatedUser, authorizeRoles('Staff', 'SuperAdmin', 'Admin'), updatePatient)
     .delete(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), deletePatient);
+
+router.route('/tally/patient').post(tallyCreatePatient)
 
 
 module.exports = router;
