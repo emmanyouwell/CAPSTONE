@@ -14,6 +14,7 @@ import bagReducer from './slices/bagSlice'
 import lettingReducer from './slices/lettingSlice'
 import scheduleReducer from './slices/scheduleSlice'
 import collectionReducer from './slices/collectionSlice'
+import metricReducer from './slices/metricSlice'
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
@@ -30,7 +31,8 @@ export const store = configureStore({
     bags: bagReducer,
     lettings: lettingReducer,
     schedules: scheduleReducer,
-    collections: collectionReducer
+    collections: collectionReducer,
+    metrics: metricReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

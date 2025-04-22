@@ -10,13 +10,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import Header from '../../../components/Superadmin/Header';
 import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
-import { getDonorsPerMonth } from '../../../redux/actions/donorActions';
+import { getDonorsPerMonth } from '../../../redux/actions/metricActions';
 import { BarChart } from 'react-native-chart-kit';
 
 const DonorsPerMonth = ({ navigation }) => {
     const dispatch = useDispatch();
 
-    const { monthlyDonors, loading, error } = useSelector((state) => state.donors);
+    const { monthlyDonors, loading, error } = useSelector((state) => state.metrics);
 
     useEffect(() => {
         dispatch(getDonorsPerMonth());
