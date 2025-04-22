@@ -298,24 +298,24 @@ exports.openFridge = catchAsyncErrors(async (req, res, next) => {
                 .sort((a, b) => new Date(a.expressDate) - new Date(b.expressDate)); // Sort by expressDate
 
         }
-        // Loop through inventories and update status if all bags are pasteurized
-        for (const inventory of inventories) {
-            const pubBags = inventory?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att =>
-                [...(att.bags || []), ...(att.additionalBags || [])]
-            ) || [];
+        // // Loop through inventories and update status if all bags are pasteurized
+        // for (const inventory of inventories) {
+        //     const pubBags = inventory?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att =>
+        //         [...(att.bags || []), ...(att.additionalBags || [])]
+        //     ) || [];
 
-            const privBags = inventory?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || [];
+        //     const privBags = inventory?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || [];
 
-            const allBags = [...pubBags, ...privBags];
+        //     const allBags = [...pubBags, ...privBags];
 
-            // Check if all bags are "Pasteurized"
-            const allPasteurized = allBags.length > 0 && allBags.every(bag => bag.status === "Pasteurized");
+        //     // Check if all bags are "Pasteurized"
+        //     const allPasteurized = allBags.length > 0 && allBags.every(bag => bag.status === "Pasteurized");
 
-            if (allPasteurized) {
-                // Update the inventory status to "Unavailable"
-                await Inventory.findByIdAndUpdate(inventory._id, { status: "Unavailable" });
-            }
-        }
+        //     if (allPasteurized) {
+        //         // Update the inventory status to "Unavailable"
+        //         await Inventory.findByIdAndUpdate(inventory._id, { status: "Unavailable" });
+        //     }
+        // }
     }
     else if (fridge.fridgeType === "Pasteurized") {
         const inventories = await Inventory.find({ fridge: id })
