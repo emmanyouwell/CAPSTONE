@@ -12,15 +12,15 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
 
     if (search) {
         query.$or = [
-            { 'name': { $regex: search, $options: 'i' } },  
-            { 'patientType': { $regex: search, $options: 'i' } },    
+            { 'name': { $regex: search, $options: 'i' } },
+            { 'patientType': { $regex: search, $options: 'i' } },
             { 'requested': { $regex: search, $options: 'i' } }
         ];
     }
-    if (type){
+    if (type) {
         query.patientType = type;
     }
-    if (brgy){
+    if (brgy) {
         query['home_address.brgy'] = brgy;
     }
 
@@ -33,13 +33,13 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
         // Find donors based on the query object
         const patients = await Patient.find(query)
             .populate('requested', 'date volumeRequested')
-            .sort({name: 1})
+            .sort({ name: 1 })
             .skip(skip)
             .limit(pageSize);
 
         const totalPatients = await Patient.countDocuments(query);
         const totalPages = Math.ceil(totalPatients / pageSize);
-        
+
 
         res.status(200).json({
             success: true,
@@ -69,7 +69,14 @@ exports.createPatient = catchAsyncErrors(async (req, res, next) => {
 
 exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
     console.log(req.body)
+    const fields = req.body.data.fields;
+    let data = {};
+    console.log("fields: ", fields);
+    req.body.data.fields.forEach((field) => {
+        data[field.label] = field.value;
+    });
 
+    console.log("data: ", data);
     // const patient = await Patient.create(req.body);
 
     // res.status(201).json({
@@ -81,7 +88,7 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
 // Get specific Patient details => /api/v1/patient/:id
 exports.getPatientDetails = catchAsyncErrors(async (req, res, next) => {
     const patient = await Patient.findById(req.params.id)
-    .populate([{path:'requested'}, {path:'staff', select: 'name'}]);
+        .populate([{ path: 'requested' }, { path: 'staff', select: 'name' }]);
 
     if (!patient) {
         return next(new ErrorHandler(`Patient is not found with this id: ${req.params.id}`))
