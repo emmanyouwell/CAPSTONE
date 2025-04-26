@@ -5,6 +5,7 @@ const Fridge = require("../models/fridge");
 const Donor = require("../models/donor");
 const Recipient = require("../models/patient");
 const Bags = require("../models/bags");
+const Request = require("../models/request");
 
 exports.getMetrics = catchAsyncErrors(async (req, res) => {
   try {
@@ -120,6 +121,57 @@ exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
     Object.values(stats).forEach((monthStats) => {
       yearlyTotals.community += monthStats.community;
       yearlyTotals.private += monthStats.private;
+      yearlyTotals.total += monthStats.total;
+    });
+
+    stats["total"] = yearlyTotals;
+
+    res.status(200).json({
+      success: true,
+      stats,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+exports.getDispensedMilk = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const requests = await Request.find();
+
+    const stats = {};
+
+    requests.forEach((request) => {
+      const isOutpatient = request.type === "Outpatient";
+      const isInpatient = request.type === "Inpatient";
+
+      if (!isOutpatient && !isInpatient) return;
+
+      const month = new Date(request.tchmb.dispenseAt).toLocaleString("default", {
+        month: "long",
+      });
+
+      const volume = request.tchmb.ebm
+        .map((item) => item.volDischarge || 0)
+        .reduce((sum, vol) => sum + vol, 0);
+
+      if (!stats[month]) {
+        stats[month] = { outpatient: 0, inpatient: 0, total: 0 };
+      }
+
+      if (isOutpatient) {
+        stats[month].outpatient += volume;
+      } else if (isInpatient) {
+        stats[month].inpatient += volume;
+      }
+
+      stats[month].total += volume;
+    });
+
+    const yearlyTotals = { outpatient: 0, inpatient: 0, total: 0 };
+    Object.values(stats).forEach((monthStats) => {
+      yearlyTotals.outpatient += monthStats.outpatient;
+      yearlyTotals.inpatient += monthStats.inpatient;
       yearlyTotals.total += monthStats.total;
     });
 

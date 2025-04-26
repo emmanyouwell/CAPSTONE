@@ -144,6 +144,7 @@ const AddRequest = ({ navigation, route }) => {
       reason,
       doctor,
       requestedBy,
+      type: patientType,
       volumeRequested: {volume: Number(volume) , days: Number(days)},
       images,
     };
