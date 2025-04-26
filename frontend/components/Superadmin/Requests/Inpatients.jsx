@@ -81,6 +81,7 @@ const Inpatients = ({ navigation }) => {
     const data = {
       request: reservedRequest,
       transport,
+      dispenseAt: Date.now(),
       approvedBy: userDetails._id
     }
     dispatch(inpatientDispense(data)).then(() => setModalVisible(false))

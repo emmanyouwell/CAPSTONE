@@ -292,7 +292,7 @@ exports.updateVolumeRequested = catchAsyncErrors(async (req, res, next) => {
 
 // Dispense Inpatient Request
 exports.inpatientDispense = catchAsyncErrors(async (req, res) => {
-  const { request, transport, approvedBy } = req.body;
+  const { request, transport, approvedBy, dispenseAt } = req.body;
   try {
     if (!Array.isArray(request) || request.length === 0) {
       return next(new ErrorHandler("Request data are required.", 400));
@@ -340,6 +340,7 @@ exports.inpatientDispense = catchAsyncErrors(async (req, res) => {
       }
       updatedRequest.status = "Done";
       updatedRequest.tchmb.transport = transport;
+      updatedRequest.tchmb.dispenseAt = dispenseAt;
       updatedRequest.tchmb.approvedBy = approvedBy;
       await updatedRequest.save();
     }

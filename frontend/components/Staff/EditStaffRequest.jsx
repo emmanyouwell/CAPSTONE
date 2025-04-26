@@ -150,10 +150,11 @@ const EditStaffRequest = ({ navigation, route }) => {
       reason,
       doctor,
       requestedBy,
+      type: patientType,
       volumeRequested: { volume: Number(volume), days: Number(days) },
       images,
     };
-    console.log("Request New Data: ", requestData);
+
     dispatch(updateRequest(requestData))
       .then((res) => {
         Alert.alert("Success", "Request Updated");
