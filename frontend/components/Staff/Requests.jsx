@@ -20,7 +20,7 @@ const Requests = ({ data }) => {
 
   const handleEdit = (item) => {
     console.log("Edit: ", item);
-    navigation.navigate('EditStaffRequest', { request: item });
+    navigation.navigate("EditStaffRequest", { request: item });
   };
 
   const handleDelete = (id) => {
@@ -63,22 +63,26 @@ const Requests = ({ data }) => {
     const { status, date, patient, volumeRequested, images, doctor } = item;
 
     return (
-      <Swipeable renderRightActions={() => renderRightActions(item)}>
+      <Swipeable
+        renderRightActions={() => {
+          item.status === "Done" ? null : renderRightActions(item);
+        }}
+      >
         <TouchableOpacity
           key={item._id}
           style={styles.card}
           onPress={() => {
-            console.log("Item: ", item)
-            Alert.alert(
-              "Information",
-              `See request details?`,
-              [
-                { text: "Cancel", style: "cancel" },
-                { text: "", style: "cancel" },
-                { text: "Okay", onPress: () => navigation.navigate("RequestDetails", {request: item}) },
-              ]
-            )}
-          }
+            console.log("Item: ", item);
+            Alert.alert("Information", `See request details?`, [
+              { text: "Cancel", style: "cancel" },
+              { text: "", style: "cancel" },
+              {
+                text: "Okay",
+                onPress: () =>
+                  navigation.navigate("RequestDetails", { request: item }),
+              },
+            ]);
+          }}
         >
           {images && images.length > 0 ? (
             <Image source={{ uri: images[0].url }} style={styles.image} />
@@ -93,7 +97,7 @@ const Requests = ({ data }) => {
             <Text style={styles.details}>Date: {formatDate(date)}</Text>
             <Text style={styles.details}>Patient: {patient.name}</Text>
             <Text style={styles.details}>
-            Volume: {volumeRequested.volume} mL
+              Volume: {volumeRequested.volume} mL
             </Text>
             <Text style={styles.details}>Days: {volumeRequested.days}</Text>
             <Text style={styles.details}>Prescribed By: {doctor}</Text>

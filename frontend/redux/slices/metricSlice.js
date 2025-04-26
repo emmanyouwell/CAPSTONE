@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getMilkPerMonth, getDonorsPerMonth } from '../actions/metricActions';
+import { getMilkPerMonth, getDonorsPerMonth, getDispensedMilkPerMonth } from '../actions/metricActions';
 export const metricSlice = createSlice({
   name: 'metric',
   initialState: {
@@ -7,6 +7,7 @@ export const metricSlice = createSlice({
     error: null, 
     stats: {},
     monthlyDonors: {},
+    dispensedMilk: {},
   },
   reducers: {
   },
@@ -35,6 +36,18 @@ export const metricSlice = createSlice({
         state.loading = false;
         state.error = action.payload; 
       })
+
+      .addCase(getDispensedMilkPerMonth.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getDispensedMilkPerMonth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.dispensedMilk = action.payload.dispensedMilk;
+      })
+      .addCase(getDispensedMilkPerMonth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
+      });
       
   },
 });

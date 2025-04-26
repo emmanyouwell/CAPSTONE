@@ -179,7 +179,7 @@ exports.getDispensedMilk = catchAsyncErrors(async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      stats,
+      dispensedMilk: stats,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
