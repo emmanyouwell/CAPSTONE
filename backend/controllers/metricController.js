@@ -5,6 +5,7 @@ const Fridge = require("../models/fridge");
 const Donor = require("../models/donor");
 const Recipient = require("../models/patient");
 const Bags = require("../models/bags");
+const Patient = require("../models/patient");
 const Request = require("../models/request");
 
 exports.getMetrics = catchAsyncErrors(async (req, res) => {
@@ -183,5 +184,107 @@ exports.getDispensedMilk = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+exports.getPatientsPerMonth = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const patients = await Patient.find();
+    const monthlyData = {};
+
+    patients.forEach((patient) => {
+      const isOutpatient = patient.patientType === "Outpatient";
+      const isInpatient = patient.patientType === "Inpatient";
+
+      if (!isOutpatient && !isInpatient) return;
+
+      const month = new Date(patient.createdAt).toLocaleString("default", {
+        month: "long",
+      });
+
+      if (!monthlyData[month]) {
+        monthlyData[month] = { outpatient: 0, inpatient: 0, total: 0 };
+      }
+
+      if (isOutpatient) {
+        monthlyData[month].outpatient++;
+      } else if (isInpatient) {
+        monthlyData[month].inpatient++;
+      }
+
+      monthlyData[month].total++;
+    });
+
+    const yearlyTotals = { outpatient: 0, inpatient: 0, total: 0 };
+    Object.values(monthlyData).forEach((monthStats) => {
+      yearlyTotals.outpatient += monthStats.outpatient;
+      yearlyTotals.inpatient += monthStats.inpatient;
+      yearlyTotals.total += monthStats.total;
+    });
+
+    monthlyData["total"] = yearlyTotals;
+
+    const result = monthlyData;
+
+    res.status(200).json({
+      success: true,
+      recipients: result,
+    });
+  } catch (error) {
+    console.error("Error fetching request recipients counts:", error);
+    res.status(500).json({
+      message: "Server error, please try again later.",
+    });
+  }
+});
+
+exports.getRequestsPerMonth = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const requests = await Request.find();
+    const monthlyData = {};
+
+    requests.forEach((req) => {
+      const isOutpatient = req.type === "Outpatient";
+      const isInpatient = req.type === "Inpatient";
+
+      if (!isOutpatient && !isInpatient) return;
+
+      const month = new Date(req.date).toLocaleString("default", {
+        month: "long",
+      });
+
+      if (!monthlyData[month]) {
+        monthlyData[month] = { outpatient: 0, inpatient: 0, total: 0 };
+      }
+
+      if (isOutpatient) {
+        monthlyData[month].outpatient++;
+      } else if (isInpatient) {
+        monthlyData[month].inpatient++;
+      }
+
+      monthlyData[month].total++;
+    });
+
+    const yearlyTotals = { outpatient: 0, inpatient: 0, total: 0 };
+    Object.values(monthlyData).forEach((monthStats) => {
+      yearlyTotals.outpatient += monthStats.outpatient;
+      yearlyTotals.inpatient += monthStats.inpatient;
+      yearlyTotals.total += monthStats.total;
+    });
+
+    monthlyData["total"] = yearlyTotals;
+
+    const result = monthlyData;
+
+    res.status(200).json({
+      success: true,
+      requests: result,
+    });
+  } catch (error) {
+    console.error("Error fetching request recipients counts:", error);
+    res.status(500).json({
+      message: "Server error, please try again later.",
+    });
   }
 });
