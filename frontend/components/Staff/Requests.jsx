@@ -61,12 +61,10 @@ const Requests = ({ data }) => {
 
   const renderRequest = ({ item }) => {
     const { status, date, patient, volumeRequested, images, doctor } = item;
-
+    const isDone = status === "Done";
     return (
       <Swipeable
-        renderRightActions={() => {
-          item.status === "Done" ? null : renderRightActions(item);
-        }}
+        renderRightActions={() => (isDone ? null : renderRightActions(item))}
       >
         <TouchableOpacity
           key={item._id}
