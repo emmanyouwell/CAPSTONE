@@ -26,10 +26,10 @@ const Login = ({ navigation }) => {
             const user = await getUser();
             if (user) {
                 if (user.role === 'User') {
-                    navigation.replace('userHome');
+                    navigation.navigate('userHome');
                 }
                 else {
-                    navigation.replace('superadmin_dashboard');
+                    navigation.navigate('superadmin_dashboard');
                 }
             }
         }
@@ -47,11 +47,11 @@ const Login = ({ navigation }) => {
         if (isLoggedIn){
             if (userDetails && userDetails.role === 'User') {
 
-                navigation.replace('userHome');
+                navigation.navigate('userHome');
             }
             else {
                 
-                navigation.replace('superadmin_dashboard');
+                navigation.navigate('superadmin_dashboard');
             }
         }
     },[isLoggedIn, userDetails])
@@ -107,7 +107,7 @@ const Login = ({ navigation }) => {
                                 <Text style={divider.dividerText}>Employee Sign in</Text>
                                 <View style={divider.divider} />
                             </View>
-                            <Button title="Sign in with ID" onPress={() => navigation.replace('employee_login')} />
+                            <Button title="Sign in with ID" onPress={() => navigation.navigate('employee_login')} />
 
                         </LinearGradient>
                     </ScrollView>
