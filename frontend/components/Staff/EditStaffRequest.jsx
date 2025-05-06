@@ -80,7 +80,7 @@ const EditStaffRequest = ({ navigation, route }) => {
 
   const onLogoutPress = () => {
     dispatch(logoutUser())
-      .then(() => navigation.replace("login"))
+      .then(() => navigation.navigate("login"))
       .catch((err) => console.log(err));
   };
 

@@ -59,7 +59,7 @@ const AddEquipment = ({ navigation }) => {
     const onLogoutPress = () => {
         dispatch(logoutUser())
             .then(() => {
-                navigation.replace('login');
+                navigation.navigate('login');
             })
             .catch((err) => console.log(err));
     };

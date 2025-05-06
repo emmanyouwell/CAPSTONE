@@ -26,7 +26,7 @@ const EmployeeLogin = ({ navigation }) => {
 
     useEffect(()=>{
         if (isLoggedIn) {
-            navigation.replace('superadmin_dashboard');
+            navigation.navigate('superadmin_dashboard');
         }
     },[isLoggedIn])
     useEffect(()=>{
@@ -82,7 +82,7 @@ const EmployeeLogin = ({ navigation }) => {
                                 <Text style={divider.dividerText}>User Sign in</Text>
                                 <View style={divider.divider} />
                             </View>
-                            <Button title="Sign in with email" onPress={() => navigation.replace('login')} />
+                            <Button title="Sign in with email" onPress={() => navigation.navigate('login')} />
 
                         </LinearGradient>
                     </ScrollView>

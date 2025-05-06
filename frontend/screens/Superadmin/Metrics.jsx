@@ -87,7 +87,7 @@ const Metrics = ({ navigation }) => {
   const handleLogoutClick = () => {
     dispatch(logoutUser())
       .then(() => {
-        navigation.replace("login");
+        navigation.navigate("login");
       })
       .catch((err) => console.log(err));
   };
