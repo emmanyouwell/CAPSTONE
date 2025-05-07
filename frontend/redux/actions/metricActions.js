@@ -62,3 +62,93 @@ export const getDonorsPerMonth = createAsyncThunk(
         }
     }
 )
+
+export const getDispensedMilkPerMonth = createAsyncThunk(
+    'donorsPerMonth/getDispensedMilkPerMonth',
+    async (thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        
+        try {
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/dispensePerMonth`, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+export const getPatientsPerMonth = createAsyncThunk(
+    'donorsPerMonth/getPatientsPerMonth',
+    async (thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        
+        try {
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/patientsPerMonth`, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+export const getRequestsPerMonth = createAsyncThunk(
+    'donorsPerMonth/getRequestsPerMonth',
+    async (thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        
+        try {
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/requestsPerMonth`, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

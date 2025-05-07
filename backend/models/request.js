@@ -53,6 +53,10 @@ const requestSchema = new mongoose.Schema({
   outcome: {
     type: String,
   },
+  type: {
+    type: String,
+    enum: ["Inpatient", "Outpatient"],
+  },
   tchmb: {
     ebm: [
       {
@@ -75,6 +79,9 @@ const requestSchema = new mongoose.Schema({
     ],
     transport: {
       type: String,
+    },
+    dispenseAt: {
+      type: Date,
     },
     approvedBy: {
       type: ObjectId,
