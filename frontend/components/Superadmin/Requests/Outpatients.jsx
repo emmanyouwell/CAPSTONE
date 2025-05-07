@@ -83,6 +83,7 @@ const Outpatients = ({ navigation }) => {
     const data = {
       request: reqToUpdate,
       transport,
+      dispenseAt: Date.now(),
       approvedBy: userDetails._id,
     };
     console.log(data);

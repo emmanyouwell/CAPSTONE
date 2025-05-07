@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getMilkPerMonth, getDonorsPerMonth } from '../actions/metricActions';
+import { getMilkPerMonth, getDonorsPerMonth, getDispensedMilkPerMonth, getPatientsPerMonth, getRequestsPerMonth } from '../actions/metricActions';
 export const metricSlice = createSlice({
   name: 'metric',
   initialState: {
@@ -7,6 +7,9 @@ export const metricSlice = createSlice({
     error: null, 
     stats: {},
     monthlyDonors: {},
+    dispensedMilk: {},
+    monthlyPatients: {},
+    monthlyRequests: {},
   },
   reducers: {
   },
@@ -35,6 +38,42 @@ export const metricSlice = createSlice({
         state.loading = false;
         state.error = action.payload; 
       })
+
+      .addCase(getDispensedMilkPerMonth.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getDispensedMilkPerMonth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.dispensedMilk = action.payload.dispensedMilk;
+      })
+      .addCase(getDispensedMilkPerMonth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
+      })
+      
+      .addCase(getPatientsPerMonth.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getPatientsPerMonth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.monthlyPatients = action.payload.recipients;
+      })
+      .addCase(getPatientsPerMonth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
+      })
+      
+      .addCase(getRequestsPerMonth.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getRequestsPerMonth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.monthlyRequests = action.payload.requests;
+      })
+      .addCase(getRequestsPerMonth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; 
+      });
       
   },
 });

@@ -11,9 +11,9 @@ const superAdminItems = [
   { id: '3', title: 'Schedules', route: 'superadmin_schedules', image: require('../../assets/image/calendar.png') },
   { id: '4', title: 'Inventory', route: 'superadmin_inventories', image: require('../../assets/image/inventory-and-metrics.png') },
   { id: '5', title: 'Account Management', route: 'superadmin_account_management', image: require('../../assets/image/account-management.png') },
-  { id: '6', title: 'Announcement Creation', image: require('../../assets/image/announcement-creation.png') },
-  { id: '7', title: 'Resources Management', route: 'superadmin_articles', image: require('../../assets/image/resources-management.png') },
-  { id: '8', title: 'Metrics', route: 'superadmin_metrics', image: require('../../assets/image/metrics.png') },
+  // { id: '6', title: 'Announcement Creation', image: require('../../assets/image/announcement-creation.png') },
+  { id: '6', title: 'Resources Management', route: 'superadmin_articles', image: require('../../assets/image/resources-management.png') },
+  { id: '7', title: 'Metrics', route: 'superadmin_metrics', image: require('../../assets/image/metrics.png') },
 ];
 
 const adminItems = [
@@ -22,7 +22,7 @@ const adminItems = [
   { id: '3', title: 'Inventory', route: 'superadmin_inventories', image: require('../../assets/image/inventory-and-metrics.png') },
   { id: '4', title: 'Resources Management', route: 'superadmin_articles', image: require('../../assets/image/resources-management.png') },
   { id: '5', title: 'Schedules', route: 'superadmin_schedules', image: require('../../assets/image/calendar.png') },
-  { id: '6', title: 'Announcement Creation', image: require('../../assets/image/announcement-creation.png') },
+  { id: '6', title: 'Metrics', route: 'superadmin_metrics', image: require('../../assets/image/metrics.png') },
   { id: '7', title: 'Milk Requesting', route: 'RequestOpt', image: require('../../assets/image/resources-management.png') },
   { id: '8', title: 'Milk Letting', route: 'superadmin_milkLetting', image: require('../../assets/image/resources-management.png') },
 ];

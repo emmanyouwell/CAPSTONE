@@ -5,6 +5,8 @@ const Fridge = require("../models/fridge");
 const Donor = require("../models/donor");
 const Recipient = require("../models/patient");
 const Bags = require("../models/bags");
+const Patient = require("../models/patient");
+const Request = require("../models/request");
 
 exports.getMetrics = catchAsyncErrors(async (req, res) => {
   try {
@@ -131,5 +133,158 @@ exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+exports.getDispensedMilk = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const requests = await Request.find();
+
+    const stats = {};
+
+    requests.forEach((request) => {
+      const isOutpatient = request.type === "Outpatient";
+      const isInpatient = request.type === "Inpatient";
+
+      if (!isOutpatient && !isInpatient) return;
+
+      const month = new Date(request.tchmb.dispenseAt).toLocaleString("default", {
+        month: "long",
+      });
+
+      const volume = request.tchmb.ebm
+        .map((item) => item.volDischarge || 0)
+        .reduce((sum, vol) => sum + vol, 0);
+
+      if (!stats[month]) {
+        stats[month] = { outpatient: 0, inpatient: 0, total: 0 };
+      }
+
+      if (isOutpatient) {
+        stats[month].outpatient += volume;
+      } else if (isInpatient) {
+        stats[month].inpatient += volume;
+      }
+
+      stats[month].total += volume;
+    });
+
+    const yearlyTotals = { outpatient: 0, inpatient: 0, total: 0 };
+    Object.values(stats).forEach((monthStats) => {
+      yearlyTotals.outpatient += monthStats.outpatient;
+      yearlyTotals.inpatient += monthStats.inpatient;
+      yearlyTotals.total += monthStats.total;
+    });
+
+    stats["total"] = yearlyTotals;
+
+    res.status(200).json({
+      success: true,
+      dispensedMilk: stats,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+exports.getPatientsPerMonth = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const patients = await Patient.find();
+    const monthlyData = {};
+
+    patients.forEach((patient) => {
+      const isOutpatient = patient.patientType === "Outpatient";
+      const isInpatient = patient.patientType === "Inpatient";
+
+      if (!isOutpatient && !isInpatient) return;
+
+      const month = new Date(patient.createdAt).toLocaleString("default", {
+        month: "long",
+      });
+
+      if (!monthlyData[month]) {
+        monthlyData[month] = { outpatient: 0, inpatient: 0, total: 0 };
+      }
+
+      if (isOutpatient) {
+        monthlyData[month].outpatient++;
+      } else if (isInpatient) {
+        monthlyData[month].inpatient++;
+      }
+
+      monthlyData[month].total++;
+    });
+
+    const yearlyTotals = { outpatient: 0, inpatient: 0, total: 0 };
+    Object.values(monthlyData).forEach((monthStats) => {
+      yearlyTotals.outpatient += monthStats.outpatient;
+      yearlyTotals.inpatient += monthStats.inpatient;
+      yearlyTotals.total += monthStats.total;
+    });
+
+    monthlyData["total"] = yearlyTotals;
+
+    const result = monthlyData;
+
+    res.status(200).json({
+      success: true,
+      recipients: result,
+    });
+  } catch (error) {
+    console.error("Error fetching request recipients counts:", error);
+    res.status(500).json({
+      message: "Server error, please try again later.",
+    });
+  }
+});
+
+exports.getRequestsPerMonth = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const requests = await Request.find();
+    const monthlyData = {};
+
+    requests.forEach((req) => {
+      const isOutpatient = req.type === "Outpatient";
+      const isInpatient = req.type === "Inpatient";
+
+      if (!isOutpatient && !isInpatient) return;
+
+      const month = new Date(req.date).toLocaleString("default", {
+        month: "long",
+      });
+
+      if (!monthlyData[month]) {
+        monthlyData[month] = { outpatient: 0, inpatient: 0, total: 0 };
+      }
+
+      if (isOutpatient) {
+        monthlyData[month].outpatient++;
+      } else if (isInpatient) {
+        monthlyData[month].inpatient++;
+      }
+
+      monthlyData[month].total++;
+    });
+
+    const yearlyTotals = { outpatient: 0, inpatient: 0, total: 0 };
+    Object.values(monthlyData).forEach((monthStats) => {
+      yearlyTotals.outpatient += monthStats.outpatient;
+      yearlyTotals.inpatient += monthStats.inpatient;
+      yearlyTotals.total += monthStats.total;
+    });
+
+    monthlyData["total"] = yearlyTotals;
+
+    const result = monthlyData;
+
+    res.status(200).json({
+      success: true,
+      requests: result,
+    });
+  } catch (error) {
+    console.error("Error fetching request recipients counts:", error);
+    res.status(500).json({
+      message: "Server error, please try again later.",
+    });
   }
 });
