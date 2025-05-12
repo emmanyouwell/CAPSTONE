@@ -18,7 +18,7 @@ import * as FileSystem from "expo-file-system";
 import DropDownPicker from "react-native-dropdown-picker";
 import Header from "../../components/Superadmin/Header";
 import { logoutUser } from "../../redux/actions/userActions";
-import {getRecipients} from "../../redux/actions/recipientActions";
+import { getRecipients } from "../../redux/actions/recipientActions";
 import { addRequest } from "../../redux/actions/requestActions";
 import { getDevices, sendNotification } from "../../redux/actions/notifActions";
 import { SuperAdmin } from "../../styles/Styles";
@@ -86,40 +86,46 @@ const AddRequest = ({ navigation, route }) => {
   const handleChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
-
+  
   const handlePickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
         "Permission Denied",
-        "You need to grant camera roll permissions to upload images."
+        "You need to grant camera permissions to take pictures."
       );
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-    });
+    const takePhoto = async () => {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        base64: true,
+      });
 
-    if (!result.canceled) {
-      const base64Images = await Promise.all(
-        result.assets.map(async (asset) => {
-          const base64 = await FileSystem.readAsStringAsync(asset.uri, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-          return `data:image/jpeg;base64,${base64}`;
-        })
+      if (!result.canceled) {
+        const base64 = `data:image/jpeg;base64,${result.assets[0].base64}`;
+        setImages((prevImages) => [...prevImages, base64]);
+      }
+
+      Alert.alert(
+        "Add another?",
+        "Do you want to take another picture?",
+        [
+          { text: "No", style: "cancel" },
+          { text: "Yes", onPress: takePhoto },
+        ],
+        { cancelable: true }
       );
+    };
 
-      setImages((prevImages) => [...prevImages, ...base64Images]);
-    }
+    takePhoto();
   };
 
   const handleSubmit = () => {
     const { patient, location, diagnosis, reason, doctor, volume, days } =
       formData;
-    const patientType = outPatient ? 'Outpatient' : 'Inpatient';
+    const patientType = outPatient ? "Outpatient" : "Inpatient";
     if (
       !patient ||
       !location ||
@@ -145,39 +151,39 @@ const AddRequest = ({ navigation, route }) => {
       doctor,
       requestedBy,
       type: patientType,
-      volumeRequested: {volume: Number(volume) , days: Number(days)},
+      volumeRequested: { volume: Number(volume), days: Number(days) },
       images,
     };
-    
+
     dispatch(addRequest(requestData))
       .then((res) => {
-          if (devices) {
-            for (const device of devices) {
-              if (
-                (device.token && device.user.role === "Admin") ||
-                device.user.role === "SuperAdmin"
-              ) {
-                const notifData = {
-                  token: device.token,
-                  title: "New Request for Milk",
-                  body: `A nurse issued a new request for milk with the volume of ${res.payload.request.volumeRequested.volume} mL per day for ${res.payload.request.volumeRequested.days} days. Open TCHMB Portal App to see more details`,
-                };
-                dispatch(sendNotification(notifData))
-                  .then((response) => {
-                    console.log(
-                      "Notification Status: ",
-                      response.payload.data.status
-                    );
-                  })
-                  .catch((error) => {
-                    console.error("Error sending notification:", error);
-                    Alert.alert("Error", "Sending Notification");
-                  });
-              }
+        if (devices) {
+          for (const device of devices) {
+            if (
+              (device.token && device.user.role === "Admin") ||
+              device.user.role === "SuperAdmin"
+            ) {
+              const notifData = {
+                token: device.token,
+                title: "New Request for Milk",
+                body: `A nurse issued a new request for milk with the volume of ${res.payload.request.volumeRequested.volume} mL per day for ${res.payload.request.volumeRequested.days} days. Open TCHMB Portal App to see more details`,
+              };
+              dispatch(sendNotification(notifData))
+                .then((response) => {
+                  console.log(
+                    "Notification Status: ",
+                    response.payload.data.status
+                  );
+                })
+                .catch((error) => {
+                  console.error("Error sending notification:", error);
+                  Alert.alert("Error", "Sending Notification");
+                });
             }
           }
-          Alert.alert("Success", "Request added successfully!");
-          navigation.navigate("superadmin_dashboard");
+        }
+        Alert.alert("Success", "Request added successfully!");
+        navigation.navigate("superadmin_dashboard");
       })
       .catch((error) => {
         console.error("Error adding request:", error);
