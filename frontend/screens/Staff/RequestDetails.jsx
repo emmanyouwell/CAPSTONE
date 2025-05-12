@@ -10,10 +10,12 @@ import {
 } from "react-native";
 import ImageViewing from "react-native-image-viewing";
 import Header from "../../components/Superadmin/Header";
+import { useDispatch } from "react-redux";
 import { logoutUser } from "../../redux/actions/userActions";
 import { SuperAdmin, colors } from "../../styles/Styles";
 
 const RequestDetails = ({ navigation, route }) => {
+  const dispatch = useDispatch()
   const { request } = route.params;
 
   const totalBottles = request.tchmb.ebm?.reduce((total, e) => {
