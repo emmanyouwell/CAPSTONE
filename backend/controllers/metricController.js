@@ -150,9 +150,9 @@ exports.getDispensedMilk = catchAsyncErrors(async (req, res, next) => {
 
       const rawDate = request.tchmb.dispenseAt;
       const parsedDate = new Date(rawDate);
-
+      let month="";
       if (!isNaN(parsedDate)) {
-        const month = parsedDate.toLocaleString("default", { month: "long" });
+        month = parsedDate.toLocaleString("default", { month: "long" });
         // proceed to use `month` in your grouping logic
       } else {
         console.warn("Invalid date encountered:", rawDate);
