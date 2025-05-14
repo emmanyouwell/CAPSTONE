@@ -78,7 +78,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     const expiration = new Date(pasteurizedDetails.pasteurizationDate);
     expiration.setDate(expiration.getDate() + 183);
     const batchVolume =
-      pasteurizedDetails.bottleType * 20;
+      pasteurizedDetails.bottleType * pasteurizedDetails.bottleQty;
     const pastDetails = {
       ...pasteurizedDetails,
       batchVolume: batchVolume,
