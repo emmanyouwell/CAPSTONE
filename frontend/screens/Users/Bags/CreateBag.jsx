@@ -30,10 +30,7 @@ const CreateBag = ({ navigation }) => {
         expressDate: Yup.date()
             .required("Express date is required")
     });
-    useEffect(() => {
-        dispatch(getUserDetails())
-    }, [dispatch])
-
+    
     return (
         <>
             <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
