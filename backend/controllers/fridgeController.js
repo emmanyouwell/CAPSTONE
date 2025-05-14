@@ -87,12 +87,14 @@ exports.allFridges = catchAsyncErrors(async (req, res) => {
                 };
             }));
         }
-
+        const availableMilk = pastFridge.reduce((acc, fridge) => acc + fridge.totalVolume, 0);
+        
         const updatedFridges = [...unpastFridge, ...pastFridge]
         res.status(200).json({
             success: true,
             count: updatedFridges.length,
-            fridges: updatedFridges
+            fridges: updatedFridges,
+            availableMilk: availableMilk
         });
     } catch (error) {
         console.error('Error fetching fridges:', error);

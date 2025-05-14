@@ -150,7 +150,7 @@ exports.getDispensedMilk = catchAsyncErrors(async (req, res, next) => {
 
       const rawDate = request.tchmb.dispenseAt;
       const parsedDate = new Date(rawDate);
-      let month="";
+      let month = "";
       if (!isNaN(parsedDate)) {
         month = parsedDate.toLocaleString("default", { month: "long" });
         // proceed to use `month` in your grouping logic
@@ -295,3 +295,129 @@ exports.getRequestsPerMonth = catchAsyncErrors(async (req, res, next) => {
     });
   }
 });
+
+exports.getAvailableMilk = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const fridges = await Fridge.find();
+    let totalVolume = 0;
+    const past = fridges.filter((f) => f.fridgeType === 'Pasteurized') || []
+
+
+    let pastFridge = []
+
+    if (past.length > 0) {
+      pastFridge = await Promise.all(past.map(async (fridge) => {
+        const inventories = await Inventory.find({ fridge: fridge._id })
+
+        // Calculate total volume for this fridge
+        totalVolume = inventories.reduce((acc, inv) => acc + (inv.status === "Available" && inv.pasteurizedDetails.batchVolume || 0), 0);
+
+        // Return fridge object with totalVolume included
+        return {
+
+          totalVolume
+        };
+      }));
+    }
+
+    const availableMilk = pastFridge.reduce((acc, fridge) => acc + fridge.totalVolume, 0);
+    res.status(200).json({
+      success: true,
+      count: pastFridge.length,
+      availableMilk: availableMilk
+    });
+  } catch (error) {
+    console.error('Error fetching fridges:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+})
+
+exports.pasteurizeSoon = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const fridges = await Fridge.find();
+    let totalVolume = 0;
+    const unpast = fridges.filter((f) => f.fridgeType === 'Unpasteurized') || []
+
+
+    let unpastFridge = []
+
+    if (unpast.length > 0) {
+      unpastFridge = await Promise.all(unpast.map(async (fridge) => {
+        const inventories = await Inventory.find({ fridge: fridge._id })
+          .populate({
+            path: "unpasteurizedDetails.collectionId",
+            populate: [{
+              path: "pubDetails",
+              populate: [
+                {
+                  path: "attendance.donor",
+                  populate: {
+                    path: "user",
+                    select: "name email phone"
+                  },
+                  select: "_id home_address"
+                },
+                {
+                  path: "attendance.bags",
+                  select: "volume status"
+                },
+                {
+                  path: "attendance.additionalBags",
+                  select: "volume status"
+                }
+              ]
+            },
+            {
+              path: 'privDetails',
+              populate: [{
+                path: "donorDetails.donorId",
+              },
+              {
+                path: "donorDetails.bags",
+                select: "volume status"
+              }]
+            }]
+          });
+        if (inventories.length > 0) {
+          const allBags = inventories.flatMap(inv => {
+            const attendanceBags = inv?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att => [
+              ...(att.bags || []),
+              ...(att.additionalBags || [])
+            ]) || [];
+
+            const donorBags = inv?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || [];
+
+            return [...attendanceBags, ...donorBags];
+          });
+          totalVolume = allBags
+            .filter(bag => bag.status !== "Pasteurized") // Exclude "Pasteurized" bags
+            .reduce((acc, bag) => acc + (bag.volume || 0), 0); // Sum up the volume
+
+        }
+        // Return fridge object with totalVolume included
+        return {
+          ...fridge.toObject(), // Convert Mongoose object to plain object
+          totalVolume
+        };
+      }));
+
+
+    }
+
+    const availableMilk = unpastFridge.reduce((acc, fridge) => acc + fridge.totalVolume, 0);
+    res.status(200).json({
+      success: true,
+      count: unpastFridge.length,
+      expiringMilk: availableMilk
+    });
+  } catch (error) {
+    console.error('Error fetching fridges:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+})
