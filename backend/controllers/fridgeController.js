@@ -78,7 +78,7 @@ exports.allFridges = catchAsyncErrors(async (req, res) => {
                 const inventories = await Inventory.find({ fridge: fridge._id })
 
                 // Calculate total volume for this fridge
-                totalVolume = inventories.reduce((acc, inv) => acc + (inv.pasteurizedDetails.batchVolume || 0), 0);
+                totalVolume = inventories.reduce((acc, inv) => acc + (inv.status === available && inv.pasteurizedDetails.batchVolume || 0), 0);
 
                 // Return fridge object with totalVolume included
                 return {
