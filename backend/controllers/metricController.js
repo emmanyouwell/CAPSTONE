@@ -148,9 +148,16 @@ exports.getDispensedMilk = catchAsyncErrors(async (req, res, next) => {
 
       if (!isOutpatient && !isInpatient) return;
 
-      const month = new Date(request.tchmb.dispenseAt).toLocaleString("default", {
-        month: "long",
-      });
+      const rawDate = request.tchmb.dispenseAt;
+      const parsedDate = new Date(rawDate);
+      let month="";
+      if (!isNaN(parsedDate)) {
+        month = parsedDate.toLocaleString("default", { month: "long" });
+        // proceed to use `month` in your grouping logic
+      } else {
+        console.warn("Invalid date encountered:", rawDate);
+        // optionally skip this entry or put it in a separate error log
+      }
 
       const volume = request.tchmb.ebm
         .map((item) => item.volDischarge || 0)
