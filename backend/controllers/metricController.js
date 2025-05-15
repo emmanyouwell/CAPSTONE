@@ -421,3 +421,70 @@ exports.pasteurizeSoon = catchAsyncErrors(async (req, res, next) => {
     })
   }
 })
+
+exports.getDonationLocations = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const allBags = await Bags.find()
+      .populate({
+        path: "donor",
+        select: "user home_address",
+        populate: {
+          path: "user",
+          select: "name"
+        }
+      });
+    const count = await Bags.countDocuments();
+
+    const cityGroups = {}; // { mainKeyword: { name: fullCityName, totalVolume: number } }
+
+    const normalizeCity = (rawCity = '') => {
+      let normalized = rawCity.trim().toLowerCase();
+      normalized = normalized.replace(/\b(city|municipality)\b/g, '').trim();
+      return normalized.split(' ')[0]; // main keyword (e.g., "taguig")
+    };
+
+    allBags.forEach(bag => {
+      const rawCity = bag?.donor?.home_address?.brgy || 'Unknown';
+      const volume = bag.volume || 0;
+      const mainKeyword = normalizeCity(rawCity);
+      const fullNormalizedCity = rawCity.trim().toLowerCase();
+
+      if (!cityGroups[mainKeyword]) {
+        cityGroups[mainKeyword] = {
+          name: fullNormalizedCity,
+          totalVolume: 0
+        };
+      }
+
+      // Use the longest/most descriptive name as the label
+      if (fullNormalizedCity.length > cityGroups[mainKeyword].name.length) {
+        cityGroups[mainKeyword].name = fullNormalizedCity;
+      }
+
+      cityGroups[mainKeyword].totalVolume += volume;
+    });
+
+    // Build the final result
+    const result = {};
+    let grandTotal = 0;
+
+    Object.values(cityGroups).forEach(group => {
+      result[group.name] = group.totalVolume;
+      grandTotal += group.totalVolume;
+    });
+
+    result.total = grandTotal;
+    const volumePerLocation = result;
+    res.status(200).json({
+      success: true,
+      count,
+      volumePerLocation
+    })
+  } catch (error) {
+    console.error('Error fetching donation locations:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+})
