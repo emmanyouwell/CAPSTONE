@@ -11,6 +11,7 @@ const {
   getRequestsPerMonth,
   getAvailableMilk,
   pasteurizeSoon,
+  getDonationLocations,
 } = require("../controllers/metricController");
 
 router.route("/metrics")
@@ -59,6 +60,13 @@ router.route("/expiringMilk")
   isAuthenticatedUser,
   authorizeRoles("SuperAdmin", "Admin"),
   pasteurizeSoon
+);
+
+router.route("/donationLocation")
+.get(
+  isAuthenticatedUser,
+  authorizeRoles("SuperAdmin", "Admin"),
+  getDonationLocations
 );
 
 module.exports = router;
