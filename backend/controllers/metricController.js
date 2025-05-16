@@ -424,7 +424,7 @@ exports.pasteurizeSoon = catchAsyncErrors(async (req, res, next) => {
 
 exports.getDonationLocations = catchAsyncErrors(async (req, res, next) => {
   try {
-    const allBags = await Bags.find()
+    const allBags = await Bags.find({status: ["Collected", "Pasteurized"]})
       .populate({
         path: "donor",
         select: "user home_address",
@@ -487,4 +487,4 @@ exports.getDonationLocations = catchAsyncErrors(async (req, res, next) => {
       message: error.message
     })
   }
-})
+})  
