@@ -12,6 +12,8 @@ const {
   getAvailableMilk,
   pasteurizeSoon,
   getDonationLocations,
+  getDonorLocations,
+  getPatientHospitals,
 } = require("../controllers/metricController");
 
 router.route("/metrics")
@@ -69,4 +71,17 @@ router.route("/donationLocation")
   getDonationLocations
 );
 
+router.route("/donorLocation")
+.get(
+  isAuthenticatedUser,
+  authorizeRoles("SuperAdmin", "Admin"),
+  getDonorLocations
+);
+
+router.route("/patientHospital")
+.get(
+  isAuthenticatedUser,
+  authorizeRoles("SuperAdmin", "Admin"),
+  getPatientHospitals
+);
 module.exports = router;
