@@ -424,7 +424,7 @@ exports.pasteurizeSoon = catchAsyncErrors(async (req, res, next) => {
 
 exports.getDonationLocations = catchAsyncErrors(async (req, res, next) => {
   try {
-    const allBags = await Bags.find({status: ["Collected", "Pasteurized"]})
+    const allBags = await Bags.find({ status: ["Collected", "Pasteurized"] })
       .populate({
         path: "donor",
         select: "user home_address",
@@ -487,4 +487,102 @@ exports.getDonationLocations = catchAsyncErrors(async (req, res, next) => {
       message: error.message
     })
   }
-})  
+})
+
+exports.getDonorLocations = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const donors = await Donor.find();
+
+    const brgyMap = new Map();
+    let total = 0;
+
+    donors.forEach((donor) => {
+      const originalBrgy = donor.home_address?.brgy || '';
+      const normalizedBrgy = originalBrgy
+        .toLowerCase()
+        .replace(/^brgy[.\s]*/i, '') // remove "brgy.", "brgy ", "brgy. " prefix
+        .trim();
+
+      if (!normalizedBrgy) return;
+
+      total += 1;
+
+      if (!brgyMap.has(normalizedBrgy)) {
+        brgyMap.set(normalizedBrgy, {
+          count: 1,
+          originalNames: [originalBrgy],
+        });
+      } else {
+        const entry = brgyMap.get(normalizedBrgy);
+        entry.count += 1;
+        entry.originalNames.push(originalBrgy);
+      }
+    });
+
+    const groupedResult = {};
+
+    for (const [normalized, { count, originalNames }] of brgyMap.entries()) {
+      const finalBrgyName = originalNames.reduce((a, b) =>
+        a.length >= b.length ? a : b
+      );
+      groupedResult[finalBrgyName] = count;
+    }
+
+    // Add total at the end
+    groupedResult.total = total;
+
+    res.status(200).json({
+      success: true,
+      donors: groupedResult
+    })
+
+  } catch (error) {
+    console.error('Error fetching donor locations:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+})
+
+exports.getPatientHospitals = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const requests = await Request.find();
+    const hospitalMap = {};
+
+    requests.forEach((request) => {
+      let hospitalKey;
+
+      if (request.department) {
+        // If department exists, group under TPDH
+        hospitalKey = "TPDH";
+      } else if (request.hospital) {
+        hospitalKey = request.hospital;
+      } else {
+        hospitalKey = "Unknown";
+      }
+
+      // Initialize or increment count
+      if (!hospitalMap[hospitalKey]) {
+        hospitalMap[hospitalKey] = 1;
+      } else {
+        hospitalMap[hospitalKey]++;
+      }
+    });
+
+    // Optionally, compute total
+    const total = Object.values(hospitalMap).reduce((sum, val) => sum + val, 0);
+    hospitalMap.total = total;
+
+    res.status(200).json({
+      success: true,
+      hospitals: hospitalMap
+    })
+  } catch (error) {
+    console.error('Error fetching patient hospitals:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
+})
