@@ -70,9 +70,10 @@ if (type) {
 
 exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
     try {
+        console.log("predicting...")
         const fields = req.body.data.fields;
         let data = {};
-        console.log("fields: ", fields);
+        
         fields.forEach(field => {
             if (field.type === "MULTIPLE_CHOICE") {
                 const result = field.value.map(selected => {
@@ -130,7 +131,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             return null; // Default if not found
         })];
 
-        console.log("values: ", values);
+        
         const json = {
             data: values
         }
