@@ -49,6 +49,16 @@ const donorSchema = new mongoose.Schema({
     type: String,
 
   },
+  submissionID: {
+    type: String,
+  },
+  lastSubmissionDate: {
+    type: Date,
+  },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
   dateTested: {
     type: Date
   },

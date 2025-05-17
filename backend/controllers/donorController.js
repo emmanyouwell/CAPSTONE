@@ -162,12 +162,99 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                 message: "An error occurred while predicting eligibility."
             });
         }
-        console.log("prediction: ", prediction);
-        console.log("Prediction data: ", prediction.data.predictions.includes(1) ? "Eligible" : "Not Eligible");
+
+        const result = prediction.data.predictions.includes(1) ? "Eligible" : "Not Eligible";
+        let new_data = {};
+
+        fields.forEach(field => {
+            if (field.type === "MULTIPLE_CHOICE" && field.value !== null) {
+                const result = field.value.map(selected => {
+                    const match = field.options.find(option => option.id === selected);
+                    return match ? match.text : null;
+                }).filter(item => item !== null);
+                new_data[field.label] = result;
+            }
+            else if (field.type === "CHECKBOXES" && field.key === "question_rBK1gL") {
+                const result = field.value.map(selected => {
+                    const match = field.options.find(option => option.id === selected);
+                    return match ? match.text : null;
+                }).filter(item => item !== null);
+                console.log("result: ", result);
+                new_data[field.label] = result;
+            }
+            else if (field.type === "DROPDOWN") {
+                const result = field.value.map(selected => {
+                    const match = field.options.find(option => option.id === selected);
+                    return match ? match.text : null;
+                }).filter(item => item !== null);
+                console.log("result: ", result);
+                new_data[field.label] = result[0];
+            }
+            else {
+                new_data[field.label] = field.value;
+            }
+
+        })
+
+        const children = [{
+            name: new_data.child_name,
+            age: new_data.child_age,
+            birth_weight: new_data.birth_weight,
+            aog: new_data.aog
+        }];
+        let password = `${new_data.first_name.replace(/\s+/g, "").toLowerCase()}${new_data.last_name.replace(/\s+/g, "").toLowerCase()}`;
+
+        const name = {
+            first: new_data.first_name || "",
+            middle: new_data.middle_name || "",
+            last: new_data.last_name || "",
+        };
+         
+        const userExist = await User.findOne({
+            
+            email: new_data.email
+        });
+        
+        if (userExist) {
+            
+            await Donor.findOneAndUpdate({ user: userExist._id }, { submissionID: req.body.data.submissionId, lastSubmissionDate: req.body.createdAt, verified: false }, { new: true });
+        }
+        else {
+          
+            const user = await User.create({
+                name: name,
+                email: new_data.email,
+                phone: new_data.contact_number,
+                password: password,
+                role: 'User',
+            });
+            // Create donor in the new_database
+            await Donor.create({
+                user: user._id,
+                home_address: {
+                    street: new_data.Street,
+                    brgy: new_data.brgy,
+                    city: new_data.city || 'Taguig City'
+                },
+                age: new_data.age,
+                birthday: new_data.birthday,
+                children: children,
+                office_address: new_data.office_address,
+                contact_number: new_data.contact_number_2,
+                donorType: new_data.donor_type[0],
+                occupation: new_data.occupation,
+                eligibility: result,
+                submissionID: req.body.data.submissionId,
+                lastSubmissionDate: req.body.createdAt
+            });
+
+        }
         res.status(200).json({
             success: true,
-            prediction: prediction.data.predictions.includes(1) ? "Eligible" : "Not Eligible"
+            prediction: result
         });
+
+
     }
     catch (error) {
         console.error("Error in predicting eligibility:", error);
@@ -400,4 +487,50 @@ exports.deleteDonor = catchAsyncErrors(async (req, res, next) => {
         success: true,
         message: "Donor Deleted"
     })
+})
+
+exports.checkEligibility = catchAsyncErrors(async (req, res, next) => {
+    const id = req.params.id;
+
+    const donor = await Donor.find({ submissionID: id })
+    if (donor.length === 0) {
+        return res.status(404).json({
+            success: false,
+            message: "Donor not found"
+        })
+    }
+    res.status(200).json({
+        success: true,
+        message: "Donor found",
+        donor
+    })
+})
+
+exports.getNewSubmissions = catchAsyncErrors(async (req, res, next) => {
+    try {
+        const donors = await Donor.find({ verified: false })
+            .populate({
+                path: 'user',
+                select: 'name'
+            });
+        if (!donors || donors.length === 0) {
+            return res.status(201).json({
+                success: false,
+                message: "No new submissions found."
+            });
+        }
+        res.status(200).json({
+            success: true,
+            message: "New submissions found.",
+            donors
+        })
+
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "An error occurred while fetching submissions.",
+            error: error.message,
+        });
+    }
 })

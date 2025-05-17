@@ -9,6 +9,8 @@ const {
     deleteDonor,
     testDonors,
     predictEligibility,
+    checkEligibility,
+    getNewSubmissions,
 } = require('../controllers/donorController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -16,6 +18,8 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 // Super Admin Routes
 router.post('/test-donor', testDonors);
 router.post('/predict', predictEligibility);
+router.get('/check-eligibility/:id', checkEligibility);
+router.get('/donor/submissions', isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), getNewSubmissions);
 router.route('/donors')
     .get(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), allDonors)
     .post(createDonor);
