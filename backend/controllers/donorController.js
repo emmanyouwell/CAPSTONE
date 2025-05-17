@@ -9,34 +9,34 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     const { search, brgy, type } = req.query;
 
     // Create a query object for Donor
-const query = {};
+    const query = {};
 
-// Step 1: Find matching users based on name search
-if (search) {
-    const matchingUsers = await User.find({
-        $or: [
-            { "name.first": { $regex: search, $options: "i" } },
-            { "name.middle": { $regex: search, $options: "i" } },
-            { "name.last": { $regex: search, $options: "i" } },
-        ],
-    }).select("_id"); // Get only user IDs
+    // Step 1: Find matching users based on name search
+    if (search) {
+        const matchingUsers = await User.find({
+            $or: [
+                { "name.first": { $regex: search, $options: "i" } },
+                { "name.middle": { $regex: search, $options: "i" } },
+                { "name.last": { $regex: search, $options: "i" } },
+            ],
+        }).select("_id"); // Get only user IDs
 
-    // If any users match, filter donors by these user IDs
-    if (matchingUsers.length > 0) {
-        query.user = { $in: matchingUsers.map(user => user._id) };
-    } else {
-        // If no users match, return an empty result early
-        return res.json({ donors: [], total: 0 });
+        // If any users match, filter donors by these user IDs
+        if (matchingUsers.length > 0) {
+            query.user = { $in: matchingUsers.map(user => user._id) };
+        } else {
+            // If no users match, return an empty result early
+            return res.json({ donors: [], total: 0 });
+        }
     }
-}
 
-// Step 2: Apply other filters on Donor
-if (brgy) {
-    query["home_address.brgy"] = brgy;
-}
-if (type) {
-    query["donorType"] = type;
-}
+    // Step 2: Apply other filters on Donor
+    if (brgy) {
+        query["home_address.brgy"] = brgy;
+    }
+    if (type) {
+        query["donorType"] = type;
+    }
 
     // Optional: Add pagination (e.g., limit results and skip for page number)
     const page = Number(req.query.page) || 1;
@@ -44,7 +44,7 @@ if (type) {
     const skip = (page - 1) * pageSize;
 
     try {
-        
+
         // Find donors based on the query object
         const donors = await Donor.find(query)
             .populate('user')
@@ -71,16 +71,28 @@ if (type) {
 exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
     try {
         console.log("predicting...")
+        const bod = req.body;
+
+        if (!bod || !bod.data.fields || !Array.isArray(bod.data.fields)) {
+            console.log("no data or fields", data);
+            return res.status(400).json({
+                success: false,
+                message: "Invalid request body. 'fields' array is required."
+            });
+        }
         const fields = req.body.data.fields;
         let data = {};
-        
+
         fields.forEach(field => {
             if (field.type === "MULTIPLE_CHOICE") {
-                const result = field.value.map(selected => {
-                    const match = field.options.find(option => option.id === selected);
-                    return match ? match.text : null;
-                }).filter(item => item !== null);
-                data[field.label] = { label: field.label, value: result };
+                if (field.value !== null) {
+                    const result = field.value.map(selected => {
+                        const match = field.options.find(option => option.id === selected);
+                        return match ? match.text : null;
+                    }).filter(item => item !== null);
+                    data[field.label] = { label: field.label, value: result };
+                }
+
             }
             else if (field.type === "CHECKBOXES" && field.key === "question_rBK1gL") {
                 const result = field.value.map(selected => {
@@ -131,7 +143,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             return null; // Default if not found
         })];
 
-        
+
         const json = {
             data: values
         }
