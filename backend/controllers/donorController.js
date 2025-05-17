@@ -247,6 +247,8 @@ exports.testDonors = catchAsyncErrors(async (req, res, next) => {
             donorType: data.donor_type[0],
             occupation: data.occupation
         });
+
+        console.log("data: ", data);
         res.status(200).json({
             success: true,
             fields,
