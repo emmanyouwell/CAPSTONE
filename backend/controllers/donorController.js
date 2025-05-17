@@ -150,6 +150,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             });
         }
         console.log("prediction: ", prediction);
+        console.log("Prediction data: ", prediction.data.predictions.includes(1) ? "Eligible" : "Not Eligible");
         res.status(200).json({
             success: true,
             prediction: prediction.data.predictions.includes(1) ? "Eligible" : "Not Eligible"
