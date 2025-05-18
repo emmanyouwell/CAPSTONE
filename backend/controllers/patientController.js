@@ -14,7 +14,7 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
         query.$or = [
             { 'name': { $regex: search, $options: 'i' } },
             { 'patientType': { $regex: search, $options: 'i' } },
-            
+
         ];
     }
     if (type) {
@@ -83,12 +83,28 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
         city: data.city
     }
     console.log("home_address: ", home_address);
-    // const patient = await Patient.create(req.body);
+    /*
+    
+      name: 'New Patient 1',
+      motherName: 'Testing Mother',
+      street: '123 Sesame St.',
+      brgy: 'Central Signal',
+      city: 'Taguig City',
+      phone: '09665867965'
+    
+    */
+    const patientData = {
+        name: data.name,
+        home_address,
+        phone: data.phone,
+        motherName: data.motherName,
+    }
+    const patient = await Patient.create(patientData);
 
-    // res.status(201).json({
-    //     success: true,
-    //     patient
-    // });
+    res.status(201).json({
+        success: true,
+        patient
+    });
 })
 
 // Get specific Patient details => /api/v1/patient/:id
