@@ -248,6 +248,9 @@ exports.getPatientsPerMonth = catchAsyncErrors(async (req, res, next) => {
 exports.getRequestsPerMonth = catchAsyncErrors(async (req, res, next) => {
   try {
     const requests = await Request.find();
+    const incomingRequests = requests.filter((req) => req.status === "Pending");
+    console.log(requests)
+
     const monthlyData = {};
 
     requests.forEach((req) => {
@@ -281,7 +284,7 @@ exports.getRequestsPerMonth = catchAsyncErrors(async (req, res, next) => {
     });
 
     monthlyData["total"] = yearlyTotals;
-
+    monthlyData["pending"] = incomingRequests.length;
     const result = monthlyData;
 
     res.status(200).json({
