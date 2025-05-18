@@ -68,11 +68,11 @@ exports.createPatient = catchAsyncErrors(async (req, res, next) => {
 })
 
 exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
-    console.log(req.body)
+
     const fields = req.body.data.fields;
     let data = {};
-    console.log("fields: ", fields);
-    req.body.data.fields.forEach((field) => {
+    
+    fields.forEach((field) => {
         data[field.label] = field.value;
     });
 
@@ -82,7 +82,7 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
         brgy: data.brgy,
         city: data.city
     }
-    console.log("home_address: ", home_address);
+    
     /*
     
       name: 'New Patient 1',
@@ -98,6 +98,7 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
         home_address,
         phone: data.phone,
         motherName: data.motherName,
+        staff: data.staffId
     }
     const patient = await Patient.create(patientData);
 
