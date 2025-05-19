@@ -379,7 +379,7 @@ exports.reserveInventoryForRequest = catchAsyncErrors(
 
         // Check if all bottles are now reserved
         const allReserved = inventory.pasteurizedDetails.bottles.every(
-          (bot) => bot.status === "Reserved"
+          (bot) => bot.status !== "Available"
         );
 
         if (allReserved) {

@@ -75,19 +75,35 @@ exports.allFridges = catchAsyncErrors(async (req, res) => {
         }
         if (past.length > 0) {
             pastFridge = await Promise.all(past.map(async (fridge) => {
-                const inventories = await Inventory.find({ fridge: fridge._id })
-
-                // Calculate total volume for this fridge
-                totalVolume = inventories.reduce((acc, inv) => acc + (inv.status === "Available" && inv.pasteurizedDetails.batchVolume || 0), 0);
-
+                const inventories = await Inventory.find({ fridge: fridge._id, status: "Available" })
+                    .populate({
+                        path: "pasteurizedDetails.donors",
+                        populate: {
+                            path: "user",
+                            select: "name"
+                        }
+                    })
+                    .sort({ 'pasteurizedDetails.pasteurizationDate': 1 })
                 // Return fridge object with totalVolume included
                 return {
-                    ...fridge.toObject(), // Convert Mongoose object to plain object
-                    totalVolume
+                    ...fridge.toObject(),
+                    inventories
                 };
             }));
         }
-        const availableMilk = pastFridge.reduce((acc, fridge) => acc + fridge.totalVolume, 0);
+        let availableMilk = 0;
+        pastFridge[0].inventories.forEach((inventory) => {
+            if (inventory.status === "Available") {
+                const details = inventory.pasteurizedDetails;
+                const bottleVolume = details.bottleType; // volume per bottle in mL
+
+                const availableBottlesCount = details.bottles.filter(
+                    (bottle) => bottle.status === "Available"
+                ).length;
+
+                availableMilk += availableBottlesCount * bottleVolume;
+            }
+        });
 
         const updatedFridges = [...unpastFridge, ...pastFridge]
         res.status(200).json({
@@ -304,24 +320,7 @@ exports.openFridge = catchAsyncErrors(async (req, res, next) => {
                 .sort((a, b) => new Date(a.expressDate) - new Date(b.expressDate)); // Sort by expressDate
 
         }
-        // // Loop through inventories and update status if all bags are pasteurized
-        // for (const inventory of inventories) {
-        //     const pubBags = inventory?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att =>
-        //         [...(att.bags || []), ...(att.additionalBags || [])]
-        //     ) || [];
 
-        //     const privBags = inventory?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || [];
-
-        //     const allBags = [...pubBags, ...privBags];
-
-        //     // Check if all bags are "Pasteurized"
-        //     const allPasteurized = allBags.length > 0 && allBags.every(bag => bag.status === "Pasteurized");
-
-        //     if (allPasteurized) {
-        //         // Update the inventory status to "Unavailable"
-        //         await Inventory.findByIdAndUpdate(inventory._id, { status: "Unavailable" });
-        //     }
-        // }
     }
     else if (fridge.fridgeType === "Pasteurized") {
         const inventories = await Inventory.find({ fridge: id })
