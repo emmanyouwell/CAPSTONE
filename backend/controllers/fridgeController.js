@@ -88,7 +88,7 @@ exports.allFridges = catchAsyncErrors(async (req, res) => {
             }));
         }
         const availableMilk = pastFridge.reduce((acc, fridge) => acc + fridge.totalVolume, 0);
-        
+
         const updatedFridges = [...unpastFridge, ...pastFridge]
         res.status(200).json({
             success: true,
@@ -289,12 +289,16 @@ exports.openFridge = catchAsyncErrors(async (req, res, next) => {
         if (inventories) {
             allBags = inventories.flatMap(inv => {
                 if (inv?.unpasteurizedDetails?.collectionId?.pubDetails) {
-                    return inv?.unpasteurizedDetails?.collectionId?.pubDetails?.attendance?.flatMap(att => [...(att.bags) || [], ...(att.additionalBags || [])])
+                    return inv.unpasteurizedDetails.collectionId.pubDetails.attendance?.flatMap(att => [
+                        ...(att.bags || []),
+                        ...(att.additionalBags || [])
+                    ]) || [];
+                } else if (inv?.unpasteurizedDetails?.collectionId?.privDetails) {
+                    return inv.unpasteurizedDetails.collectionId.privDetails.donorDetails?.bags || [];
                 }
-                else if (inv?.unpasteurizedDetails?.collectionId?.privDetails) {
-                    return inv?.unpasteurizedDetails?.collectionId?.privDetails?.donorDetails?.bags || []
-                }
-            })
+
+                return []; // <- Always return an array
+            });
             filteredBags = allBags
                 .filter(bag => bag.status !== "Pasteurized") // Filter out "Pasteurized" bags
                 .sort((a, b) => new Date(a.expressDate) - new Date(b.expressDate)); // Sort by expressDate
