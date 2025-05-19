@@ -310,24 +310,41 @@ exports.getAvailableMilk = catchAsyncErrors(async (req, res, next) => {
 
     if (past.length > 0) {
       pastFridge = await Promise.all(past.map(async (fridge) => {
-        const inventories = await Inventory.find({ fridge: fridge._id })
-
-        // Calculate total volume for this fridge
-        totalVolume = inventories.reduce((acc, inv) => acc + (inv.status === "Available" && inv.pasteurizedDetails.batchVolume || 0), 0);
-
+        const inventories = await Inventory.find({ fridge: fridge._id, status: "Available" })
+          .populate({
+            path: "pasteurizedDetails.donors",
+            populate: {
+              path: "user",
+              select: "name"
+            }
+          })
+          .sort({ 'pasteurizedDetails.pasteurizationDate': 1 })
         // Return fridge object with totalVolume included
         return {
-
-          totalVolume
+          inventories
         };
       }));
     }
 
-    const availableMilk = pastFridge.reduce((acc, fridge) => acc + fridge.totalVolume, 0);
+    pastFridge[0].inventories.forEach((inventory) => {
+      if (inventory.status === "Available") {
+        const details = inventory.pasteurizedDetails;
+        const bottleVolume = details.bottleType; // volume per bottle in mL
+
+        const availableBottlesCount = details.bottles.filter(
+          (bottle) => bottle.status === "Available"
+        ).length;
+
+        totalVolume += availableBottlesCount * bottleVolume;
+      }
+    });
+
+
+
     res.status(200).json({
       success: true,
-      count: pastFridge.length,
-      availableMilk: availableMilk
+      count: pastFridge[0].inventories.length,
+      availableMilk: totalVolume
     });
   } catch (error) {
     console.error('Error fetching fridges:', error);
