@@ -1,80 +1,148 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, Button, TouchableOpacity, RefreshControl } from 'react-native'
-import Header from '../../components/Superadmin/Header'
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { useDispatch, useSelector } from "react-redux";
+import Header from "../../components/Superadmin/Header";
+import { logoutUser } from "../../redux/actions/userActions";
+import { getAllSchedules } from "../../redux/actions/scheduleActions";
+import { SuperAdmin } from "../../styles/Styles";
+import Schedules from "../../components/Superadmin/Schedule/Schedules";
+import { resetError } from "../../redux/slices/scheduleSlice";
 
-import { SuperAdmin, buttonStyle } from '../../styles/Styles'
-
-import { logoutUser } from '../../redux/actions/userActions'
-import { useDispatch, useSelector } from 'react-redux'
-import Icon from 'react-native-vector-icons/Ionicons';
-import CalendarComponent from '../../components/Superadmin/Schedule/CalendarComponent'
-import { getEvents } from '../../redux/actions/eventActions'
-import { ScrollView } from 'react-native-gesture-handler'
 const Schedule = ({ navigation }) => {
   const dispatch = useDispatch();
-  const [mode, setMode] = useState('month');
-  const handleMenuClick = () => {
-    navigation.openDrawer();
-  }
-  const handleLogoutClick = () => {
-    dispatch(logoutUser()).then(() => { navigation.navigate('login') }).catch((err) => console.log(err))
-  }
+  const { schedules, error, loading } = useSelector((state) => state.schedules);
+
   const [refreshing, setRefreshing] = useState(false);
-  const [events, setEvents] = useState([]);
+
   useEffect(() => {
-
-    dispatch(getEvents()).then((res) => {
-      console.log("response: ", res);
-
-      // Format events properly
-      const formattedEvents = res.payload.events.filter(event => event.eventStatus !== "Done").map(event => ({
-        title: event.title,
-        start: new Date(event.eventDetails.start),
-        end: new Date(event.eventDetails.end),
-        status: event.eventStatus,
-        id: event._id
-      }))
-      setEvents(formattedEvents); // Update state in one go
-    });
+    dispatch(getAllSchedules());
   }, [dispatch]);
+  useEffect(() => {
+    if (error) {
+      dispatch(resetError());
+    }
+  }, [error]);
   const handleRefresh = () => {
     setRefreshing(true);
-    dispatch(getEvents())
-      .then((res) => {
-        console.log("response: ", res);
-
-        // Format events properly
-        const formattedEvents = res.payload.events.filter(event => event.eventStatus !== "Done").map(event => ({
-          title: event.title,
-          start: new Date(event.eventDetails.start),
-          end: new Date(event.eventDetails.end),
-          status: event.eventStatus,
-          id: event._id
-        }))
-        setEvents(formattedEvents); // Update state in one go
-        setRefreshing(false)
-      })
+    dispatch(getAllSchedules())
+      .then(() => setRefreshing(false))
       .catch(() => setRefreshing(false));
   };
+
+  const onMenuPress = () => {
+    navigation.openDrawer();
+  };
+
+  const onLogoutPress = () => {
+    dispatch(logoutUser())
+      .then(() => {
+        navigation.navigate("login");
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const filteredSchedules = schedules.filter(
+    (sched) => sched.status && sched.status !== "Completed"
+  );
+  
   return (
-    <>
-      <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
-      <View style={{ ...SuperAdmin.container, padding: 10 }}>
+    <View style={SuperAdmin.container}>
+      {/* Header Component */}
+      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
 
-        <View style={{ flexDirection: "row", justifyContent: 'center', gap: 4, alignItems: 'center', paddingHorizontal: 10 }}>
+      <Text style={styles.screenTitle}>Schedules Management</Text>
 
-          <Text style={SuperAdmin.headerText}>Schedules</Text>
-          <TouchableOpacity  onPress={handleRefresh}>
-            <Icon name="refresh" size={30} color="#000" />
-          </TouchableOpacity>
-        </View>
-        <CalendarComponent events={events} mode={mode} setMode={setMode} />
-
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={styles.historyButton}
+          onPress={() => navigation.navigate("HistoryLetting")}
+        >
+          <Text style={styles.buttonText}>
+            <MaterialIcons name="history" size={16} color="white" /> History
+          </Text>
+        </TouchableOpacity>
       </View>
-    </>
 
-  )
-}
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
+        <SafeAreaView style={styles.form}>
+          {loading ? (
+            <Text>Loading...</Text>
+          ) : error ? (
+            <View style={styles.center}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : (
+            <Schedules data={filteredSchedules} />
+          )}
+        </SafeAreaView>
+      </ScrollView>
+    </View>
+  );
+};
 
-export default Schedule
+const styles = StyleSheet.create({
+  screenTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginVertical: 16,
+  },
+  form: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  navButtons: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 16,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginVertical: 8,
+    width: "80%",
+    alignItems: "center",
+  },
+  historyButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#4CAF50",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 5,
+    marginLeft: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});
+
+export default Schedule;
