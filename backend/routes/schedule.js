@@ -10,7 +10,7 @@ const {
     requestSchedule,
     approveSchedule,
     getDonorSchedules,
-    checkScheduleBagStatus
+    updateStatus
 } = require('../controllers/scheduleController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -33,6 +33,9 @@ router.route('/request-schedule')
 // Route to approve or modify a pickup schedule
 router.route('/approve-schedule')
     .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), approveSchedule);
+
+router.route('/update-schedule')
+    .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateStatus);
 
 
 module.exports = router;

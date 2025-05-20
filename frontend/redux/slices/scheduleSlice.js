@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   approveSchedule,
+  getAllSchedules,
   getDonorSchedules,
   getScheduleDetails,
   requestSchedule,
+  updateSchedule,
 } from "../actions/scheduleActions";
 
 export const scheduleSlice = createSlice({
@@ -20,6 +22,9 @@ export const scheduleSlice = createSlice({
   reducers: {
     resetSuccess: (state) => {
       state.success = false;
+    },
+    resetError: (state) => {
+      state.error = null;
     },
     resetScheduleDetails: (state) => {
       state.scheduleDetails = {};
@@ -75,9 +80,33 @@ export const scheduleSlice = createSlice({
       .addCase(getScheduleDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      
+      .addCase(getAllSchedules.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getAllSchedules.fulfilled, (state, action) => {
+        state.loading = false;
+        state.schedules = action.payload.schedules;
+      })
+      .addCase(getAllSchedules.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      .addCase(updateSchedule.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updateSchedule.fulfilled, (state, action) => {
+        state.loading = false;
+        state.scheduleDetails = action.payload.schedule;
+      })
+      .addCase(updateSchedule.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { resetSuccess, resetScheduleDetails } = scheduleSlice.actions;
+export const { resetSuccess, resetScheduleDetails, resetError } = scheduleSlice.actions;
 export default scheduleSlice.reducer;
