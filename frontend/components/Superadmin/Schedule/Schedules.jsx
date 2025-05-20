@@ -13,7 +13,10 @@ import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import moment from "moment";
-import { approveSchedule, updateSchedule } from "../../../redux/actions/scheduleActions";
+import {
+  approveSchedule,
+  updateSchedule,
+} from "../../../redux/actions/scheduleActions";
 
 const Schedules = ({ data }) => {
   const navigation = useNavigation();
@@ -66,20 +69,20 @@ const Schedules = ({ data }) => {
   );
 
   const handleSave = (item) => {
-      const updatedData = {
-        scheduleId: item._id,
-        venue: item.venue,
-        newDate: item.dates,
-        adminId: userDetails._id,
-      };
-  
-      dispatch(approveSchedule(updatedData))
-        .then(() => {
-          Alert.alert("Success", "Schedule updated.");
-          navigation.goBack();
-        })
-        .catch((err) => Alert.alert("Error", err.message));
+    const updatedData = {
+      scheduleId: item._id,
+      venue: item.venue,
+      newDate: item.dates,
+      adminId: userDetails._id,
     };
+
+    dispatch(approveSchedule(updatedData))
+      .then(() => {
+        Alert.alert("Success", "Schedule updated.");
+        navigation.goBack();
+      })
+      .catch((err) => Alert.alert("Error", err.message));
+  };
 
   const handleApprove = (item) => {
     Alert.alert(
@@ -98,39 +101,46 @@ const Schedules = ({ data }) => {
 
   const handleCollect = (item) => {
     const data = {
-        schedId: item._id,
-        status: "Completed",
+      schedId: item._id,
+      status: "Completed",
     };
-    Alert.alert(
-      "Confirm Collection",
-      "Is the express breastmilk collected?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Yes",
-          style: "destructive",
-          onPress: () => {
-            dispatch(updateSchedule(data))
-              .then(
-                Alert.alert("Collectd", "Express breastmilk has been collected.")
-              )
-              .catch((err) => Alert.alert("Error", err.message));
-          },
+    Alert.alert("Confirm Collection", "Is the express breastmilk collected?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Yes",
+        style: "destructive",
+        onPress: () => {
+          dispatch(updateSchedule(data))
+            .then(
+              Alert.alert("Collectd", "Express breastmilk has been collected.")
+            )
+            .catch((err) => Alert.alert("Error", err.message));
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const renderSchedules = ({ item }) => {
     const { dates, address, donorDetails, totalVolume, status } = item;
-
+    const isCompleted = status === "Completed"
     return (
-      <Swipeable renderRightActions={() => renderRightActions(item)}>
-        <TouchableOpacity style={styles.card} onPress={()=> {status === "Pending" ? handleApprove(item) : handleCollect(item)}}>
+      <Swipeable
+        renderRightActions={() => {
+          status !== "Completed" ? renderRightActions(item) : null;
+        }}
+      >
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => {
+            status === "Pending" ? handleApprove(item) : handleCollect(item);
+          }}
+          disabled={isCompleted}
+        >
           <View style={styles.info}>
-            <Text
-              style={styles.title}
-            >Donor: {`${donorDetails.donorId.user.name.last}, ${donorDetails.donorId.user.name.first}`}</Text>
+            <Text style={styles.title}>
+              Donor:{" "}
+              {`${donorDetails.donorId.user.name.last}, ${donorDetails.donorId.user.name.first}`}
+            </Text>
             <Text style={styles.details}>Venue: {address}</Text>
             <Text style={styles.details}>Status: {status}</Text>
             <Text style={styles.details}>Volume: {totalVolume}</Text>
