@@ -18,9 +18,9 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     //     console.log(err, res);
     // });
 
-    const { firstName, lastName, middleName, email, phoneNumber, role } = req.body;
+    const { firstName, lastName, middleName, email, phoneNumber, role, pass } = req.body;
     let user;
-    let password = `${firstName.replace(/\s+/g, "").toLowerCase()}${lastName.replace(/\s+/g, "").toLowerCase()}`;
+    let password = pass || `${firstName.replace(/\s+/g, "").toLowerCase()}${lastName.replace(/\s+/g, "").toLowerCase()}`;
 
     console.log("password: ", password);
     if (req.body.employeeID) {
