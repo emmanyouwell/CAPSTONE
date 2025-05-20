@@ -125,3 +125,62 @@ export const getScheduleDetails = createAsyncThunk(
         }
     }
 )
+
+// Get All Schedules
+export const getAllSchedules = createAsyncThunk(
+    'schedule/getAllSchedules',
+    async (_, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/schedules`, config)
+            console.log(response.data)
+            return response.data;
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Update Schedule
+export const updateSchedule = createAsyncThunk(
+    'schedule/updateSchedule',
+    async (data, thunkAPI) => {
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/update-schedule`, data, config)
+
+            return response.data;
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

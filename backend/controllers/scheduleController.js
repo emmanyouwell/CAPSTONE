@@ -283,3 +283,31 @@ exports.approveSchedule = catchAsyncErrors(async (req, res) => {
       .json({ error: "Failed to approve schedule", details: error.message });
   }
 });
+
+
+exports.updateStatus = catchAsyncErrors(async (req, res, next) => {
+  const { schedId, status } = req.body;
+
+  const schedule = await Schedule.findById(schedId);
+  if (!schedule) return res.status(404).json({ error: "Schedule not found" });
+
+  schedule.status = status;
+
+  await schedule.save();
+
+  if (schedule.status === "Completed") {
+    const collection = await Collection.findOne({privDetails: schedId});
+    collection.status = "Collected";
+    await collection.save();
+
+    await Bag.updateMany(
+      { _id: { $in: schedule.donorDetails.bags } },
+      { $set: { status: "Collected" } }
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    schedule,
+  });
+});
