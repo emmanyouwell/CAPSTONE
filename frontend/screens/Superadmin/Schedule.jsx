@@ -64,7 +64,7 @@ const Schedule = ({ navigation }) => {
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={styles.historyButton}
-          onPress={() => navigation.navigate("HistoryLetting")}
+          onPress={() => navigation.navigate("HistorySchedules")}
         >
           <Text style={styles.buttonText}>
             <MaterialIcons name="history" size={16} color="white" /> History

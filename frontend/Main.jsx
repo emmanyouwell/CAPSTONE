@@ -73,6 +73,7 @@ import AddArticles from "./components/Superadmin/Articles/AddArticles";
 
 // Schedules
 import EditSchedule from "./components/Superadmin/Schedule/EditSchedule";
+import HistorySchedules from "./components/Superadmin/Schedule/HistorySchedules";
 
 //Charts Screens
 import MilkPerMonth from "./components/Superadmin/Metrics/MilkPerMonth";
@@ -256,6 +257,7 @@ const MainStack = () => {
         <Stack.Screen name="addEvents" component={AddEvent} />
         <Stack.Screen name="schedule_user" component={PickUpSchedules} />
         <Stack.Screen name="EditSchedule" component={EditSchedule} />
+        <Stack.Screen name="HistorySchedules" component={HistorySchedules} />
         {/* Articles */}
         <Stack.Screen name="superadmin_articles"
           component={Articles} />
