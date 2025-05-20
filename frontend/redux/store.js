@@ -15,6 +15,7 @@ import lettingReducer from './slices/lettingSlice'
 import scheduleReducer from './slices/scheduleSlice'
 import collectionReducer from './slices/collectionSlice'
 import metricReducer from './slices/metricSlice'
+import announcementReducer from './slices/announcementSlice'
 export const store = configureStore({
   reducer: {
     counter: counterReducer,
@@ -32,7 +33,8 @@ export const store = configureStore({
     lettings: lettingReducer,
     schedules: scheduleReducer,
     collections: collectionReducer,
-    metrics: metricReducer
+    metrics: metricReducer,
+    announcements: announcementReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
