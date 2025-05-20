@@ -45,6 +45,7 @@ const collection = require('./routes/collection');
 const bag = require('./routes/bag')
 const checkEvents = require('./schedule/eventChecker');
 const metrics = require('./routes/metrics');
+const announcement = require('./routes/announcement');
 // API routes
 app.use('/api/v1', user);
 app.use('/api/v1', event);
@@ -61,6 +62,7 @@ app.use('/api/v1', letting);
 app.use('/api/v1', collection);
 app.use('/api/v1', bag);
 app.use('/api/v1', metrics)
+app.use('/api/v1', announcement);
 
 // Middleware to handle errors
 app.use(errorMiddleware);

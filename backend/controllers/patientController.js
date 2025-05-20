@@ -93,14 +93,15 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
       phone: '09665867965'
     
     */
-    const patientData = {
-        name: data.name,
-        home_address,
-        phone: data.phone,
-        motherName: data.motherName,
-        staff: data.staffId
-    }
-    const patient = await Patient.create(patientData);
+    // const patientData = {
+    //     name: data.name,
+    //     home_address,
+    //     phone: data.phone,
+    //     motherName: data.motherName,
+    //     staff: data.staffId,
+        
+    // }
+    // const patient = await Patient.create(patientData);
 
     res.status(201).json({
         success: true,
