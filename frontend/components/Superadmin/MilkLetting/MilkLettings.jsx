@@ -80,7 +80,7 @@ const MilkLettings = ({ data }) => {
           <MaterialIcons name="group-add" size={30} color="white" />
         </TouchableOpacity>
       )}
-      {item.status === "On-Going" && item.attendance.lenght > 0 && (
+      {item.status === "On-Going" && item.attendance.length > 0 && (
         <TouchableOpacity
           style={[styles.actionButton, styles.finalizeButton]}
           onPress={() => navigation.navigate("FinalizeLetting", { item })}
@@ -93,7 +93,6 @@ const MilkLettings = ({ data }) => {
 
   const renderEquipment = ({ item }) => {
     const { activity, venue, status, actDetails, attendance } = item;
-
     return (
       <Swipeable
         renderRightActions={() => renderRightActions(item)}
