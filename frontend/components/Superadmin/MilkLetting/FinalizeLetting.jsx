@@ -14,7 +14,6 @@ import moment from "moment";
 import Header from "../../../components/Superadmin/Header";
 import { logoutUser, getUserDetails } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
-import { getUser } from "../../../utils/helper";
 import {
   finalizeSession,
   getLettingDetails,
@@ -25,10 +24,8 @@ import { useFocusEffect } from "@react-navigation/native";
 const FinalizeLetting = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { item } = route.params;
-
-  // const [userDetails, setUserDetails] = useState(null);
   const { userDetails } = useSelector((state) => state.users);
-  const { lettingDetails, loading, success } = useSelector(
+  const { lettingDetails, loading, error } = useSelector(
     (state) => state.lettings
   );
   const [refreshing, setRefreshing] = useState(false);
@@ -38,22 +35,6 @@ const FinalizeLetting = ({ route, navigation }) => {
       dispatch(getLettingDetails(item._id));
     }
   }, [dispatch]);
-
-  // useEffect(() => {
-  //   startTransition(() => {
-  //     const fetchUserDetails = async () => {
-  //       const user = await getUser();
-  //       setUserDetails(user);
-  //     };
-  //     fetchUserDetails();
-  //   });
-  // }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      dispatch(getUserDetails());
-    }, [dispatch]) // Only depends on `dispatch`
-  );
 
 
   const handleRefresh = () => {
