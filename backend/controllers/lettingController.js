@@ -424,6 +424,9 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
       contact_number: data.contact_number_2,
       donorType: "Community",
       occupation: data.occupation,
+      verified: true,
+      lastSubmissionDate: new Date(),
+      eligibility: "Eligible"
     });
 
     res.status(200).json({
