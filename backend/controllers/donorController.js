@@ -49,9 +49,7 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
         const donors = await Donor.find(query)
             .populate('user')
             .sort({ 'user.name.first': 1 })
-            .skip(skip)
-            .limit(pageSize);
-
+           
         const totalDonors = await Donor.countDocuments(query);
         const totalPages = Math.ceil(totalDonors / pageSize);
 

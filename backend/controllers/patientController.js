@@ -34,8 +34,6 @@ exports.allPatients = catchAsyncErrors(async (req, res, next) => {
         const patients = await Patient.find(query)
             .populate('requested', 'date volumeRequested')
             .sort({ name: 1 })
-            .skip(skip)
-            .limit(pageSize);
 
         const totalPatients = await Patient.countDocuments(query);
         const totalPages = Math.ceil(totalPatients / pageSize);
