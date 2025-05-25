@@ -84,33 +84,35 @@ exports.allFridges = catchAsyncErrors(async (req, res) => {
                         }
                     })
                     .sort({ 'pasteurizedDetails.pasteurizationDate': 1 })
+                let availableMilk = 0;
+                inventories.forEach((inventory) => {
+                    if (inventory.status === "Available") {
+                        const details = inventory.pasteurizedDetails;
+                        const bottleVolume = details.bottleType; // volume per bottle in mL
+
+                        const availableBottlesCount = details.bottles.filter(
+                            (bottle) => bottle.status === "Available"
+                        ).length;
+
+                        availableMilk += availableBottlesCount * bottleVolume;
+                    }
+                });
                 // Return fridge object with totalVolume included
                 return {
                     ...fridge.toObject(),
-                    inventories
+                    inventories,
+                    availableMilk
                 };
             }));
         }
-        let availableMilk = 0;
-        pastFridge[0].inventories.forEach((inventory) => {
-            if (inventory.status === "Available") {
-                const details = inventory.pasteurizedDetails;
-                const bottleVolume = details.bottleType; // volume per bottle in mL
 
-                const availableBottlesCount = details.bottles.filter(
-                    (bottle) => bottle.status === "Available"
-                ).length;
-
-                availableMilk += availableBottlesCount * bottleVolume;
-            }
-        });
 
         const updatedFridges = [...unpastFridge, ...pastFridge]
         res.status(200).json({
             success: true,
             count: updatedFridges.length,
             fridges: updatedFridges,
-            availableMilk: availableMilk
+            
         });
     } catch (error) {
         console.error('Error fetching fridges:', error);

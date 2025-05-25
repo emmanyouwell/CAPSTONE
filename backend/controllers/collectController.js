@@ -38,17 +38,17 @@ exports.recordPublicDonation = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("No matching donors found for this event."));
     }
 
-        res.status(200).json({ 
-            success: true, 
-            message: 'Donation recorded successfully',
-            updatedDonors: result.modifiedCount
-        });
-    } catch (error) {
-        res.status(500).json({ 
-            error: 'Failed to record donation', 
-            details: error.message 
-        });
-    }
+    res.status(200).json({
+      success: true,
+      message: 'Donation recorded successfully',
+      updatedDonors: result.modifiedCount
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to record donation',
+      details: error.message
+    });
+  }
 });
 
 // Record Private Donation after Schedule Approval
@@ -91,54 +91,107 @@ exports.recordPrivateDonation = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getCollections = catchAsyncErrors(async (req, res, next) => {
-    try {
-        const collections = await Collection.find()
-            .populate('user')
-            .populate({
-                path: 'pubDetails',
-                populate: [
-                    {
-                        path: 'attendance.donor',
-                        populate: { path: 'user', select: 'name phone' }
-                    },
-                    {
-                        path: 'attendance.bags',
-                        select: 'volume'
-                    },
-                    {
-                        path: 'attendance.additionalBags',
-                        select: 'volume expressDate',
-                    }
-                ],
-                select: { 'activity': 1, 'venue': 1, 'totalVolume': 1, 'attendance': 1 }
-            })
+  try {
+    const { search, type } = req.query;
 
-            .populate({
-                path: 'privDetails',
-                populate: [
-                    {
-                        path: 'donorDetails.donorId',
-                        populate: {path: 'user', select: 'name phone'}
-                    },
-                    {
-                        path: 'donorDetails.bags'
-                    }
-                ]
-            
-            })
-            .sort({ collectionDate: -1 });
+    const regexQuery = new RegExp(search, 'i'); // Case-insensitive match
+    const regexType = new RegExp(type, 'i'); // Case-insensitive match
+    const collections = await Collection.aggregate([
+      {
+        $match: {
+          collectionType: regexType
+        }
+      },
+      // Lookup pubDetails → Letting
+      {
+        $lookup: {
+          from: 'lettings',
+          localField: 'pubDetails',
+          foreignField: '_id',
+          as: 'pubDetails'
+        }
+      },
+      {
+        $unwind: {
+          path: '$pubDetails',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+
+      // Lookup privDetails → Schedule
+      {
+        $lookup: {
+          from: 'schedules',
+          localField: 'privDetails',
+          foreignField: '_id',
+          as: 'privDetails'
+        }
+      },
+      {
+        $unwind: {
+          path: '$privDetails',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+
+      // Lookup privDetails.donorDetails.donorId → Donor
+      {
+        $lookup: {
+          from: 'donors',
+          localField: 'privDetails.donorDetails.donorId',
+          foreignField: '_id',
+          as: 'donor'
+        }
+      },
+      {
+        $unwind: {
+          path: '$donor',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+
+      // Lookup donor.user → User
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'donor.user',
+          foreignField: '_id',
+          as: 'donorUser'
+        }
+      },
+      {
+        $unwind: {
+          path: '$donorUser',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+
+      // Match by pubDetails.activity or donorUser.name
+      {
+        $match: {
+          $or: [
+            { 'pubDetails.activity': { $regex: regexQuery } },
+            { 'donorUser.name.firstName': { $regex: regexQuery } },
+            { 'donorUser.name.lastName': { $regex: regexQuery } }
+          ]
+        }
+      },
+
+      // Sort if needed
+      { $sort: { collectionDate: -1 } }
+    ]);
 
 
 
 
-        res.status(200).json({
-            success: true,
-            collections
-        })
-    }
-    catch (error) {
-        res.status(500).json({ error: 'Failed to retrieve collections', message: error.message });
-    }
+    res.status(200).json({
+      success: true,
+      collections
+    })
+  }
+  catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve collections', message: error.message });
+  }
 })
 
 // Get specific collection details => /api/v1/collection/:id
