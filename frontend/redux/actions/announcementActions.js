@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 export const getAnnouncement = createAsyncThunk(
     'article/getAnnouncement',
     async(query, thunkAPI) => {
@@ -20,12 +20,12 @@ export const getAnnouncement = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `${REACT_APP_API_URL}/api/v1/announcements?search=${query}`
+                urlString = `/api/v1/announcements?search=${query}`
             }
             else {
-                urlString = `${REACT_APP_API_URL}/api/v1/announcements`
+                urlString = `/api/v1/announcements`
             }
-            const response = await axios.get(urlString, config);
+            const response = await api.get(urlString, config);
             console.log("Response", response.data)
             console.log("URL: ", urlString)
             return response.data;
@@ -52,8 +52,8 @@ export const addAnnouncements = createAsyncThunk(
         }
         try {
             console.log("sending request");
-            console.log(`${REACT_APP_API_URL}/api/v1/articles`)
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/announcements`, req, config);
+            console.log(`/api/v1/articles`)
+            const response = await api.post(`/api/v1/announcements`, req, config);
             console.log("response: ", response);
             return response.data;
         }catch (error){
@@ -77,7 +77,7 @@ export const updateAnnouncements = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/announcement/${req.id}`, req, config);
+            const response = await api.put(`/api/v1/announcement/${req.id}`, req, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
@@ -100,7 +100,7 @@ export const deleteAnnouncement = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/announcement/${id}`, config);
+            const response = await api.delete(`/api/v1/announcement/${id}`, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
@@ -123,7 +123,7 @@ export const getAnnouncementDetails = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/announcement/${id}`, config);
+            const response = await api.get(`/api/v1/announcement/${id}`, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);

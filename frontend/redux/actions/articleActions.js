@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 export const getArticles = createAsyncThunk(
     'article/getArticles',
     async(query, thunkAPI) => {
@@ -20,12 +20,12 @@ export const getArticles = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `${REACT_APP_API_URL}/api/v1/articles?search=${query}`
+                urlString = `/api/v1/articles?search=${query}`
             }
             else {
-                urlString = `${REACT_APP_API_URL}/api/v1/articles`
+                urlString = `/api/v1/articles`
             }
-            const response = await axios.get(urlString, config);
+            const response = await api.get(urlString, config);
             console.log("Response", response.data)
             console.log("URL: ", urlString)
             return response.data;
@@ -52,8 +52,8 @@ export const addArticles = createAsyncThunk(
         }
         try {
             console.log("sending request");
-            console.log(`${REACT_APP_API_URL}/api/v1/articles`)
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/articles`, req, config);
+            console.log(`/api/v1/articles`)
+            const response = await api.post(`/api/v1/articles`, req, config);
             console.log("response: ", response);
             return response.data;
         }catch (error){
@@ -77,7 +77,7 @@ export const updateArticle = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/article/${req.id}`, req, config);
+            const response = await api.put(`/api/v1/article/${req.id}`, req, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
@@ -100,7 +100,7 @@ export const deleteArticle = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/article/${id}`, config);
+            const response = await api.delete(`/api/v1/article/${id}`, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);
@@ -123,7 +123,7 @@ export const getArticleDetails = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/article/${id}`, config);
+            const response = await api.get(`/api/v1/article/${id}`, config);
             return response.data;
         }catch (error){
             return thunkAPI.rejectWithValue(error.message);

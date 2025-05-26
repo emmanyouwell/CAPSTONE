@@ -1,9 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
-import { REACT_APP_API_URL } from '@env';
+
 // import {server as REACT_APP_API_URL} from '../store';
 // import {REACT_APP_API_URL} from '../store';
+import {API_URL} from '@env';
 import api from '../../api/axiosInstance'
 export const loginUser = createAsyncThunk(
   'user/loginUser',
@@ -17,9 +18,9 @@ export const loginUser = createAsyncThunk(
       
     };
     try {
-      let url = `${REACT_APP_API_URL}/api/v1/login`;
+      let url = `${API_URL}/api/v1/login`;
       if (isEmp) {
-        url = `${REACT_APP_API_URL}/api/v1/login/?emp=true`;
+        url = `${API_URL}/api/v1/login/?emp=true`;
       }
       console.log("Login url: ", url);
       const response = await axios.post(url, credentials, config);
@@ -39,7 +40,7 @@ export const logoutUser = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await axios.get(
-        `${REACT_APP_API_URL}/api/v1/logout`,
+        `${API_URL}/api/v1/logout`,
         {},
         {
           headers: {
@@ -78,7 +79,7 @@ export const getUserDetails = createAsyncThunk(
     try {
       console.log("Getting user details");
       const response = await api.get(
-        `${REACT_APP_API_URL}/api/v1/me`,
+        `/api/v1/me`,
         config
       );
 
@@ -104,7 +105,7 @@ export const registerUser = createAsyncThunk(
     };
     try {
 
-      const response = await api.post(`${REACT_APP_API_URL}/api/v1/register`, userData, config);
+      const response = await api.post(`/api/v1/register`, userData, config);
       await authenticate(response.data, () => { });
       return response;
 
