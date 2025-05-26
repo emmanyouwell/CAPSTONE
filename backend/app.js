@@ -66,7 +66,9 @@ app.use('/api/v1', announcement);
 
 // Example refresh route
 app.post('/api/v1/refresh-token', (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies.refreshToken || req.refreshToken;
+    console.log("Refresh Token:", refreshToken);
+    console.log("Called")
     if (!refreshToken) return res.status(401).json({ message: 'No refresh token' });
 
     try {
