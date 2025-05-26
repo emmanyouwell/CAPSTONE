@@ -5,6 +5,7 @@ export const authenticate = async (data, next) => {
   try {
     
     await AsyncStorage.setItem('token', JSON.stringify(data.token));
+    await AsyncStorage.setItem('refreshToken', JSON.stringify(data.refreshToken));
     await AsyncStorage.setItem('user', JSON.stringify(data.user));
   } catch (error) {
     console.error('Error storing authentication data', error);

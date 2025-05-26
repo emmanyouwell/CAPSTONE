@@ -1,6 +1,7 @@
 import api from './axiosInstance'
 import { logoutUser } from '../redux/actions/userActions';
 import store from '../redux/store'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 let isRefreshing = false;
 export const setupAxiosInterceptors = () => {
     // Add access token to request
@@ -19,7 +20,7 @@ export const setupAxiosInterceptors = () => {
         async error => {
             const originalRequest = error.config;
 
-            if (error.response.status === 401 && !originalRequest._retry) {
+            if (error.response?.status === 401 && !originalRequest._retry) {
                 originalRequest._retry = true;
 
                 // Use refresh token to get a new access token
@@ -27,7 +28,7 @@ export const setupAxiosInterceptors = () => {
                 if (!isRefreshing) {
                     isRefreshing = true;
                     try {
-                        const res = await axios.post('/api/v1/refresh-token', {
+                        const res = await api.post('/api/v1/refresh-token', {
                             refreshToken,
                         });
                         const newAccessToken = res.data.accessToken;
