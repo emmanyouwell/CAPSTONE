@@ -3,47 +3,62 @@ import { logoutUser } from '../redux/actions/userActions';
 import store from '../redux/store'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 let isRefreshing = false;
-export const setupAxiosInterceptors = () => {
-    // Add access token to request
-    api.interceptors.request.use(async (config) => {
-        const token = await AsyncStorage.getItem('token');
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-            config.headers['x-client-type'] = 'mobile'; // identify as mobile
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
         }
-        return config;
     });
 
-    // Handle expired access token
+    failedQueue = [];
+};
+
+export const setupAxiosInterceptors = () => {
+    console.log("Initializing interceptors")
     api.interceptors.response.use(
         res => res,
         async error => {
             const originalRequest = error.config;
 
-            if (error.response?.status === 401 && !originalRequest._retry) {
+            if (error.response?.status === 403 && !originalRequest._retry) {
                 originalRequest._retry = true;
 
-                // Use refresh token to get a new access token
                 const refreshToken = await AsyncStorage.getItem('refreshToken');
-                if (!isRefreshing) {
-                    isRefreshing = true;
-                    try {
-                        const res = await api.post('/api/v1/refresh-token', {
-                            refreshToken,
+                console.log("refresh: ", refreshToken);
+                if (isRefreshing) {
+                    return new Promise(function (resolve, reject) {
+                        failedQueue.push({
+                            resolve: (token) => {
+                                originalRequest.headers.Authorization = 'Bearer ' + token;
+                                resolve(api(originalRequest));
+                            },
+                            reject: (err) => {
+                                reject(err);
+                            }
                         });
-                        const newAccessToken = res.data.accessToken;
-                        await AsyncStorage.setItem('token', newAccessToken);
-                        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                        isRefreshing=false;
-                        return api(originalRequest);
-                    } catch (refreshError) {
-                        // logout or show error
-                        isRefreshing=false;
-                        store.dispatch(logoutUser())
-                        return Promise.reject(refreshError);
-                    }
+                    });
                 }
 
+                isRefreshing = true;
+
+                try {
+                    const res = await api.post('/api/v1/refresh-token', { refreshToken });
+                    const newAccessToken = res.data.accessToken;
+                    await AsyncStorage.setItem('token', newAccessToken);
+                    processQueue(null, newAccessToken);
+                    isRefreshing = false;
+                    originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                    return api(originalRequest);
+                } catch (err) {
+                    processQueue(err, null);
+                    isRefreshing = false;
+                    store.dispatch(logoutUser());
+                    return Promise.reject(err);
+                }
             }
 
             return Promise.reject(error);

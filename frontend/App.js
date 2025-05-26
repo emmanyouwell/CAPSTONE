@@ -5,8 +5,14 @@ import { NotificationProvider } from "./context/NotificationContext";
 import * as Notifications from 'expo-notifications';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { setupAxiosInterceptors } from './api/interceptor';
-setupAxiosInterceptors();
+
+import { useEffect } from 'react'
 export default function App() {
+  useEffect(() => {
+    setupAxiosInterceptors();
+    console.log('[Setup] Axios interceptors initialized');
+
+  }, [])
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
