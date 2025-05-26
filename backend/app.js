@@ -83,7 +83,7 @@ app.post('/api/v1/refresh-token', (req, res) => {
             maxAge: 15 * 60 * 1000
         });
 
-        res.status(200).json({ success: true });
+        res.status(200).json({ success: true, accessToken: newAccessToken });
     } catch (err) {
         return res.status(403).json({ message: 'Invalid refresh token' });
     }
