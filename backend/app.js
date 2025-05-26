@@ -74,7 +74,7 @@ app.post('/api/v1/refresh-token', (req, res) => {
     try {
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         const newAccessToken = jwt.sign({ id: decoded.id, role: decoded.role }, process.env.JWT_SECRET, {
-            expiresIn: '15m'
+            expiresIn: '10s'
         });
 
         res.cookie('accessToken', newAccessToken, {
