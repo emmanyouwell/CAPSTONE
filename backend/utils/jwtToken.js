@@ -1,23 +1,30 @@
 const sendToken = (user, statusCode, req, res) => {
-    const token = user.getJwtToken();
+    const accessToken = user.getAccessToken();
+    const refreshToken = user.getRefreshToken();
 
     const isMobile = req.headers['x-client-type'] === 'mobile';
 
     if (isMobile) {
-        // Return token in response (for mobile clients)
-        res.setHeader('Authorization', `Bearer ${token}`);
+        res.setHeader('Authorization', `Bearer ${accessToken}`);
         res.status(statusCode).json({
             success: true,
-            token,
+            token: accessToken,
+            refreshToken, // Optional: only if mobile needs to store/refresh manually
             user
         });
     } else {
-        // Set token as httpOnly cookie (for web clients)
-        res.cookie('token', token, {
+        res.cookie('accessToken', accessToken, {
             httpOnly: true,
-            secure: false, // set to true in production with HTTPS
+            maxAge: 15 * 60 * 1000, // 15 mins
             sameSite: 'Strict',
-            maxAge: 15 * 60 * 1000 // 15 mins
+            secure: false // set to true in production
+        });
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            sameSite: 'Strict',
+            secure: false
         });
 
         res.status(statusCode).json({
@@ -26,5 +33,6 @@ const sendToken = (user, statusCode, req, res) => {
         });
     }
 };
+
 
 module.exports = sendToken
