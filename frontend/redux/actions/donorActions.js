@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
+import api from '../../api/axiosInstance'
 export const getDonors = createAsyncThunk(
     'donor/getDonors',
     async ({ search="", page = 1, pageSize = 10 }, thunkAPI) => {
@@ -26,7 +27,7 @@ export const getDonors = createAsyncThunk(
                 urlString += `&search=${encodeURIComponent(search)}`;
             }
 
-            const response = await axios.get(urlString, config);
+            const response = await api.get(urlString, config);
 
             return response.data;
         } catch (error) {
