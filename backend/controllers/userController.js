@@ -61,7 +61,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     }
 
 
-    sendToken(user, 200, res);
+    sendToken(user, 200, req, res);
 })
 
 
@@ -101,7 +101,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
         return res.status(401).json({ success: false, message: "Invalid email or password" });
     }
 
-    sendToken(user, 200, res);
+    sendToken(user, 200, req, res);
 })
 
 // Forgot Password => /api/v1/password/forgot
@@ -248,10 +248,11 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
 // Logout User => /api/v1/logout
 exports.logout = catchAsyncErrors(async (req, res, next) => {
 
-    res.cookie('token', null, {
-        expires: new Date(Date.now()),
-        httpOnly: true
-    })
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: false, // true in production if using HTTPS
+        sameSite: 'Strict'
+    });
 
     res.status(200).json({
         success: true,

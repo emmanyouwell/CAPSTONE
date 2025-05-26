@@ -11,6 +11,7 @@ export const loginUser = createAsyncThunk(
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",
+        'X-Client-Type': 'mobile'
       },
       withCredentials: true
     };

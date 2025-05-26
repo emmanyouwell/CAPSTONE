@@ -7,21 +7,21 @@ const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const checkExpiringMilk = require('./notifications/expirationChecker')
 const newDonor = require('./notifications/newDonor')
-
+const cookieParser = require('cookie-parser')
 const errorMiddleware = require('./middlewares/errors');
 
 // Setting up config file
 dotenv.config({ path: 'config/.env' });
 
 const corsOptions = {
-    origin:['*','http://localhost:5173', 'http://localhost:5174','http://192.168.7.85', 'http://192.168.5.235:8081','http://192.168.5.234:8081', 'https://tchmb-portal.vercel.app'], // Add your frontend's URL here
+    origin:['http://localhost:5173', 'http://localhost:5174','http://192.168.7.85', 'http://192.168.5.235:8081','http://192.168.5.234:8081', 'https://tchmb-portal.vercel.app'], // Add your frontend's URL here
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 app.use(cors(corsOptions));
-
+app.use(cookieParser());
 // Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
