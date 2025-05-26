@@ -4,6 +4,8 @@ import { store } from './redux/store';
 import { NotificationProvider } from "./context/NotificationContext";
 import * as Notifications from 'expo-notifications';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { setupAxiosInterceptors } from './api/interceptor';
+setupAxiosInterceptors();
 export default function App() {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({

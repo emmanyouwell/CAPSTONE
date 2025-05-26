@@ -9,12 +9,12 @@ const checkExpiringMilk = require('./notifications/expirationChecker')
 const newDonor = require('./notifications/newDonor')
 const cookieParser = require('cookie-parser')
 const errorMiddleware = require('./middlewares/errors');
-
+const jwt = require('jsonwebtoken');
 // Setting up config file
 dotenv.config({ path: 'config/.env' });
 
 const corsOptions = {
-    origin:['http://localhost:5173', 'http://localhost:5174','http://192.168.7.85', 'http://192.168.5.235:8081','http://192.168.5.234:8081', 'https://tchmb-portal.vercel.app'], // Add your frontend's URL here
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://192.168.7.85', 'http://192.168.5.235:8081', 'http://192.168.5.234:8081', 'https://tchmb-portal.vercel.app'], // Add your frontend's URL here
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -63,6 +63,29 @@ app.use('/api/v1', collection);
 app.use('/api/v1', bag);
 app.use('/api/v1', metrics)
 app.use('/api/v1', announcement);
+
+// Example refresh route
+app.post('/api/v1/refresh-token', (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) return res.status(401).json({ message: 'No refresh token' });
+
+    try {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const newAccessToken = jwt.sign({ id: decoded.id, role: decoded.role }, process.env.JWT_SECRET, {
+            expiresIn: '15m'
+        });
+
+        res.cookie('accessToken', newAccessToken, {
+            httpOnly: true,
+            sameSite: 'Strict',
+            maxAge: 15 * 60 * 1000
+        });
+
+        res.status(200).json({ success: true });
+    } catch (err) {
+        return res.status(403).json({ message: 'Invalid refresh token' });
+    }
+});
 
 // Middleware to handle errors
 app.use(errorMiddleware);

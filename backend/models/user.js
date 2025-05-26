@@ -54,7 +54,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['User','Staff', 'Admin', 'SuperAdmin'],
+        enum: ['User', 'Staff', 'Admin', 'SuperAdmin'],
         default: 'User'
     },
     createdAt: {
@@ -85,6 +85,19 @@ userSchema.methods.getJwtToken = function () {
         expiresIn: process.env.JWT_EXPIRES_TIME
     });
 }
+// Generate Access Token (short-lived)
+userSchema.methods.getAccessToken = function () {
+    return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
+        expiresIn: '15m', // short-lived token
+    });
+};
+
+// Generate Refresh Token (long-lived)
+userSchema.methods.getRefreshToken = function () {
+    return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_REFRESH_SECRET, {
+        expiresIn: '7d', // longer-lived token
+    });
+};
 
 // Generate password reset token
 userSchema.methods.getResetPasswordToken = function () {
