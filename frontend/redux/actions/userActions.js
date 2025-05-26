@@ -4,6 +4,7 @@ import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
 // import {server as REACT_APP_API_URL} from '../store';
 // import {REACT_APP_API_URL} from '../store';
+import api from '../../api/axiosInstance'
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async (credentials, thunkAPI) => {
@@ -76,7 +77,7 @@ export const getUserDetails = createAsyncThunk(
     }
     try {
       console.log("Getting user details");
-      const response = await axios.get(
+      const response = await api.get(
         `${REACT_APP_API_URL}/api/v1/me`,
         config
       );
@@ -103,7 +104,7 @@ export const registerUser = createAsyncThunk(
     };
     try {
 
-      const response = await axios.post(`${REACT_APP_API_URL}/api/v1/register`, userData, config);
+      const response = await api.post(`${REACT_APP_API_URL}/api/v1/register`, userData, config);
       await authenticate(response.data, () => { });
       return response;
 

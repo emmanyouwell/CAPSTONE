@@ -56,7 +56,7 @@ export const updateDonor = createAsyncThunk(
         }
         
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/donor/${req.id}`, req, config)
+            const response = await api.put(`${REACT_APP_API_URL}/api/v1/donor/${req.id}`, req, config)
 
             return response.data;
 
