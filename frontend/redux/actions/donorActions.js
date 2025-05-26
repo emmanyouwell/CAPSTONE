@@ -18,7 +18,7 @@ export const getDonors = createAsyncThunk(
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
             },
-            withCredentials: true
+            
         };
 
         try {
@@ -52,7 +52,7 @@ export const updateDonor = createAsyncThunk(
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
             },
-            withCredentials: true
+            
         }
         
         try {

@@ -14,7 +14,7 @@ export const loginUser = createAsyncThunk(
         "Content-Type": "multipart/form-data",
         'X-Client-Type': 'mobile'
       },
-      withCredentials: true
+      
     };
     try {
       let url = `${REACT_APP_API_URL}/api/v1/login`;
@@ -45,7 +45,7 @@ export const logoutUser = createAsyncThunk(
           headers: {
             "Content-Type": "application/json",
           },
-          withCredentials: true, // Assuming the API uses cookies or session for auth
+           // Assuming the API uses cookies or session for auth
         }
       );
       await logout();
@@ -73,7 +73,7 @@ export const getUserDetails = createAsyncThunk(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      withCredentials: true
+      
     }
     try {
       console.log("Getting user details");
@@ -100,7 +100,7 @@ export const registerUser = createAsyncThunk(
       headers: {
         "Content-Type": "application/json",
       },
-      withCredentials: true
+      
     };
     try {
 
