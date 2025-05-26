@@ -5,26 +5,22 @@ const User = require('../models/user');
 
 // Checks if user is authenticated or not
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-    // Get the token from the Authorization header
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Extract token from the "Bearer TOKEN" format
+    let token;
 
-    if (!token) {
-        return next(new ErrorHandler('Login first to access this resource.', 401));
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies && req.cookies.token) {
+        token = req.cookies.token;
     }
+    
+    if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
-    // Verify the token
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = await User.findById(decoded.id);
-
-        if (!req.user) {
-            return next(new ErrorHandler('User not found with this token', 401));
-        }
-
-        next(); // Proceed to the next middleware or route handler
-    } catch (error) {
-        return next(new ErrorHandler('Invalid token. Please log in again.', 401));
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(403).json({ message: 'Token is invalid or expired' });
     }
 });
 
