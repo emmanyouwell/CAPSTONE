@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import {getToken} from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 // Get Devices with Token
 export const getDevices = createAsyncThunk(
     'devices/getDevices',
@@ -22,9 +22,9 @@ export const getDevices = createAsyncThunk(
             withCredentials: true
         }
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/notifications`
+            let urlString = `/api/v1/notifications`
 
-            const response = await axios.get(urlString, config);
+            const response = await api.get(urlString, config);
 
             return response.data;
 
@@ -54,7 +54,7 @@ export const addDevice = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/notifications/save-token`, req, config)
+            const response = await api.post(`/api/v1/notifications/save-token`, req, config)
 
             return response.data;
 
@@ -85,7 +85,7 @@ export const sendNotification = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/send-notification`, req, config)
+            const response = await api.post(`/api/v1/send-notification`, req, config)
             
             return response.data;
 

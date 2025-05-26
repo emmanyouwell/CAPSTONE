@@ -1,8 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
-import { REACT_APP_API_URL } from '@env';
 
+import api from '../../api/axiosInstance';
 // Get All Patient
 export const getRecipients = createAsyncThunk(
     'recipient/getRecipients',
@@ -23,12 +23,12 @@ export const getRecipients = createAsyncThunk(
             withCredentials: true
         }
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/patients?page=${page}&pageSize=${pageSize}`;
+            let urlString = `/api/v1/patients?page=${page}&pageSize=${pageSize}`;
             if (search) {
                 urlString += `&search=${encodeURIComponent(search)}`;
             }
-           
-            const response = await axios.get(urlString, config);
+           console.log("API: ", api);
+            const response = await api.get(urlString, config);
 
             console.log("Response", response.data)
             console.log("URL: ", urlString)
@@ -62,7 +62,7 @@ export const addPatient = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/patients`, req, config)
+            const response = await api.post(`/api/v1/patients`, req, config)
 
             return response.data;
 
@@ -92,7 +92,8 @@ export const updatePatient = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/patient/${req.id}`, req, config)
+            
+            const response = await api.put(`/api/v1/patient/${req.id}`, req, config)
 
             return response.data;
 
@@ -123,7 +124,7 @@ export const deletePatient = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/patient/${id}`, config)
+            const response = await api.delete(`/api/v1/patient/${id}`, config)
 
             return response.data;
 
@@ -155,7 +156,7 @@ export const getPatientDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/patient/${id}`, config)
+            const response = await api.get(`/api/v1/patient/${id}`, config)
             console.log("Response: ", response.data)
             return response.data;
 

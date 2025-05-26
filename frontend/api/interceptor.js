@@ -1,6 +1,6 @@
 import api from './axiosInstance'
 import { logoutUser } from '../redux/actions/userActions';
-import store from '../redux/store'
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 let isRefreshing = false;
 let failedQueue = [];
@@ -17,7 +17,7 @@ const processQueue = (error, token = null) => {
     failedQueue = [];
 };
 
-export const setupAxiosInterceptors = () => {
+export const setupAxiosInterceptors = (store) => {
     console.log("Initializing interceptors")
     api.interceptors.response.use(
         res => res,
@@ -56,7 +56,7 @@ export const setupAxiosInterceptors = () => {
                 } catch (err) {
                     processQueue(err, null);
                     isRefreshing = false;
-                    // store.dispatch(logoutUser());
+                    store.dispatch(logoutUser());
                     return Promise.reject(err);
                 }
             }

@@ -2,6 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
+import api from '../../api/axiosInstance';
 
 // Get All Equipments
 export const getEquipments = createAsyncThunk(
@@ -24,13 +25,13 @@ export const getEquipments = createAsyncThunk(
         try {
             let urlString = ''
             if (query){
-                urlString = `${REACT_APP_API_URL}/api/v1/equipments?search=${query}`
+                urlString = `/api/v1/equipments?search=${query}`
             }
             else {
-                urlString = `${REACT_APP_API_URL}/api/v1/equipments`
+                urlString = `/api/v1/equipments`
             }
 
-            const response = await axios.get(urlString, config);
+            const response = await api.get(urlString, config);
             console.log("Response", response.data)
             console.log("URL: ", urlString)
 
@@ -62,7 +63,7 @@ export const addEquipments = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/equipments`, req, config)
+            const response = await api.post(`/api/v1/equipments`, req, config)
 
             return response.data;
 
@@ -92,7 +93,7 @@ export const updateEquipment = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/equipment/${req.id}`, req, config)
+            const response = await api.put(`/api/v1/equipment/${req.id}`, req, config)
             console.log(response)
             return response.data;
 
@@ -122,7 +123,7 @@ export const deleteEquipments = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/equipment/${id}`, config)
+            const response = await api.delete(`/api/v1/equipment/${id}`, config)
 
             return response.data;
 
@@ -153,7 +154,7 @@ export const getEquipmentDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/equipment/${id}`, config)
+            const response = await api.get(`/api/v1/equipment/${id}`, config)
             console.log("Response: ", response.data)
             return response.data;
 
