@@ -56,7 +56,7 @@ export const setupAxiosInterceptors = () => {
                 } catch (err) {
                     processQueue(err, null);
                     isRefreshing = false;
-                    store.dispatch(logoutUser());
+                    // store.dispatch(logoutUser());
                     return Promise.reject(err);
                 }
             }
