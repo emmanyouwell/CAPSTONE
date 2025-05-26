@@ -88,7 +88,7 @@ userSchema.methods.getJwtToken = function () {
 // Generate Access Token (short-lived)
 userSchema.methods.getAccessToken = function () {
     return jwt.sign({ id: this._id, role: this.role }, process.env.JWT_SECRET, {
-        expiresIn: '15m', // short-lived token
+        expiresIn: '10s', // short-lived token
     });
 };
 
