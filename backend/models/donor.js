@@ -21,8 +21,14 @@ const donorSchema = new mongoose.Schema({
     },
   },
   age: {
-    type: Number,
-    required: [true, "Please enter age of the donor"],
+    value: {
+      type: Number,
+      required: [true, "Please enter age of the donor"]
+    },
+    isYear: {
+      type: Boolean,
+      required: true
+    }
   },
   birthday: {
     type: Date,
@@ -69,7 +75,14 @@ const donorSchema = new mongoose.Schema({
         type: Date,
       },
       age: {
-        type: String,
+        value: {
+          type: Number,
+          required: [true, "Please enter age of the donor"]
+        },
+        isYear: {
+          type: Boolean,
+          required: true
+        }
       },
       birth_weight: {
         type: String,

@@ -8,6 +8,7 @@ const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const Event = require("../models/event");
 const Inventory = require("../models/inventory");
 const mongoose = require("mongoose");
+const { calculateAge } = require("../utils/helper");
 
 exports.getUpcomingLettings = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -371,10 +372,11 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
       data[field.label] = field.value;
     });
     // Prepare children array with one child object
+    const {age, isYear} = calculateAge(data.child_age);
     const children = [
       {
         name: data.child_name,
-        age: data.child_age,
+        age: {value: age, isYear: isYear},
         birth_weight: data.birth_weight,
         aog: data.aog,
       },
@@ -408,7 +410,7 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
       password: password,
       role: "User",
     });
-
+    const {age: donorAge, isYear: isDonorYear} = calculateAge(data.birthday);
     // Create donor
     const donor = await Donor.create({
       user: user._id,
@@ -417,7 +419,7 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
         brgy: data.brgy,
         city: data.city || "Taguig City",
       },
-      age: data.age,
+      age: {value: donorAge, isYear: isDonorYear},
       birthday: data.birthday,
       children: children,
       office_address: data.office_address,

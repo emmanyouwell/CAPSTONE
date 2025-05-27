@@ -1,16 +1,22 @@
 export const calculateAge = (birthday) => {
-    const birthDate = new Date(birthday);
-    const today = new Date();
+  const birthDate = new Date(birthday);
+  const today = new Date();
 
-    let age = today.getFullYear() - birthDate.getFullYear();
+  let years = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
 
-    const hasHadBirthdayThisYear =
-        today.getMonth() > birthDate.getMonth() ||
-        (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+  if (today.getDate() < birthDate.getDate()) {
+    months--;
+  }
 
-    if (!hasHadBirthdayThisYear) {
-        age--;
-    }
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
 
-    return age;
-}
+  if (years >= 1) {
+    return { age: years, isYear: true };
+  } else {
+    return { age: months, isYear: false };
+  }
+};
