@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { getToken } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 // Request Milk schedule
 export const requestSchedule = createAsyncThunk(
     'schedule/requestSchedule',
@@ -23,7 +23,7 @@ export const requestSchedule = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/request-schedule`, req, config)
+            const response = await api.post(`/api/v1/request-schedule`, req, config)
             console.log("request schedule: ", response.data)
             return response.data;
 
@@ -54,7 +54,7 @@ export const approveSchedule = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/approve-schedule`, req, config)
+            const response = await api.post(`/api/v1/approve-schedule`, req, config)
             console.log("approve schedule: ", response.data)
             return response.data;
 
@@ -85,7 +85,7 @@ export const getDonorSchedules = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/me/schedules/${req}`, config)
+            const response = await api.get(`/api/v1/me/schedules/${req}`, config)
             
             return response.data;
 
@@ -116,7 +116,7 @@ export const getScheduleDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/schedule/${id}`, config)
+            const response = await api.get(`/api/v1/schedule/${id}`, config)
             return response.data;
 
         } catch (error) {
@@ -146,7 +146,7 @@ export const getAllSchedules = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/schedules`, config)
+            const response = await api.get(`/api/v1/schedules`, config)
             console.log(response.data)
             return response.data;
         } catch (error) {
@@ -175,7 +175,7 @@ export const updateSchedule = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/update-schedule`, data, config)
+            const response = await api.post(`/api/v1/update-schedule`, data, config)
 
             return response.data;
         } catch (error) {

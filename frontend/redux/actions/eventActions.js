@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 export const getEvents = createAsyncThunk(
     'event/getEvents',
     async (query, thunkAPI) => {
@@ -23,7 +23,7 @@ export const getEvents = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/events`, config)
+            const response = await api.get(`/api/v1/events`, config)
             
             return response.data;
 
@@ -56,7 +56,7 @@ export const addEvents = createAsyncThunk(
         try {
 
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/events`, req, config)
+            const response = await api.post(`/api/v1/events`, req, config)
 
             return response.data;
 
@@ -86,7 +86,7 @@ export const editEvents = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/event/${req.id}`, req, config)
+            const response = await api.put(`/api/v1/event/${req.id}`, req, config)
 
             return response.data;
 
@@ -116,7 +116,7 @@ export const deleteEvents = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/event/${id}`, config)
+            const response = await api.delete(`/api/v1/event/${id}`, config)
 
             return response.data;
 
@@ -147,7 +147,7 @@ export const getEventDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/event/${id}`, config)
+            const response = await api.get(`/api/v1/event/${id}`, config)
             
             return response.data;
 
