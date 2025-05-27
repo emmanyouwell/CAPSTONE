@@ -25,8 +25,9 @@ const donorSchema = new mongoose.Schema({
       type: Number,
       required: [true, "Please enter age of the donor"]
     },
-    isYear: {
-      type: Boolean,
+    unit: {
+      enum: ["year", "month", "week", "day"],
+      type: String,
       required: true
     }
   },
@@ -79,8 +80,9 @@ const donorSchema = new mongoose.Schema({
           type: Number,
           required: [true, "Please enter age of the donor"]
         },
-        isYear: {
-          type: Boolean,
+        unit: {
+          enum: ["year", "month", "week", "day"],
+          type: String,
           required: true
         }
       },
