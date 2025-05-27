@@ -81,16 +81,6 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
         city: data.city
     }
     
-    /*
-    
-      name: 'New Patient 1',
-      motherName: 'Testing Mother',
-      street: '123 Sesame St.',
-      brgy: 'Central Signal',
-      city: 'Taguig City',
-      phone: '09665867965'
-    
-    */
     const patientData = {
         name: data.name,
         home_address,

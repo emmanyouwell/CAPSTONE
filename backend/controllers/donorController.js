@@ -2,7 +2,8 @@ const Donor = require('../models/donor')
 const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const axios = require('axios');
-const User = require('../models/user')
+const User = require('../models/user');
+const { calculateAge } = require('../utils/helper');
 // Get All Donors => /api/v1/donors
 exports.allDonors = catchAsyncErrors(async (req, res, next) => {
     // Destructure search query parameters from the request
@@ -196,7 +197,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
 
         const children = [{
             name: new_data.child_name,
-            age: new_data.child_age,
+            age: calculateAge(new_data.child_birthday),
             birth_weight: new_data.birth_weight,
             aog: new_data.aog
         }];
@@ -234,7 +235,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                     brgy: new_data.brgy,
                     city: new_data.city || 'Taguig City'
                 },
-                age: new_data.age,
+                age: calculateAge(new_data.birthday),
                 birthday: new_data.birthday,
                 children: children,
                 office_address: new_data.office_address,
