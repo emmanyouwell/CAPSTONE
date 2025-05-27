@@ -2,6 +2,11 @@ export const calculateAge = (birthday) => {
   const birthDate = new Date(birthday);
   const today = new Date();
 
+  // Calculate total difference in milliseconds
+  const diffTime = today - birthDate;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const diffWeeks = Math.floor(diffDays / 7);
+
   let years = today.getFullYear() - birthDate.getFullYear();
   let months = today.getMonth() - birthDate.getMonth();
 
@@ -15,8 +20,12 @@ export const calculateAge = (birthday) => {
   }
 
   if (years >= 1) {
-    return { age: years, isYear: true };
+    return { age: years, unit: 'year' };
+  } else if (months >= 1) {
+    return { age: months, unit: 'month' };
+  } else if (diffDays >= 7) {
+    return { age: diffWeeks, unit: 'week' };
   } else {
-    return { age: months, isYear: false };
+    return { age: diffDays, unit: 'day' };
   }
 };

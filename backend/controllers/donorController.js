@@ -194,10 +194,10 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             }
 
         })
-        const {age, isYear} = calculateAge(new_data.child_birthday);
+        const {age, unit} = calculateAge(new_data.child_birthday);
         const children = [{
             name: new_data.child_name,
-            age: {value: age, isYear: isYear},
+            age: {value: age, unit: unit},
             birth_weight: new_data.birth_weight,
             aog: new_data.aog
         }];
@@ -228,7 +228,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                 role: 'User',
             });
             // Create donor in the new_database
-            const {age: donorAge, isYear: isDonorYear} = calculateAge(new_data.birthday);
+            const {age: donorAge, unit: donorUnit} = calculateAge(new_data.birthday);
             await Donor.create({
                 user: user._id,
                 home_address: {
@@ -236,7 +236,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                     brgy: new_data.brgy,
                     city: new_data.city || 'Taguig City'
                 },
-                age: {value: donorAge, isYear: isDonorYear},
+                age: {value: donorAge, unit: donorUnit},
                 birthday: new_data.birthday,
                 children: children,
                 office_address: new_data.office_address,
