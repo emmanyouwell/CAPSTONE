@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { authenticate, getToken, logout } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 // Get All Inventory
 export const getInventories = createAsyncThunk(
     'inventory/getInventory',
@@ -22,9 +22,9 @@ export const getInventories = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const urlString = `${REACT_APP_API_URL}/api/v1/inventories`
+            const urlString = `/api/v1/inventories`
             console.log("URL: ", urlString)
-            const response = await axios.get(urlString, config);
+            const response = await api.get(urlString, config);
             return response.data;
 
         } catch (error) {
@@ -53,7 +53,7 @@ export const addInventory = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/inventories`, req, config)
+            const response = await api.post(`/api/v1/inventories`, req, config)
 
             return response.data;
 
@@ -83,7 +83,7 @@ export const updateInventory = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/inventory/${req.id}`, req, config)
+            const response = await api.put(`/api/v1/inventory/${req.id}`, req, config)
             console.log("Updated Inventory: ", req.id)
             return response.data;
 
@@ -114,7 +114,7 @@ export const deleteInventory = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/inventory/${id}`, config)
+            const response = await api.delete(`/api/v1/inventory/${id}`, config)
 
             return response.data;
 
@@ -146,7 +146,7 @@ export const getInventoryDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/inventory/${id}`, config)
+            const response = await api.get(`/api/v1/inventory/${id}`, config)
             console.log("Response: ", response.data)
             return response.data;
 
@@ -175,7 +175,7 @@ export const checkInventories = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/check-inventories`, config)
+            const response = await api.put(`/api/v1/check-inventories`, config)
             
             return response.data;
 
@@ -205,7 +205,7 @@ export const reserveInventory = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/reserved-bottle/${req.id}`, req, config)
+            const response = await api.put(`/api/v1/reserved-bottle/${req.id}`, req, config)
 
             return response.data;
 

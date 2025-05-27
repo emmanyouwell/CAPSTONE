@@ -22,11 +22,11 @@ export const getDonors = createAsyncThunk(
         };
 
         try {
-            let urlString = `${REACT_APP_API_URL}/api/v1/donors?page=${page}&pageSize=${pageSize}`;
+            let urlString = `/api/v1/donors?page=${page}&pageSize=${pageSize}`;
             if (search) {
                 urlString += `&search=${encodeURIComponent(search)}`;
             }
-
+            console.log("API: ", api);
             const response = await api.get(urlString, config);
 
             return response.data;
@@ -56,7 +56,7 @@ export const updateDonor = createAsyncThunk(
         }
         
         try {
-            const response = await api.put(`${REACT_APP_API_URL}/api/v1/donor/${req.id}`, req, config)
+            const response = await api.put(`/api/v1/donor/${req.id}`, req, config)
 
             return response.data;
 

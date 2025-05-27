@@ -16,15 +16,15 @@ const sendToken = (user, statusCode, req, res) => {
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
             maxAge: 15 * 60 * 1000, // 15 mins
-            sameSite: 'Strict',
-            secure: false // set to true in production
+            sameSite: 'None',
+            secure: true // set to true in production
         });
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            sameSite: 'Strict',
-            secure: false
+            sameSite: 'None',
+            secure: true
         });
 
         res.status(statusCode).json({

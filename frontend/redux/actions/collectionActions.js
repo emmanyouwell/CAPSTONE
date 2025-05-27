@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { getToken } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 // Record Record Public Collection
 export const recordPublicRecord = createAsyncThunk(
     'collection/recordPublicRecord',
@@ -23,7 +23,7 @@ export const recordPublicRecord = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/record-public`, req, config)
+            const response = await api.post(`/api/v1/record-public`, req, config)
             console.log("record public: ", response.data)
             return response.data;
 
@@ -54,7 +54,7 @@ export const recordPrivateRecord = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/record-private`, req, config)
+            const response = await api.post(`/api/v1/record-private`, req, config)
             console.log("record private: ", response.data)
             return response.data;
 
@@ -84,8 +84,8 @@ export const getCollectionDetails = createAsyncThunk(
             withCredentials: true
         }
         try {
-            console.log("URL: ", `${REACT_APP_API_URL}/api/v1/collection/${id}`)
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/collection/${id}`, config)
+            console.log("URL: ", `/api/v1/collection/${id}`)
+            const response = await api.get(`/api/v1/collection/${id}`, config)
             
             return response.data;
 
@@ -115,7 +115,7 @@ export const allCollections = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/collections`, config)
+            const response = await api.get(`/api/v1/collections`, config)
 
             return response.data;
 

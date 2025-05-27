@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { getToken } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 // Create Milk Letting
 export const createLetting = createAsyncThunk(
     'letting/createLetting',
@@ -23,7 +23,7 @@ export const createLetting = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/create-letting`, req, config)
+            const response = await api.post(`/api/v1/create-letting`, req, config)
             console.log("Create Letting: ", response.data)
             return response.data;
 
@@ -54,7 +54,7 @@ export const newPublicDonor = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/letting-newDonor`, req, config)
+            const response = await api.post(`/api/v1/letting-newDonor`, req, config)
             return response.data;
 
         } catch (error) {
@@ -84,7 +84,7 @@ export const markAttendance = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/mark-attendance`, req, config)
+            const response = await api.post(`/api/v1/mark-attendance`, req, config)
             console.log("Mark Attendance: ", response.data)
             return response.data;
 
@@ -115,7 +115,7 @@ export const finalizeSession = createAsyncThunk(
         }
         try {
 
-            const response = await axios.post(`${REACT_APP_API_URL}/api/v1/finalize-session`, req, config)
+            const response = await api.post(`/api/v1/finalize-session`, req, config)
             console.log("Finalize Session: ", response.data)
             return response.data;
 
@@ -149,13 +149,13 @@ export const getLettings = createAsyncThunk(
         try {
             let urlString = ''
             if (query) {
-                urlString = `${REACT_APP_API_URL}/api/v1/lettings?search=${query}`
+                urlString = `/api/v1/lettings?search=${query}`
             }
             else {
-                urlString = `${REACT_APP_API_URL}/api/v1/lettings`
+                urlString = `/api/v1/lettings`
             }
             console.log("URL: ", urlString)
-            const response = await axios.get(urlString, config);
+            const response = await api.get(urlString, config);
             return response.data;
 
         } catch (error) {
@@ -187,7 +187,7 @@ export const getUpcomingLettings = createAsyncThunk(
         console.log("Config: ", config)
         try {
             
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/upcoming/lettings`, config);
+            const response = await api.get(`/api/v1/upcoming/lettings`, config);
             return response.data;
 
         } catch (error) {
@@ -217,7 +217,7 @@ export const getLettingDetails = createAsyncThunk(
         }
         try {
 
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/letting/${id}`, config)
+            const response = await api.get(`/api/v1/letting/${id}`, config)
             return response.data;
 
         } catch (error) {
@@ -246,7 +246,7 @@ export const deleteLetting = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.delete(`${REACT_APP_API_URL}/api/v1/letting/${id}`, config)
+            const response = await api.delete(`/api/v1/letting/${id}`, config)
 
             return response.data;
 
@@ -277,7 +277,7 @@ export const updateLetting = createAsyncThunk(
             withCredentials: true
         }
         try {
-            const response = await axios.put(`${REACT_APP_API_URL}/api/v1/letting/${req.id}`, req, config)
+            const response = await api.put(`/api/v1/letting/${req.id}`, req, config)
             
             return response.data;
 

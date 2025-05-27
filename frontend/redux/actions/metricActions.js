@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { getToken } from '../../utils/helper';
 import { REACT_APP_API_URL } from '@env';
-
+import api from '../../api/axiosInstance';
 export const getMilkPerMonth = createAsyncThunk(
     'milkPerMonth/getMilkPerMonth',
     async (thunkAPI) => {
@@ -22,7 +22,7 @@ export const getMilkPerMonth = createAsyncThunk(
         }
         
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/milkPerMonth`, config)
+            const response = await api.get(`/api/v1/milkPerMonth`, config)
 
             return response.data;
 
@@ -52,7 +52,7 @@ export const getDonorsPerMonth = createAsyncThunk(
         }
         
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/donorsPerMonth`, config)
+            const response = await api.get(`/api/v1/donorsPerMonth`, config)
             
             return response.data;
 
@@ -82,7 +82,7 @@ export const getDispensedMilkPerMonth = createAsyncThunk(
         }
         
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/dispensePerMonth`, config)
+            const response = await api.get(`/api/v1/dispensePerMonth`, config)
             
             return response.data;
 
@@ -112,7 +112,7 @@ export const getPatientsPerMonth = createAsyncThunk(
         }
         
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/patientsPerMonth`, config)
+            const response = await api.get(`/api/v1/patientsPerMonth`, config)
             
             return response.data;
 
@@ -142,7 +142,7 @@ export const getRequestsPerMonth = createAsyncThunk(
         }
         
         try {
-            const response = await axios.get(`${REACT_APP_API_URL}/api/v1/requestsPerMonth`, config)
+            const response = await api.get(`/api/v1/requestsPerMonth`, config)
             
             return response.data;
 
