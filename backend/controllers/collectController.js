@@ -94,14 +94,12 @@ exports.getCollections = catchAsyncErrors(async (req, res, next) => {
   try {
     const { search, type } = req.query;
 
-    const regexQuery = new RegExp(search, 'i'); // Case-insensitive match
-    const regexType = new RegExp(type, 'i'); // Case-insensitive match
-    const collections = await Collection.aggregate([
-      {
-        $match: {
-          collectionType: regexType
-        }
-      },
+    const regexType = type ? new RegExp(type, 'i') : /.*/; // Match all if type is not specified
+    const matchStage = { collectionType: { $regex: regexType } };
+
+    const pipeline = [
+      { $match: matchStage },
+
       // Lookup pubDetails → Letting
       {
         $lookup: {
@@ -111,12 +109,7 @@ exports.getCollections = catchAsyncErrors(async (req, res, next) => {
           as: 'pubDetails'
         }
       },
-      {
-        $unwind: {
-          path: '$pubDetails',
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: '$pubDetails', preserveNullAndEmptyArrays: true } },
 
       // Lookup privDetails → Schedule
       {
@@ -127,12 +120,7 @@ exports.getCollections = catchAsyncErrors(async (req, res, next) => {
           as: 'privDetails'
         }
       },
-      {
-        $unwind: {
-          path: '$privDetails',
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: '$privDetails', preserveNullAndEmptyArrays: true } },
 
       // Lookup privDetails.donorDetails.donorId → Donor
       {
@@ -140,52 +128,47 @@ exports.getCollections = catchAsyncErrors(async (req, res, next) => {
           from: 'donors',
           localField: 'privDetails.donorDetails.donorId',
           foreignField: '_id',
-          as: 'donor'
+          as: 'privDetails.donorDetails.donor'
         }
       },
-      {
-        $unwind: {
-          path: '$donor',
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: '$privDetails.donorDetails.donor', preserveNullAndEmptyArrays: true } },
+
 
       // Lookup donor.user → User
       {
         $lookup: {
           from: 'users',
-          localField: 'donor.user',
+          localField: 'privDetails.donorDetails.donor.user',
           foreignField: '_id',
-          as: 'donorUser'
+          as: 'privDetails.donorDetails.donor.user'
         }
       },
-      {
-        $unwind: {
-          path: '$donorUser',
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: '$privDetails.donorDetails.donor.user', preserveNullAndEmptyArrays: true } },
 
-      // Match by pubDetails.activity or donorUser.name
-      {
+    ];
+
+    // Only add the $match for search if a search query is present
+    if (search) {
+      const regexQuery = new RegExp(search, 'i');
+      pipeline.push({
         $match: {
           $or: [
             { 'pubDetails.activity': { $regex: regexQuery } },
             { 'donorUser.name.firstName': { $regex: regexQuery } },
-            { 'donorUser.name.lastName': { $regex: regexQuery } }
+            { 'donorUser.name.lastName': { $regex: regexQuery } },
           ]
         }
-      },
+      });
+    }
 
-      // Sort if needed
-      { $sort: { collectionDate: -1 } }
-    ]);
+    // Add sort stage
+    pipeline.push({ $sort: { collectionDate: -1 } });
 
-
-
+    const collections = await Collection.aggregate(pipeline);
 
     res.status(200).json({
       success: true,
+      count: collections.length,
       collections
     })
   }
