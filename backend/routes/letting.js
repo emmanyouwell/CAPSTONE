@@ -15,6 +15,8 @@ const {
     newPublicDonorTally,
     updateAttendance,
     checkLettingBagStatus,
+    getAverageLettingVolume,
+    deleteAttendance,
 } = require('../controllers/lettingController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
@@ -47,4 +49,8 @@ router.route('/tally/newDonor')
     .post(newPublicDonorTally)
 router.route('/additional-bags/:id')
     .put(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), updateAttendance)
+router.route('/lettings/average')
+    .get(isAuthenticatedUser, authorizeRoles("SuperAdmin", "Admin"), getAverageLettingVolume);
+router.route('/lettings/:lettingId/attendance/:attendanceId')
+    .delete(isAuthenticatedUser, authorizeRoles("SuperAdmin", "Admin"), deleteAttendance);
 module.exports = router;
