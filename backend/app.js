@@ -79,7 +79,8 @@ app.post('/api/v1/refresh-token', (req, res) => {
 
         res.cookie('accessToken', newAccessToken, {
             httpOnly: true,
-            sameSite: 'Strict',
+            sameSite: 'None',
+            secure: true,
             maxAge: 15 * 60 * 1000
         });
 
