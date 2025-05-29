@@ -71,7 +71,7 @@ exports.createLetting = catchAsyncErrors(async (req, res, next) => {
     start: new Date(req.body.start), // This stores in UTC
     end: new Date(req.body.end), // This stores in UTC
   };
- 
+
   const letting = await Letting.create({
     ...req.body,
     actDetails,
@@ -316,8 +316,8 @@ exports.updateAttendance = catchAsyncErrors(async (req, res, next) => {
 
 // Finalize the Milk Letting Session
 exports.finalizeSession = catchAsyncErrors(async (req, res) => {
-  const { lettingId, adminId } = req.body;
-
+  const { lettingId, adminId, percent } = req.body;
+  console.log(percent)
   try {
     const event = await Letting.findById(lettingId);
     if (!event) return res.status(404).json({ error: "Event not found" });
@@ -332,6 +332,7 @@ exports.finalizeSession = catchAsyncErrors(async (req, res) => {
         );
 
         event.status = "Done";
+        event.performance = Number(percent);
         await event.save();
 
         collection = await Collection.create({
@@ -372,11 +373,11 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
       data[field.label] = field.value;
     });
     // Prepare children array with one child object
-    const {age, unit} = calculateAge(data.child_age);
+    const { age, unit } = calculateAge(data.child_age);
     const children = [
       {
         name: data.child_name,
-        age: {value: age, unit: unit},
+        age: { value: age, unit: unit },
         birth_weight: data.birth_weight,
         aog: data.aog,
       },
@@ -410,7 +411,7 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
       password: password,
       role: "User",
     });
-    const {age: donorAge, unit: donorUnit} = calculateAge(data.birthday);
+    const { age: donorAge, unit: donorUnit } = calculateAge(data.birthday);
     // Create donor
     const donor = await Donor.create({
       user: user._id,
@@ -419,7 +420,7 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
         brgy: data.brgy,
         city: data.city || "Taguig City",
       },
-      age: {value: donorAge, unit: donorUnit},
+      age: { value: donorAge, unit: donorUnit },
       birthday: data.birthday,
       children: children,
       office_address: data.office_address,
@@ -513,3 +514,70 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+exports.getAverageLettingVolume = catchAsyncErrors(async (req, res, next) => {
+  try {
+    // Only include events that are marked as "Done"
+    const completedEvents = await Letting.find({ status: 'Done' });
+
+    if (completedEvents.length === 0) {
+      return res.status(200).json({ averageVolume: 0 });
+    }
+
+    const totalVolume = completedEvents.reduce((sum, event) => sum + event.totalVolume, 0);
+    const averageVolume = totalVolume / completedEvents.length;
+
+    res.status(200).json({ averageVolume: Math.round(averageVolume) });
+  } catch (error) {
+    console.error('Error calculating average volume:', error.message);
+    res.status(500).json({ error: 'Server error calculating average volume' });
+  }
+});
+
+
+exports.deleteAttendance = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const { lettingId, attendanceId } = req.params
+    const letting = await Letting
+      .findById(lettingId)
+      .populate('attendance.bags', 'volume')
+      .populate('attendance.additionalBags', 'volume');
+    if (!letting) {
+      throw new Error("Letting not found.")
+    }
+
+
+    const attendance = letting.attendance.find(att => att._id.toString() === attendanceId);
+    const expressedMilk = attendance.bags.reduce((acc, bag) => acc + bag.volume, 0)
+    const additionalBags = attendance.additionalBags.reduce((acc, bag) => acc + bag.volume, 0)
+    if (attendance?.bags?.length > 0) {
+      await Bag.deleteMany({ _id: { $in: attendance.bags } })
+    }
+    if (attendance?.additionalBags?.length > 0) {
+      await Bag.deleteMany({ _id: { $in: attendance.additionalBags } });
+    }
+
+
+
+
+    await Letting.updateOne(
+      { _id: letting._id },
+      {
+        $pull: {
+          attendance: { _id: attendanceId }
+        }
+      }
+    );
+
+    letting.totalVolume -= Number(expressedMilk + additionalBags);
+    await letting.save()
+    res.status(200).json({
+      success: true,
+      message: "Attendance successfully deleted"
+    })
+  } catch (error) {
+    console.error('Error deleting attendance:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+
+})
