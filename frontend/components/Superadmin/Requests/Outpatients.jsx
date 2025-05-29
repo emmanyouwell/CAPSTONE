@@ -87,7 +87,7 @@ const Outpatients = ({ navigation }) => {
       approvedBy: userDetails._id,
     };
     console.log(data);
-    dispatch(outpatientDispense(data)).then(() => setModalVisible(false))
+    dispatch(outpatientDispense(data)).then(() => setModalVisible(false));
   };
 
   const handleReserve = (item) => {
@@ -98,6 +98,22 @@ const Outpatients = ({ navigation }) => {
         text: "Reserve",
         style: "destructive",
         onPress: () => navigation.navigate("EditRequest", { request: item }),
+      },
+    ]);
+  };
+
+  const addRequest = () => {
+    Alert.alert("Add Request", "Is the outpatient has a record in TCHMB?", [
+      { text: "Cancel", style: "cancel" },
+      { 
+        text: "No",
+        style: "destructive",
+        onPress: () => navigation.navigate("AddPatient"),
+      },
+      {
+        text: "Yes",
+        style: "destructive",
+        onPress: () => navigation.navigate("AddRequest"),
       },
     ]);
   };
@@ -181,6 +197,16 @@ const Outpatients = ({ navigation }) => {
     <View style={SuperAdmin.container}>
       <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
       <Text style={styles.screenTitle}>Outpatient Requests</Text>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={styles.addButton}
+          onPress={() => addRequest()}
+        >
+          <Text style={styles.buttonText}>
+            <MaterialIcons name="add" size={16} color="white" /> Add
+          </Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView
         style={styles.cardContainer}
         refreshControl={
@@ -429,6 +455,33 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginVertical: 8,
+    width: "80%",
+    alignItems: "center",
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2196F3",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 5,
+    flex: 1,
+    marginLeft: 5,
+    marginRight: 10,
   },
 });
 

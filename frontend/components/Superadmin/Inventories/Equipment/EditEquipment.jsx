@@ -64,7 +64,7 @@ const EditEquipments = ({ navigation, route }) => {
     const onMenuPress = () => navigation.openDrawer();
     const onLogoutPress = () => {
         dispatch(logoutUser())
-            .then(() => navigation.navigate('login'))
+            .then(() => navigation.replace('login'))
             .catch((err) => console.log(err));
     };
 

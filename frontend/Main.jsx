@@ -82,7 +82,6 @@ import DispensedPerMonth from "./components/Superadmin/Metrics/DispensedPerMonth
 import PatientsPerMonth from "./components/Superadmin/Metrics/PatientsPerMonth";
 import RequestsPerMonth from "./components/Superadmin/Metrics/RequestsPerMonth";
 
-import TestNotif from "./components/Superadmin/Metrics/TestNotif";
 import EditEvent from "./components/Superadmin/Schedule/EditEvent";
 import AddEvent from "./components/Superadmin/Schedule/AddEvent";
 import EditArticles from "./components/Superadmin/Articles/EditArticles";
@@ -303,7 +302,6 @@ const MainStack = () => {
         <Stack.Screen name="DispensedPerMonth" component={DispensedPerMonth} />
         <Stack.Screen name="PatientsPerMonth" component={PatientsPerMonth} />
         <Stack.Screen name="RequestsPerMonth" component={RequestsPerMonth} />
-        <Stack.Screen name="TestNotif" component={TestNotif} />
 
         {/* Milk Letting Navigation*/}
         <Stack.Screen name="superadmin_milkLetting" component={MilkLetting} />

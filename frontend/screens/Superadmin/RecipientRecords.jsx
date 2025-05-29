@@ -20,7 +20,7 @@ const RecipientRecords = ({ navigation }) => {
     navigation.openDrawer();
   }
   const handleLogoutClick = () => {
-    dispatch(logoutUser()).then(() => { navigation.navigate('login') }).catch((err) => console.log(err))
+    dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
   }
   // Using onChangeText to update the state when text changes
   const handleTextChange = (newText) => {
