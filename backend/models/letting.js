@@ -64,6 +64,10 @@ const lettingSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    performance: {
+        type: Number,
+        default: 0
+    },
     admin: {
         type: ObjectId,
         required: true,
