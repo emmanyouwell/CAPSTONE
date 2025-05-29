@@ -27,7 +27,7 @@ const EditBag = ({ navigation }) => {
         navigation.openDrawer();
     }
     const onLogoutPress = () => {
-        dispatch(logoutUser()).then(() => { navigation.navigate('login') }).catch((err) => console.log(err))
+        dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
     }
     // Validation Schema using Yup
     const validationSchema = Yup.object().shape({

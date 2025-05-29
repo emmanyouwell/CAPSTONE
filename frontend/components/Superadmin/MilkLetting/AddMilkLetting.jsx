@@ -35,7 +35,7 @@ const AddMilkLetting = ({ navigation }) => {
         navigation.openDrawer();
     }
     const handleLogoutClick = () => {
-        dispatch(logoutUser()).then(() => { navigation.navigate('login') }).catch((err) => console.log(err))
+        dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
     }
 
     const validationSchema = Yup.object({

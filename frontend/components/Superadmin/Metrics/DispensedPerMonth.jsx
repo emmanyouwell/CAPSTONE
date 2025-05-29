@@ -28,7 +28,7 @@ const DispensedMilkPerMonth = ({ navigation }) => {
 
     const onLogoutPress = () => {
         dispatch(logoutUser()
-            .then(() => navigation.navigate('login'))
+            .then(() => navigation.replace('login'))
             .catch((err) => console.log(err))
         );
     };

@@ -82,7 +82,7 @@ const EmployeeLogin = ({ navigation }) => {
                                 <Text style={divider.dividerText}>User Sign in</Text>
                                 <View style={divider.divider} />
                             </View>
-                            <Button title="Sign in with email" onPress={() => navigation.navigate('login')} />
+                            <Button title="Sign in with email" onPress={() => navigation.replace('login')} />
 
                         </LinearGradient>
                     </ScrollView>
