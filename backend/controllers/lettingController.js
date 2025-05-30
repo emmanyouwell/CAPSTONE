@@ -407,7 +407,7 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
     const user = await User.create({
       name: name,
       email: data.email,
-      phone: data.contact_number,
+      phone: data.phone,
       password: password,
       role: "User",
     });
