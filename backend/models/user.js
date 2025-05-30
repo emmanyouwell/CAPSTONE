@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
         },
         middle: {
             type: String,
-            required: [true, 'Please enter middle name']
+            
         }
     },
     email: {
