@@ -37,15 +37,15 @@ const donorSchema = new mongoose.Schema({
   },
   office_address: {
     type: String,
-    required: [true, "Please enter office address of the donor"],
+    
   },
   contact_number: {
     type: String,
-    required: [true, "Please enter contact number of the donor"],
+    
   },
   occupation: {
     type: String,
-    required: [true, "Please enter occupation of the donor"],
+    
   },
   donorType: {
     type: String,
