@@ -6,6 +6,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getArticles } from '../../redux/actions/articleActions';
 import ArticleList from '../../components/Superadmin/Articles/ArticleList';
+import { resetError } from '../../redux/slices/articleSlice';
 
 const Articles = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -29,6 +30,7 @@ const Articles = ({ navigation }) => {
 
     const handleRefresh = () => {
         setRefreshing(true);
+        dispatch(resetError());
         dispatch(getArticles())
             .then(() => setRefreshing(false))
             .catch(() => setRefreshing(false));
