@@ -18,14 +18,13 @@ export const loginUser = createAsyncThunk(
       
     };
     try {
-      let url = `${API_URL}/api/v1/login`;
+      let url = `/api/v1/login`;
       if (isEmp) {
-        url = `${API_URL}/api/v1/login/?emp=true`;
+        url = `/api/v1/login/?emp=true`;
       }
-      console.log("Login url: ", url);
-      const response = await axios.post(url, credentials, config);
+      const response = await api.post(url, credentials, config);
 
-      await authenticate(response.data, () => { });``
+      await authenticate(response.data, () => { });
       return response.data;
 
     } catch (error) {
