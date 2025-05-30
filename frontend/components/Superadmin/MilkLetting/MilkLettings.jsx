@@ -106,11 +106,10 @@ const MilkLettings = ({ data }) => {
                 <Text style={styles.details}>Venue: {venue}</Text>
                 <Text style={styles.details}>Status: {status}</Text>
                 <Text style={styles.details}>
-                  Date: {moment(actDetails?.start).format("MMMM Do YYYY")}
+                  Date: {moment(actDetails?.date).format("MMMM Do YYYY")}
                 </Text>
                 <Text style={styles.details}>
-                  Time: {moment(actDetails?.start).format("h:mm A")} -{" "}
-                  {moment(actDetails?.end).format("h:mm A")}
+                  Time: {moment(actDetails?.date).format("h:mm A")}
                 </Text>
                 <Text style={styles.details}>Donors: {attendance?.length || 0}</Text>
               </View>
@@ -123,11 +122,10 @@ const MilkLettings = ({ data }) => {
               <Text style={styles.details}>Venue: {venue}</Text>
               <Text style={styles.details}>Status: {status}</Text>
               <Text style={styles.details}>
-                Date: {moment(actDetails?.start).format("MMMM Do YYYY")}
+                Date: {moment(actDetails?.date).format("MMMM Do YYYY")}
               </Text>
               <Text style={styles.details}>
-                Time: {moment(actDetails?.start).format("h:mm A")} -{" "}
-                {moment(actDetails?.end).format("h:mm A")}
+                Time: {moment(actDetails?.date).format("h:mm A")}
               </Text>
             </View>
           </View>

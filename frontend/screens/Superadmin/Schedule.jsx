@@ -53,7 +53,9 @@ const Schedule = ({ navigation }) => {
   const filteredSchedules = schedules.filter(
     (sched) => sched.status && sched.status !== "Completed"
   );
-  
+  useEffect(()=>{
+    console.log("Filtered Schedules: ", filteredSchedules);
+  },[schedules])  
   return (
     <View style={SuperAdmin.container}>
       {/* Header Component */}
