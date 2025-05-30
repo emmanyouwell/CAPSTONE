@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const bagSchema = new mongoose.Schema({
     collectionType: {
         type: String,
@@ -33,5 +33,5 @@ const bagSchema = new mongoose.Schema({
     }
 });
 
-
+bagSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Bags', bagSchema);

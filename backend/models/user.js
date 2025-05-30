@@ -3,7 +3,7 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-
+const softDeletePlugin = require('./plugins/softDelete')
 const userSchema = new mongoose.Schema({
     name: {
         last: {
@@ -113,4 +113,5 @@ userSchema.methods.getResetPasswordToken = function () {
     return resetToken;
 }
 
+userSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('User', userSchema);

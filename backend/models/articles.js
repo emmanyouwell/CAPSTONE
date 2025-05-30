@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const softDeletePlugin = require('./plugins/softDelete')
 const articleSchema = mongoose.Schema({
     title: {
         type: String,
@@ -28,5 +28,5 @@ const articleSchema = mongoose.Schema({
         default: Date.now
     }
 });
-
+articleSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Article', articleSchema);  

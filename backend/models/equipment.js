@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const equipmentSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -66,5 +66,5 @@ const equipmentSchema = new mongoose.Schema({
         default: Date.now
     }
 });
-
+equipmentSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Equipment', equipmentSchema);

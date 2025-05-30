@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const inventorySchema = new mongoose.Schema({
   fridge: {
     type: ObjectId,
@@ -106,5 +106,5 @@ inventorySchema.pre("validate", async function (next) {
   this._fridgeType = fridge.type; // Store fridge type in a temporary field
   next();
 });
-
+inventorySchema.plugin(softDeletePlugin)
 module.exports = mongoose.model("Inventory", inventorySchema);
