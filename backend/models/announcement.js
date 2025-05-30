@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-
-const announementSchema = mongoose.Schema({
+const softDeletePlugin = require('./plugins/softDelete')
+const announcementSchema = mongoose.Schema({
     title: {
         type: String,
         required: true
@@ -28,5 +28,5 @@ const announementSchema = mongoose.Schema({
         default: Date.now
     }
 });
-
-module.exports = mongoose.model('Announcement', announementSchema);  
+announcementSchema.plugin(softDeletePlugin)
+module.exports = mongoose.model('Announcement', announcementSchema);  

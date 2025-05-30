@@ -50,7 +50,7 @@ exports.allDonors = catchAsyncErrors(async (req, res, next) => {
         const donors = await Donor.find(query)
             .populate('user')
             .sort({ 'user.name.first': 1 })
-           
+
         const totalDonors = await Donor.countDocuments(query);
         const totalPages = Math.ceil(totalDonors / pageSize);
 
@@ -101,6 +101,12 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                 console.log("result: ", result);
                 data[field.label] = { label: field.label, value: result };
             }
+            else if (field.type === 'DROPDOWN' && Array.isArray(field.value)) {
+                // Find the matching option by ID
+                const selectedId = field.value[0]; // assuming single select dropdown
+                const selectedOption = field.options.find(option => option.id === selectedId);
+                data[field.label] = {label: field.label, value: selectedOption ? selectedOption.text : null}
+            } 
             else {
                 data[field.label] = { label: field.label, value: field.value };
             }
@@ -194,10 +200,10 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             }
 
         })
-        const {age, unit} = calculateAge(new_data.child_birthday);
+        const { age, unit } = calculateAge(new_data.child_birthday);
         const children = [{
             name: new_data.child_name,
-            age: {value: age, unit: unit},
+            age: { value: age, unit: unit },
             birth_weight: new_data.birth_weight,
             aog: new_data.aog
         }];
@@ -208,18 +214,18 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             middle: new_data.middle_name || "",
             last: new_data.last_name || "",
         };
-         
+
         const userExist = await User.findOne({
-            
+
             email: new_data.email
         });
-        
+
         if (userExist) {
-            
+
             await Donor.findOneAndUpdate({ user: userExist._id }, { submissionID: req.body.data.submissionId, lastSubmissionDate: req.body.createdAt, verified: false }, { new: true });
         }
         else {
-          
+
             const user = await User.create({
                 name: name,
                 email: new_data.email,
@@ -228,7 +234,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                 role: 'User',
             });
             // Create donor in the new_database
-            const {age: donorAge, unit: donorUnit} = calculateAge(new_data.birthday);
+            const { age: donorAge, unit: donorUnit } = calculateAge(new_data.birthday);
             await Donor.create({
                 user: user._id,
                 home_address: {
@@ -236,7 +242,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                     brgy: new_data.brgy,
                     city: new_data.city || 'Taguig City'
                 },
-                age: {value: donorAge, unit: donorUnit},
+                age: { value: donorAge, unit: donorUnit },
                 birthday: new_data.birthday,
                 children: children,
                 office_address: new_data.office_address,

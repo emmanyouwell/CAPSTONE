@@ -69,9 +69,16 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
 
     const fields = req.body.data.fields;
     let data = {};
-    
+
     fields.forEach((field) => {
-        data[field.label] = field.value;
+        if (field.type === 'DROPDOWN' && Array.isArray(field.value)) {
+            // Find the matching option by ID
+            const selectedId = field.value[0]; // assuming single select dropdown
+            const selectedOption = field.options.find(option => option.id === selectedId);
+            data[field.label] = selectedOption ? selectedOption.text : null;
+        } else {
+            data[field.label] = field.value;
+        }
     });
 
     console.log("data: ", data);
@@ -80,7 +87,7 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
         brgy: data.brgy,
         city: data.city
     }
-    
+
     const patientData = {
         name: data.name,
         home_address,

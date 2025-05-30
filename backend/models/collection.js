@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const collectionSchema = new mongoose.Schema({
     collectionType: {
         type: String,
@@ -36,5 +36,5 @@ const collectionSchema = new mongoose.Schema({
         type: String 
     }
 });
-
+collectionSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Collection', collectionSchema);

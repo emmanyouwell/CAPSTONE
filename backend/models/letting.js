@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const {ObjectId} = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const lettingSchema = mongoose.Schema({
     activity: {
         type: String,
@@ -16,14 +16,11 @@ const lettingSchema = mongoose.Schema({
         
     },
     actDetails: {
-        start: {
+        date: {
             type: Date,
             required: true
         },
-        end: {
-            type: Date,
-            required: true
-        }
+        
     },
     status: {
         type: String,
@@ -78,5 +75,5 @@ const lettingSchema = mongoose.Schema({
         default: Date.now
     }
 });
-
+lettingSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Letting', lettingSchema);
