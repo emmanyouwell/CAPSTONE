@@ -370,7 +370,14 @@ exports.newPublicDonorTally = catchAsyncErrors(async (req, res, next) => {
   try {
     let data = {};
     req.body.data.fields.forEach((field) => {
-      data[field.label] = field.value;
+      if (field.type === 'DROPDOWN' && Array.isArray(field.value)) {
+        // Find the matching option by ID
+        const selectedId = field.value[0]; // assuming single select dropdown
+        const selectedOption = field.options.find(option => option.id === selectedId);
+        data[field.label] = selectedOption ? selectedOption.text : null;
+      } else {
+        data[field.label] = field.value;
+      }
     });
     // Prepare children array with one child object
     const { age, unit } = calculateAge(data.child_age);
