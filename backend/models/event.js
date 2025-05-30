@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const {ObjectId} = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const eventSchema = mongoose.Schema({
     title: {
         type: String,
@@ -44,5 +44,5 @@ const eventSchema = mongoose.Schema({
         default: Date.now
     }
 })
-
+eventSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Event', eventSchema)

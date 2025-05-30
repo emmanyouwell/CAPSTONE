@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const {ObjectId} = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const fridgeSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -16,5 +16,5 @@ const fridgeSchema = new mongoose.Schema({
         default: Date.now
     },
 });
-
+fridgeSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Fridge', fridgeSchema);

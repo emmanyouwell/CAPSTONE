@@ -9,15 +9,6 @@ const cloudinary = require('cloudinary');
 
 //Register a user => /api/v1/register
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-
-    // const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
-    //     folder: 'avatar',
-    //     width: 150,
-    //     crop: "scale"
-    // }, (err, res) => {
-    //     console.log(err, res);
-    // });
-
     const { firstName, lastName, middleName, email, phoneNumber, role, pass } = req.body;
     let user;
     let password = pass || `${firstName.replace(/\s+/g, "").toLowerCase()}${lastName.replace(/\s+/g, "").toLowerCase()}`;
@@ -35,10 +26,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
             phone: phoneNumber,
             role,
             employeeID: req.body.employeeID
-            // avatar: {
-            //     public_id: result.public_id,
-            //     url: result.secure_url
-            // }
         })
     }
     else {
@@ -52,16 +39,14 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
             password,
             phone: phoneNumber,
             role,
-
-            // avatar: {
-            //     public_id: result.public_id,
-            //     url: result.secure_url
-            // }
         })
     }
 
-
-    sendToken(user, 200, req, res);
+    res.status(200).json({
+        success: true,
+        message: "Registered successfully"
+    })
+    
 })
 
 
@@ -172,7 +157,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     await user.save();
 
-    sendToken(user, 200,req, res);
+    sendToken(user, 200, req, res);
 
 })
 
@@ -266,7 +251,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 exports.allUsers = catchAsyncErrors(async (req, res, next) => {
     const { search, sortBy, order = "asc", role } = req.query;
     const id = req.user.id || null;
-    const user = await User.findById(id);
+    const user = await User.find({_id: id});
     // Create a query object to hold the search criteria
     const query = {};
     if (search) {
@@ -300,11 +285,6 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
     // Convert order to a valid MongoDB sorting value (1 for ascending, -1 for descending)
     const sortOrder = order === "desc" ? -1 : 1;
 
-    // Pagination settings
-    const page = Number(req.query.page) || 1;
-    const pageSize = Number(req.query.pageSize) || 12;
-    const skip = (page - 1) * pageSize;
-
     try {
         // Aggregation pipeline
         const aggregationPipeline = [{ $match: query }];
@@ -331,11 +311,7 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
             $sort: { [sortField === "employeeID" ? "employeeIDNum" : sortField]: sortOrder }
         });
 
-        // Pagination
-        aggregationPipeline.push(
-            { $skip: skip },
-            { $limit: pageSize }
-        );
+       
 
         // Fetch users
         let users = await User.aggregate(aggregationPipeline);
@@ -346,15 +322,10 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
             employeeID: user.employeeID.toString().padStart(3, "0")
         }));
 
-        // Get total count of users
-        const totalUsers = users.length
-        const totalPages = Math.ceil(totalUsers / pageSize);
 
         res.status(200).json({
             success: true,
-            totalUsers,
-            totalPages,
-            pageSize,
+            
             users
         });
     } catch (error) {

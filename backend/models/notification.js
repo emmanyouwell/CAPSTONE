@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const {ObjectId} = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const notificationSchema = new mongoose.Schema({
     token: { 
         type: String, 
@@ -17,5 +17,5 @@ const notificationSchema = new mongoose.Schema({
         default: Date.now
     }
 });
-
+notificationSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Notification', notificationSchema);
