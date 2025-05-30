@@ -336,6 +336,10 @@ export const loginStyle = StyleSheet.create({
     flex: 1,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 16 : 0,
   },
+  viewContent: {
+    flex: 1, 
+    justifyContent: "center"
+  },
   keyboardAvoidingView: {
     flex: 1,
   },
