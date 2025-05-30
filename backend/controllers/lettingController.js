@@ -13,10 +13,10 @@ const { calculateAge } = require("../utils/helper");
 exports.getUpcomingLettings = catchAsyncErrors(async (req, res, next) => {
   try {
     const events = await Letting.find({
-      "actDetails.start": {
+      "actDetails.date": {
         $gte: new Date(),
       },
-    }).sort("actDetails.start");
+    }).sort("actDetails.date");
 
     return res.status(200).json({
       success: true,
@@ -117,8 +117,7 @@ exports.getLettingDetails = catchAsyncErrors(async (req, res, next) => {
 // Update letting => /api/v1/letting/:id
 exports.updateLetting = catchAsyncErrors(async (req, res, next) => {
   const actDetails = {
-    start: req.body.start,
-    end: req.body.end,
+    date: req.body.date,
   };
 
   const newLettingData = {
@@ -144,13 +143,32 @@ exports.updateLetting = catchAsyncErrors(async (req, res, next) => {
 
 // Delete letting => /api/v1/letting/:id
 exports.deleteletting = catchAsyncErrors(async (req, res, next) => {
-  const letting = await Letting.findById(req.params.id);
+  const letting = await Letting.findById(req.params.id).populate('attendance.bags', 'volume')
+    .populate('attendance.additionalBags', 'volume');
+
 
   if (!letting) {
-    return next(
-      new ErrorHandler(`letting is not found with this id: ${req.params.id}`)
-    );
+    throw new Error("Letting not found.")
   }
+
+  const bagIdsToDelete = [];
+  const attendance = letting.attendance;
+
+  for (const item of attendance) {
+    if (item?.bags?.length > 0) {
+      bagIdsToDelete.push(...item.bags.map(bag => bag._id));
+    }
+
+    if (item?.additionalBags?.length > 0) {
+      bagIdsToDelete.push(...item.additionalBags.map(bag => bag._id));
+    }
+  }
+
+  // Delete all collected bag IDs in one go
+  if (bagIdsToDelete.length > 0) {
+    await Bag.deleteMany({ _id: { $in: bagIdsToDelete } });
+  }
+
 
   await letting.deleteOne();
 

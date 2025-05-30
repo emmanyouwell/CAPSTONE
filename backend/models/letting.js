@@ -16,14 +16,11 @@ const lettingSchema = mongoose.Schema({
         
     },
     actDetails: {
-        start: {
+        date: {
             type: Date,
             required: true
         },
-        end: {
-            type: Date,
-            required: true
-        }
+        
     },
     status: {
         type: String,
