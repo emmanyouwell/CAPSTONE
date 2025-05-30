@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const scheduleSchema = mongoose.Schema({
     dates: {
         type: Date,
@@ -42,5 +42,5 @@ const scheduleSchema = mongoose.Schema({
         default: Date.now
     }
 });
-
+scheduleSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model('Schedule', scheduleSchema);

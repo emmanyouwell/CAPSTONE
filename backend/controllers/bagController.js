@@ -1,4 +1,4 @@
-const Inventory = require('../models/inventory2');
+
 const Fridge = require('../models/fridge');
 const Bag = require('../models/bags');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');

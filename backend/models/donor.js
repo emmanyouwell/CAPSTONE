@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Schema.Types;
-
+const softDeletePlugin = require('./plugins/softDelete')
 const donorSchema = new mongoose.Schema({
   user: {
     type: ObjectId,
@@ -116,5 +116,5 @@ const donorSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
-
+donorSchema.plugin(softDeletePlugin)
 module.exports = mongoose.model("Donor", donorSchema);
