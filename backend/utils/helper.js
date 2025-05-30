@@ -1,4 +1,4 @@
-export const calculateAge = (birthday) => {
+exports.calculateAge = (birthday) => {
   const birthDate = new Date(birthday);
   const today = new Date();
 
@@ -20,12 +20,14 @@ export const calculateAge = (birthday) => {
   }
 
   if (years >= 1) {
-    return { age: years, unit: 'year' };
+    return { age: years, unit: 'years' };
   } else if (months >= 1) {
-    return { age: months, unit: 'month' };
+    return { age: months, unit: 'months' };
   } else if (diffDays >= 7) {
-    return { age: diffWeeks, unit: 'week' };
+    return { age: diffWeeks, unit: 'weeks' };
   } else {
-    return { age: diffDays, unit: 'day' };
+    return { age: diffDays, unit: 'days' };
   }
 };
+
+

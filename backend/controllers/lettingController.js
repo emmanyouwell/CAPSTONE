@@ -540,25 +540,6 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-exports.getAverageLettingVolume = catchAsyncErrors(async (req, res, next) => {
-  try {
-    // Only include events that are marked as "Done"
-    const completedEvents = await Letting.find({ status: 'Done' });
-
-    if (completedEvents.length === 0) {
-      return res.status(200).json({ averageVolume: 0 });
-    }
-
-    const totalVolume = completedEvents.reduce((sum, event) => sum + event.totalVolume, 0);
-    const averageVolume = totalVolume / completedEvents.length;
-
-    res.status(200).json({ averageVolume: Math.round(averageVolume) });
-  } catch (error) {
-    console.error('Error calculating average volume:', error.message);
-    res.status(500).json({ error: 'Server error calculating average volume' });
-  }
-});
-
 
 exports.deleteAttendance = catchAsyncErrors(async (req, res, next) => {
   try {
