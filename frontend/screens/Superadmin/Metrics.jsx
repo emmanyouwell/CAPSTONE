@@ -55,7 +55,7 @@ const Metrics = ({ navigation }) => {
     {
       id: "2",
       title: "Total Milk Collected",
-      subtitle: `${stats?.total?.total / 1000} L`,
+      subtitle: `${(stats?.total?.total / 1000).toFixed(2)} L`,
       icon: "baby-bottle",
       route: "MilkPerMonth",
     },
@@ -69,7 +69,7 @@ const Metrics = ({ navigation }) => {
     {
       id: "4",
       title: "Total Milk Released",
-      subtitle: `${dispensedMilk?.total?.total / 1000} L`,
+      subtitle: `${(dispensedMilk?.total?.total / 1000).toFixed(2)} L`,
       icon: "baby-bottle",
       route: "DispensedPerMonth",
     },
