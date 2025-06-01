@@ -80,7 +80,7 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
             data[field.label] = field.value;
         }
     });
-
+    
     console.log("data: ", data);
     const home_address = {
         street: data.street,
@@ -92,6 +92,9 @@ exports.tallyCreatePatient = catchAsyncErrors(async (req, res, next) => {
         name: data.name,
         home_address,
         phone: data.phone,
+        age: data.age,
+        aog: data.aog,
+        admissionDate: data.admissionDate,
         motherName: data.motherName,
         staff: data.staffId,
         patientType: data["outpatient_checkbox (Yes)"] ? "Outpatient" : "Inpatient",

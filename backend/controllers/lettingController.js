@@ -203,7 +203,7 @@ exports.createEvent = catchAsyncErrors(async (req, res) => {
 
 // Mark Attendance for Donors
 exports.markAttendance = catchAsyncErrors(async (req, res, next) => {
-  const { lettingId, donorId, donorType, bags, lastDonation } = req.body;
+  const { lettingId, donorId, donorType, bags, lastDonation, dateTested } = req.body;
 
   try {
     const event = await Letting.findById(lettingId);
@@ -240,6 +240,14 @@ exports.markAttendance = catchAsyncErrors(async (req, res, next) => {
     event.totalVolume = total;
     await event.save();
 
+    const donor = await Donor.findOneAndUpdate(
+      { _id: donorId },
+      {
+
+        $set: { dateTested: dateTested }, // Update totalVolume
+      },
+      { new: true }
+    );
     res.status(200).json({
       success: true,
       message: "Attendance recorded successfully",
@@ -478,7 +486,7 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
     const children = [
       {
         name: formData.child_name,
-        age: {value: child_age, unit: child_unit},
+        age: { value: child_age, unit: child_unit },
         birth_weight: formData.birth_weight,
         aog: formData.aog,
       },
