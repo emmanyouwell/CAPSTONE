@@ -478,7 +478,7 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
     const children = [
       {
         name: formData.child_name,
-        age: {age: child_age, unit: child_unit},
+        age: {value: child_age, unit: child_unit},
         birth_weight: formData.birth_weight,
         aog: formData.aog,
       },
@@ -522,7 +522,7 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
         brgy: formData.brgy,
         city: formData.city || "Taguig City",
       },
-      age: { age: age, unit: unit },
+      age: { value: age, unit: unit },
       birthday: formData.birthday,
       children: children,
       office_address: formData.office_address,
