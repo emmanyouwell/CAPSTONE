@@ -73,7 +73,6 @@ exports.recordPrivateDonation = catchAsyncErrors(async (req, res, next) => {
 
     schedule.status = "Completed";
 
-    collection.status = "Collected";
 
     await Bag.updateMany(
       { _id: { $in: schedule.donorDetails.bags } },

@@ -33,6 +33,18 @@ const patientSchema = new mongoose.Schema({
         enum: ['Inpatient', 'Outpatient'],
         default: 'Inpatient',
     },
+    age: {
+        type: String,
+        required: [true, 'Please enter age of the patient']
+    },
+    aog: {
+        type: String,
+        required: [true, 'Please enter the age of gestation of the patient']
+    },
+    admissionDate: {
+        type: Date,
+        required: [true, 'Please enter the admission date of the patient']
+    },
     staff: {
         type: ObjectId,
         required: [true, 'Staff ID required'],
