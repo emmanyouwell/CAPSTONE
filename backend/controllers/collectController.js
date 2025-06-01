@@ -86,7 +86,7 @@ exports.recordPrivateDonation = catchAsyncErrors(async (req, res, next) => {
 
     res.status(200).json({ message: "Donation recorded successfully", donor });
   } catch (error) {
-    res.status(500).json({ error: "Failed to record donation" });
+    res.status(500).json({ error: "Failed to record donation", details: error.message });
   }
 });
 
