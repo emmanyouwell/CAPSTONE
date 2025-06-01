@@ -109,6 +109,9 @@ const donorSchema = new mongoose.Schema({
         type: ObjectId,
         ref: "Letting",
       },
+      totalVolume: {
+        type: Number
+      }
     },
   ],
   createdAt: {
