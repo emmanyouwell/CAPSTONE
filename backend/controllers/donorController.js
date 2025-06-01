@@ -3,6 +3,7 @@ const ErrorHandler = require('../utils/errorHandler');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const axios = require('axios');
 const User = require('../models/user');
+const Bag = require('../models/bags');
 const { calculateAge } = require('../utils/helper');
 // Get All Donors => /api/v1/donors
 exports.allDonors = catchAsyncErrors(async (req, res, next) => {
@@ -105,8 +106,8 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                 // Find the matching option by ID
                 const selectedId = field.value[0]; // assuming single select dropdown
                 const selectedOption = field.options.find(option => option.id === selectedId);
-                data[field.label] = {label: field.label, value: selectedOption ? selectedOption.text : null}
-            } 
+                data[field.label] = { label: field.label, value: selectedOption ? selectedOption.text : null }
+            }
             else {
                 data[field.label] = { label: field.label, value: field.value };
             }
@@ -440,27 +441,52 @@ exports.createDonor = catchAsyncErrors(async (req, res, next) => {
 // Get specific donor details => /api/v1/donor/:id
 exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
     const donor = await Donor.findById(req.params.id)
-        .populate('user')
-        .lean(); // Use lean() for performance if no further Mongoose methods are needed
-
-    // // Ensure that donor data is valid
-    // if (donor && donor.donation) {
-    //     // Sort donations by collectionDate in descending order (latest first)
-    //     donor.donation.sort((a, b) => {
-    //         const dateA = new Date(a.invId.unpasteurizedDetails.collectionDate);
-    //         const dateB = new Date(b.invId.unpasteurizedDetails.collectionDate);
-    //         return dateB - dateA; // Latest dates first (descending order)
-    //     });
-    // }
+        .populate('donations.milkLettingEvent', 'activity actDetails venue attendance')
+        .populate('donations.schedule')
+        .populate('user');
 
     if (!donor) {
-        return next(new ErrorHandler(`donor is not found with this id: ${req.params.id}`))
+        return next(new ErrorHandler(`donor is not found with this id: ${req.params.id}`));
     }
 
+    for (const donation of donor.donations) {
+        const mle = donation.milkLettingEvent;
+
+        if (!mle || !Array.isArray(mle.attendance)) continue;
+
+        let totalVolume = 0;
+
+
+        if (mle?.attendance) {
+            const myAttendance = mle.attendance.find(att => att.donor._id.toString() === donor._id.toString())
+            if (myAttendance) {
+                // Use only necessary donor fields to avoid circular reference
+                myAttendance.donor = {
+                    _id: donor._id,
+                    name: donor.name, // or any fields you need
+                };
+
+                myAttendance.bags = await Bag.find({ _id: { $in: myAttendance.bags } });
+                myAttendance.additionalBags = await Bag.find({ _id: { $in: myAttendance.additionalBags } });
+                const totalBags = myAttendance.bags.reduce((acc, bag) => acc + bag.volume, 0)
+                const totalAdditionalBags = myAttendance.additionalBags.reduce((acc, bag) => acc + bag.volume, 0);
+                totalVolume = totalBags + totalAdditionalBags;
+                mle.attendance = [myAttendance];
+            } else {
+                mle.attendance = [];
+            }
+
+        }
+
+        // Add totalVolume directly to the donation object
+        donation.totalVolume = totalVolume;
+    }
+    console.log("donor: ", donor);  
     res.status(200).json({
         success: true,
-        donor
-    })
+        donor,
+    });
+
 })
 
 // Update donor => /api/v1/donor/:id
