@@ -474,10 +474,11 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
     const formData = req.body.formData;
 
     // Prepare children array with one child object
+    const { age: child_age, unit: child_unit } = calculateAge(formData.child_bday);
     const children = [
       {
         name: formData.child_name,
-        age: formData.child_age,
+        age: {age: child_age, unit: child_unit},
         birth_weight: formData.birth_weight,
         aog: formData.aog,
       },
@@ -513,6 +514,7 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
     });
 
     // Create donor
+    const { age, unit } = calculateAge(formData.birthday);
     const donor = await Donor.create({
       user: user._id,
       home_address: {
@@ -520,7 +522,7 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
         brgy: formData.brgy,
         city: formData.city || "Taguig City",
       },
-      age: formData.age,
+      age: { age: age, unit: unit },
       birthday: formData.birthday,
       children: children,
       office_address: formData.office_address,
