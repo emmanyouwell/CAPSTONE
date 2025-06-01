@@ -81,7 +81,7 @@ const donorSchema = new mongoose.Schema({
           required: [true, "Please enter age of the donor"]
         },
         unit: {
-          enum: ["year", "month", "week", "day"],
+          enum: ["years", "months", "weeks", "days"],
           type: String,
           required: true
         }
@@ -109,6 +109,9 @@ const donorSchema = new mongoose.Schema({
         type: ObjectId,
         ref: "Letting",
       },
+      totalVolume: {
+        type: Number
+      }
     },
   ],
   createdAt: {
