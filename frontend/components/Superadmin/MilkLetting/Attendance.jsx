@@ -19,7 +19,6 @@ import {
   newPublicDonor,
   markAttendance,
 } from "../../../redux/actions/lettingActions";
-import { logoutUser } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import DatePicker from "react-native-date-picker";
 
@@ -31,6 +30,7 @@ const Attendance = ({ route, navigation }) => {
   const [step, setStep] = useState(1);
   const [donorType, setDonorType] = useState("");
   const [showBirthday, setShowBirthday] = useState(false);
+  const [showChildBirthday, setShowChildBirthday] = useState(false);
   const [form, setForm] = useState(() => ({
     first_name: "",
     middle_name: "",
@@ -47,7 +47,7 @@ const Attendance = ({ route, navigation }) => {
     donor_type: "Community",
     occupation: "",
     child_name: "",
-    child_age: "",
+    child_bday: "",
     birth_weight: "",
     aog: "",
   }));
@@ -114,23 +114,46 @@ const Attendance = ({ route, navigation }) => {
     setBags([]);
     setBagDetails({});
     setSelectedDonor(null);
-    console.log(
-      "State Data: \n",
-      "Form: " + form,
-      "\n",
-      "Bags: " + bags,
-      "\n",
-      "Bag Details: " + bagDetails,
-      "\n",
-      "SelectedDonor: " + selectedDonor
-    );
     setStep(1);
   };
 
+  const removeBag = (indexToRemove) => {
+    const updatedBags = bags.filter((_, index) => index !== indexToRemove);
+    setBags(updatedBags);
+  };
+
   const handleSubmitNewDonor = () => {
+    // List of required fields (exclude optional ones)
+    const requiredFields = [
+      "first_name",
+      "last_name",
+      "birthday",
+      "street",
+      "brgy",
+      "city",
+      "child_name",
+      "child_bday",
+      "birth_weight",
+      "aog",
+      "contact_number",
+    ];
+
+    // Check for any empty required fields
+    const emptyFields = requiredFields.filter((field) => {
+      return (
+        form[field] === "" || form[field] === null || form[field] === undefined
+      );
+    });
+
+    if (emptyFields.length > 0) {
+      Alert.alert("Error", "Please fill out all required fields.");
+      return;
+    }
+
     const data = {
       formData: form,
     };
+
     dispatch(newPublicDonor(data))
       .then(() => {
         Alert.alert("Success", "Data Saved");
@@ -172,25 +195,13 @@ const Attendance = ({ route, navigation }) => {
       });
   };
 
-  // const handleDateChange = (event, selectedDate, field) => {
-  //   const date = selectedDate || form[field];
-  //   setForm({ ...form, [field]: date.toISOString().split("T")[0] });
-  //   if (field === "birthday") setShowBirthday(false);
-  // };
-
-  const onMenuPress = () => {
-    navigation.openDrawer();
+  const handleDateChange = (event, selectedDate, field) => {
+    const date = selectedDate || form[field];
+    setForm({ ...form, [field]: date.toISOString().split("T")[0] });
+    if (field === "child_bday") setShowChildBirthday(false);
   };
 
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
-  const handleDateChange = (event, date, field) => {
+  const handleDonorBirthday = (event, date, field) => {
     if (date) {
       const formattedDate = date.toISOString().split("T")[0];
       setForm((prevForm) => ({
@@ -223,22 +234,25 @@ const Attendance = ({ route, navigation }) => {
       <>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Donor Details</Text>
+          <Text style={styles.requiredLabel}>* First Name</Text>
           <TextInput
             style={styles.input}
-            placeholder="First Name"
+            placeholder="Enter first name"
             onChangeText={(value) => setForm({ ...form, first_name: value })}
           />
+          <Text style={{ fontSize: 14 }}>Middle Name</Text>
           <TextInput
             style={styles.input}
-            placeholder="Midldle Name"
+            placeholder="Enter middle name"
             onChangeText={(value) => setForm({ ...form, middle_name: value })}
           />
+          <Text style={styles.requiredLabel}>* Last Name</Text>
           <TextInput
             style={styles.input}
-            placeholder="Last Name"
+            placeholder="Enter last name"
             onChangeText={(value) => setForm({ ...form, last_name: value })}
           />
-          <Text style={styles.subTitle}>Birthday</Text>
+          <Text style={styles.requiredLabel}>* Birthday</Text>
           <TouchableOpacity
             onPress={() => setShowBirthday(true)}
             style={styles.datePickerButton}
@@ -253,45 +267,82 @@ const Attendance = ({ route, navigation }) => {
               mode="date"
               display="default"
               onChange={(event, date) =>
-                handleDateChange(event, date, "birthday")
+                handleDonorBirthday(event, date, "birthday")
               }
             />
           )}
-          <TextInput
-            style={styles.input}
-            placeholder="Age"
-            keyboardType="numeric"
-            value={form.age ? String(form.age) : ""}
-            editable={false}
-          />
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Address</Text>
+          <Text style={styles.requiredLabel}>* Street</Text>
           <TextInput
             style={styles.input}
-            placeholder="Street"
+            placeholder="Enter street"
             onChangeText={(value) => setForm({ ...form, street: value })}
           />
+          <Text style={styles.requiredLabel}>* Baranggay</Text>
           <TextInput
             style={styles.input}
-            placeholder="Baranggay"
+            placeholder="Enter baranggay"
             onChangeText={(value) => setForm({ ...form, brgy: value })}
           />
+          <Text style={styles.requiredLabel}>* City</Text>
           <TextInput
             style={styles.input}
-            placeholder="City"
+            placeholder="Enter city"
             onChangeText={(value) => setForm({ ...form, city: value })}
           />
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Other Details</Text>
+          <Text style={styles.sectionTitle}>Child Details</Text>
+          <Text style={styles.requiredLabel}>* Child Name</Text>
           <TextInput
             style={styles.input}
-            placeholder="Email"
-            onChangeText={(value) => setForm({ ...form, email: value })}
+            placeholder="Enter child name"
+            onChangeText={(value) => setForm({ ...form, child_name: value })}
           />
+          <Text style={styles.requiredLabel}>* Child Birthday</Text>
+          <TouchableOpacity
+            onPress={() => setShowChildBirthday(true)}
+            style={styles.datePickerButton}
+          >
+            <Text style={styles.datePickerText}>
+              {form.child_bday || "Select child birthday"}
+            </Text>
+          </TouchableOpacity>
+          {showChildBirthday && (
+            <DateTimePicker
+              value={new Date()}
+              mode="date"
+              display="default"
+              onChange={(event, date) =>
+                handleDateChange(event, date, "child_bday")
+              }
+            />
+          )}
+          <Text style={styles.requiredLabel}>* Birth Weight</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter birth weight (kg)"
+            keyboardType="numeric"
+            onChangeText={(value) =>
+              setForm({ ...form, birth_weight: Number(value) })
+            }
+          />
+          <Text style={styles.requiredLabel}>* Age of Gestation</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter age of gestation (weeks)"
+            keyboardType="numeric"
+            onChangeText={(value) => setForm({ ...form, aog: Number(value) })}
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Other Details </Text>
+          <Text style={styles.requiredLabel}>* Phone Number</Text>
           <TextInput
             style={styles.input}
             placeholder="Phone number"
@@ -299,6 +350,11 @@ const Attendance = ({ route, navigation }) => {
             onChangeText={(value) =>
               setForm({ ...form, contact_number: value })
             }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            onChangeText={(value) => setForm({ ...form, email: value })}
           />
           <TextInput
             style={styles.input}
@@ -314,43 +370,13 @@ const Attendance = ({ route, navigation }) => {
           />
           <TextInput
             style={styles.input}
-            placeholder="Contact Number"
+            placeholder="Office Contact Number"
             onChangeText={(value) =>
               setForm({ ...form, contact_number_2: value })
             }
           />
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Child Details</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Child Name"
-            onChangeText={(value) => setForm({ ...form, child_name: value })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Child Age"
-            keyboardType="numeric"
-            onChangeText={(value) =>
-              setForm({ ...form, child_age: Number(value) })
-            }
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Birth Weight"
-            keyboardType="numeric"
-            onChangeText={(value) =>
-              setForm({ ...form, birth_weight: Number(value) })
-            }
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Age of Gestation"
-            keyboardType="numeric"
-            onChangeText={(value) => setForm({ ...form, aog: Number(value) })}
-          />
-        </View>
         <View style={styles.section}>
           <Button title="Submit Donor" onPress={handleSubmitNewDonor} />
         </View>
@@ -360,7 +386,7 @@ const Attendance = ({ route, navigation }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <Text style={styles.screenTitle}>Attendance</Text>
 
       <ScrollView
@@ -495,16 +521,18 @@ const Attendance = ({ route, navigation }) => {
               style={styles.input}
               placeholder="Volume (ml)"
               keyboardType="numeric"
+              value={bagDetails.volume}
               onChangeText={(value) =>
-                setBagDetails({ ...bagDetails, volume: Number(value) })
+                setBagDetails({ ...bagDetails, volume: value })
               }
             />
             <TextInput
               style={styles.input}
               placeholder="Quantity"
               keyboardType="numeric"
+              value={bagDetails.quantity}
               onChangeText={(value) =>
-                setBagDetails({ ...bagDetails, quantity: Number(value) })
+                setBagDetails({ ...bagDetails, quantity: value })
               }
             />
             <Button title="Add Bag Details" onPress={addBags} />
@@ -516,6 +544,12 @@ const Attendance = ({ route, navigation }) => {
                     <View key={index} style={styles.itemContainer}>
                       <Text>Volume: {bag.volume} mL</Text>
                       <Text>Quantity: {bag.quantity}</Text>
+                      <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => removeBag(index)}
+                      >
+                        <Text style={styles.deleteText}>X</Text>
+                      </TouchableOpacity>
                     </View>
                   ))}
                 </View>
@@ -635,8 +669,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
     // fontWeight: "bold",
   },
+  deleteButton: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    backgroundColor: "#ff4d4d",
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  deleteText: {
+    color: "white",
+    fontWeight: "bold",
+  },
   dropdown: {
     marginBottom: 16,
+  },
+  requiredLabel: {
+    fontSize: 14,
+    color: "#d00", // red color for emphasis
   },
 });
 
