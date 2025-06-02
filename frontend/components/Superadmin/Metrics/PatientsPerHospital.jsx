@@ -28,12 +28,11 @@ const PatientsPerHospital = ({ navigation }) => {
       .catch(() => setRefreshing(false));
   };
 
-  // Prepare pie chart data
   const pieChartData = patientPerHospital
     ? Object.entries(patientPerHospital)
         .filter(([key]) => key !== "total")
         .map(([hospital, value], index) => ({
-          name: `${hospital} ${value}`,
+          name: `${hospital} (${value})`,
           population: value,
           color: pieColors[index % pieColors.length],
           legendFontColor: "#333",
@@ -57,33 +56,42 @@ const PatientsPerHospital = ({ navigation }) => {
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
+          contentContainerStyle={styles.scrollContainer}
         >
-          <PieChart
-            data={pieChartData}
-            width={Dimensions.get("window").width - 16}
-            height={220}
-            chartConfig={{
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            }}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute // this shows raw value on chart but we’ll hide legend manually
-            hasLegend={false} // disable default legend
-            style={{ alignSelf: "center" }}
-          />
-          {pieChartData.map((item, index) => (
-            <View key={index} style={styles.legendItem}>
-              <View
-                style={[styles.colorBox, { backgroundColor: item.color }]}
-              />
-              <Text style={styles.legendText}>{item.name}</Text>
-            </View>
-          ))}
+          <View style={styles.card}>
+            <PieChart
+              data={pieChartData}
+              width={Dimensions.get("window").width - 64}
+              height={240}
+              chartConfig={{
+                backgroundGradientFrom: "#ffffff",
+                backgroundGradientTo: "#ffffff",
+                color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
+                labelColor: () => "#333",
+                strokeWidth: 2,
+              }}
+              accessor="population"
+              backgroundColor="transparent"
+              paddingLeft="70"
+              absolute
+              hasLegend={false}
+            />
 
-          <Text style={styles.totalText}>
-            Total: {total} Patients
-          </Text>
+            <View style={styles.legendContainer}>
+              {pieChartData.map((item, index) => (
+                <View key={index} style={styles.legendItem}>
+                  <View
+                    style={[styles.colorBox, { backgroundColor: item.color }]}
+                  />
+                  <Text style={styles.legendText}>{item.name}</Text>
+                </View>
+              ))}
+            </View>
+
+            <Text style={styles.totalText}>
+              Total Patients: <Text style={styles.totalHighlight}>{total}</Text>
+            </Text>
+          </View>
         </ScrollView>
       )}
     </View>
@@ -105,48 +113,69 @@ const pieColors = [
 
 const styles = StyleSheet.create({
   screenTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 26,
+    fontWeight: "700",
     textAlign: "center",
-    marginVertical: 16,
+    marginVertical: 20,
+    color: "#333",
   },
   loadingText: {
     textAlign: "center",
     fontSize: 18,
-    color: "#666",
+    color: "#888",
+    marginTop: 30,
   },
   errorText: {
     textAlign: "center",
     fontSize: 18,
     color: "red",
+    marginTop: 30,
   },
-  totalText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 16,
+  scrollContainer: {
+    paddingBottom: 40,
+  },
+  card: {
+    marginHorizontal: 16,
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 18,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  legendContainer: {
+    marginTop: 20,
+    marginBottom: 16,
+    paddingHorizontal: 6,
   },
   legendItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 4,
-    marginLeft: 20,
+    marginVertical: 6,
   },
   colorBox: {
     width: 16,
     height: 16,
-    marginRight: 8,
     borderRadius: 4,
+    marginRight: 10,
   },
   legendText: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#333",
+    flexShrink: 1,
   },
   totalText: {
     textAlign: "center",
     fontSize: 16,
+    fontWeight: "600",
+    marginTop: 16,
+    color: "#333",
+  },
+  totalHighlight: {
+    color: "#007BFF",
     fontWeight: "bold",
-    marginTop: 12,
   },
 });
 
