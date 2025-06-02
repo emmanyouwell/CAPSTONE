@@ -29,7 +29,7 @@ import {
 const Metrics = ({ navigation }) => {
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
-  const [localLoading, setLocalLoading] = useState(true); 
+  const [localLoading, setLocalLoading] = useState(true);
 
   const {
     stats,
@@ -39,7 +39,7 @@ const Metrics = ({ navigation }) => {
     monthlyPatients,
     monthlyRequests,
     availableMilk,
-    expiringMilk
+    expiringMilk,
   } = useSelector((state) => state.metrics);
 
   useEffect(() => {
@@ -51,11 +51,6 @@ const Metrics = ({ navigation }) => {
           dispatch(getDispensedMilkPerMonth()),
           dispatch(getPatientsPerMonth()),
           dispatch(getRequestsPerMonth()),
-          dispatch(getAvailableMilk()),
-          dispatch(getExpiringMilk()),
-          dispatch(donationLocation()),
-          dispatch(donorLocation()),
-          dispatch(patientHospital()),
         ]);
       } catch (err) {
         console.error("Error fetching metrics:", err);
@@ -75,6 +70,11 @@ const Metrics = ({ navigation }) => {
       dispatch(getDispensedMilkPerMonth()),
       dispatch(getPatientsPerMonth()),
       dispatch(getRequestsPerMonth()),
+      dispatch(getAvailableMilk()),
+      dispatch(getExpiringMilk()),
+      dispatch(donationLocation()),
+      dispatch(donorLocation()),
+      dispatch(patientHospital()),
     ]).finally(() => setRefreshing(false));
   };
 
@@ -150,7 +150,10 @@ const Metrics = ({ navigation }) => {
 
   const renderItem = (item) => (
     <View style={metricsStyle.cardContainer}>
-      <TouchableOpacity onPress={() => navigation.navigate(item.route)} disabled={item.disable}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate(item.route)}
+        disabled={item.disable}
+      >
         <Cards title={item.title} subtitle={item.subtitle} icon={item.icon} />
       </TouchableOpacity>
     </View>
