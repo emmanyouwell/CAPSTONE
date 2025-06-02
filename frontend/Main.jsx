@@ -81,6 +81,9 @@ import DonorsPerMonth from "./components/Superadmin/Metrics/DonorsPerMonth";
 import DispensedPerMonth from "./components/Superadmin/Metrics/DispensedPerMonth";
 import PatientsPerMonth from "./components/Superadmin/Metrics/PatientsPerMonth";
 import RequestsPerMonth from "./components/Superadmin/Metrics/RequestsPerMonth";
+import DonationsPerBrgy from "./components/Superadmin/Metrics/DonationsPerBrgy";
+import DonorsPerBrgy from "./components/Superadmin/Metrics/DonorsPerBrgy";
+import PatientsPerHospital from "./components/Superadmin/Metrics/PatientsPerHospital";
 
 import EditEvent from "./components/Superadmin/Schedule/EditEvent";
 import AddEvent from "./components/Superadmin/Schedule/AddEvent";
@@ -304,6 +307,9 @@ const MainStack = () => {
         <Stack.Screen name="DispensedPerMonth" component={DispensedPerMonth} />
         <Stack.Screen name="PatientsPerMonth" component={PatientsPerMonth} />
         <Stack.Screen name="RequestsPerMonth" component={RequestsPerMonth} />
+        <Stack.Screen name="DonationsPerBrgy" component={DonationsPerBrgy} />
+        <Stack.Screen name="DonorsPerBrgy" component={DonorsPerBrgy} />
+        <Stack.Screen name="PatientsPerHospital" component={PatientsPerHospital} />
 
         {/* Milk Letting Navigation*/}
         <Stack.Screen name="superadmin_milkLetting" component={MilkLetting} />
