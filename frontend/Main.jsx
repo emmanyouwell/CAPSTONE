@@ -134,7 +134,7 @@ const CustomDrawerContent = (props) => {
           inactiveTintColor="black"
           activeBackgroundColor={colors.color1}
           onPress={() => props.navigation.navigate('userHome')} />
-        <DrawerItem
+        {/* <DrawerItem
           label="Profile"
           icon={({ focused, color, size }) => (
             <Icon name="account-circle" color={currentRoute === 'Dashboard' ? 'white' : colors.color2} size={26} />
@@ -143,7 +143,7 @@ const CustomDrawerContent = (props) => {
           activeTintColor="white"
           inactiveTintColor="black"
           activeBackgroundColor={colors.color1}
-          onPress={() => props.navigation.navigate('Dashboard')} />
+          onPress={() => props.navigation.navigate('Dashboard')} /> */}
         <View style={styles.container}>
           <DrawerItem
             label="Schedule"
@@ -175,7 +175,7 @@ const CustomDrawerContent = (props) => {
           activeBackgroundColor={colors.color1}
           onPress={() => props.navigation.navigate('Dashboard')} />
 
-        <DrawerItem
+        {/* <DrawerItem
           label="Settings"
           icon={({ focused, color, size }) => (
             <Icon name="cog" color={focused ? 'white' : colors.color2} size={26} />
@@ -206,7 +206,9 @@ const CustomDrawerContent = (props) => {
           activeTintColor="white"
           inactiveTintColor="black"
           activeBackgroundColor={colors.color1}
-          onPress={() => props.navigation.navigate('My Profile')} /></>}
+          onPress={() => props.navigation.navigate('My Profile')} /></> */}
+          </>
+          }
 
       {/* <DrawerItemList {...props} /> */}
     </DrawerContentScrollView>

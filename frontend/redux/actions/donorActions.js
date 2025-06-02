@@ -26,7 +26,6 @@ export const getDonors = createAsyncThunk(
             if (search) {
                 urlString += `&search=${encodeURIComponent(search)}`;
             }
-            console.log("API: ", api);
             const response = await api.get(urlString, config);
 
             return response.data;

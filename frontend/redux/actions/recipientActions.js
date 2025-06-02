@@ -27,7 +27,6 @@ export const getRecipients = createAsyncThunk(
             if (search) {
                 urlString += `&search=${encodeURIComponent(search)}`;
             }
-           console.log("API: ", api);
             const response = await api.get(urlString, config);
 
             console.log("Response", response.data)

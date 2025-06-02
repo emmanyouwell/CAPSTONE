@@ -13,7 +13,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Header from "../../Header";
-import { logoutUser } from "../../../../redux/actions/userActions";
 import { getAllBags } from "../../../../redux/actions/bagActions";
 import { getLettingDetails } from "../../../../redux/actions/lettingActions";
 import { resetLettingDetails } from "../../../../redux/slices/lettingSlice";
@@ -130,14 +129,6 @@ const BagCards = ({ route }) => {
     navigation.navigate("AddMilkInventory", {
       selectedBags,
     });
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
   };
 
   useFocusEffect(
@@ -269,10 +260,7 @@ const BagCards = ({ route }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header
-        onLogoutPress={() => onLogoutPress()}
-        onMenuPress={() => navigation.openDrawer()}
-      />
+      <Header/>
       <Text style={styles.screenTitle}>Bags in the collection</Text>
       <View style={dataTableStyle.tableContainer}>
         <ScrollView

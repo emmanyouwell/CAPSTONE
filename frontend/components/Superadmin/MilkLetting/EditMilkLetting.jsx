@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateLetting } from '../../../redux/actions/lettingActions';
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet } from 'react-native';
 import Header from '../Header';
-import { logoutUser } from '../../../redux/actions/userActions';
 import { Formik } from "formik";
 import * as Yup from "yup";
 import moment from 'moment';
@@ -17,8 +16,7 @@ const EditMilkLetting = ({ route, navigation }) => {
 
     const [open, setOpen] = useState(false);
     const [status, setStatus] = useState(item?.status || '');
-    const [startDateOpen, setStartDateOpen] = useState(false);
-    const [endDateOpen, setEndDateOpen] = useState(false);
+    const [dateOpen, setDateOpen] = useState(false);
 
     const dispatch = useDispatch();
     const { success } = useSelector(state => state.lettings);
@@ -34,20 +32,18 @@ const EditMilkLetting = ({ route, navigation }) => {
         activity: Yup.string().required("Activity is required"),
         venue: Yup.string().required("Venue is required"),
         start: Yup.date().required("Start date is required"),
-        end: Yup.date().required("End date is required").min(Yup.ref("start"), "End date must be after start date"),
     });
 
     return (
         <>
-            <Header onLogoutPress={() => dispatch(logoutUser())} onMenuPress={() => navigation.openDrawer()} />
+            <Header/>
             <View style={styles.container}>
                 <Text style={SuperAdmin.headerText}>Edit Milk Letting Event</Text>
                 <Formik
                     initialValues={{
                         activity: item?.activity || '',
                         venue: item?.venue || '',
-                        start: item?.actDetails?.start || '',
-                        end: item?.actDetails?.end || '',
+                        start: item?.actDetails?.date || '',
                         description: item?.description
                     }}
                     validationSchema={validationSchema}
@@ -56,13 +52,11 @@ const EditMilkLetting = ({ route, navigation }) => {
                             id: item._id,
                             activity: values.activity,
                             venue: values.venue,
-                            start: values.start,
-                            end: values.end,
+                            date: values.start,
                             status: status,
                             description: values.description,
                             admin: item.admin,
                         };
-                        console.log("data: ", formData)
                         dispatch(updateLetting(formData));
                         if (status === 'Done') {
                             navigation.navigate('HistoryLetting')
@@ -114,7 +108,7 @@ const EditMilkLetting = ({ route, navigation }) => {
 
                             <Text>Start Date</Text>
                             <TouchableOpacity
-                                onPress={() => setStartDateOpen(true)}
+                                onPress={() => setDateOpen(true)}
                                 style={{
                                     borderWidth: 1,
                                     borderColor: "#ccc",
@@ -127,45 +121,16 @@ const EditMilkLetting = ({ route, navigation }) => {
                             >
                                 <Text>{values.start ? moment(values.start).format('MMMM Do YYYY, h:mm:ss a') : "Select Start Date"}</Text>
                             </TouchableOpacity>
-                            {startDateOpen && (
+                            {dateOpen && (
                                 <DatePicker
                                     modal
-                                    open={startDateOpen}
+                                    open={dateOpen}
                                     date={new Date(values.start)}
                                     onConfirm={(selectedDate) => {
                                         setFieldValue('start', new Date(selectedDate).toISOString());
-                                        setStartDateOpen(false);
+                                        setDateOpen(false);
                                     }}
-                                    onCancel={() => setStartDateOpen(false)}
-                                    mode="datetime"
-                                />
-                            )}
-
-                            <Text>End Date</Text>
-                            <TouchableOpacity
-                                onPress={() => setEndDateOpen(true)}
-                                style={{
-                                    borderWidth: 1,
-                                    borderColor: "#ccc",
-                                    padding: 10,
-                                    borderRadius: 5,
-                                    marginBottom: 10,
-                                    backgroundColor: "#f0f0f0",
-                                    marginVertical: 8,
-                                }}
-                            >
-                                <Text >{values.end ? moment(values.end).format('MMMM Do YYYY, h:mm:ss a') : "Select End Date"}</Text>
-                            </TouchableOpacity>
-                            {endDateOpen && (
-                                <DatePicker
-                                    modal
-                                    open={endDateOpen}
-                                    date={new Date(values.end)}
-                                    onConfirm={(selectedDate) => {
-                                        setFieldValue('end', new Date(selectedDate).toISOString());
-                                        setEndDateOpen(false);
-                                    }}
-                                    onCancel={() => setEndDateOpen(false)}
+                                    onCancel={() => setDateOpen(false)}
                                     mode="datetime"
                                 />
                             )}

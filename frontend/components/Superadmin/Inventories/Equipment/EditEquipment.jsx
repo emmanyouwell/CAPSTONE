@@ -17,7 +17,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useDispatch } from 'react-redux';
 import Header from '../../../../components/Superadmin/Header';
 import { updateEquipment } from '../../../../redux/actions/equipmentActions';
-import { logoutUser } from '../../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../../styles/Styles';
 import { getUser } from '../../../../utils/helper';
 
@@ -60,13 +59,6 @@ const EditEquipments = ({ navigation, route }) => {
             fetchUserDetails();
         });
     }, []);
-
-    const onMenuPress = () => navigation.openDrawer();
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => navigation.replace('login'))
-            .catch((err) => console.log(err));
-    };
 
     const handlePickImage = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -136,7 +128,7 @@ const EditEquipments = ({ navigation, route }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <ScrollView>
                 <SafeAreaView style={styles.form}>
                     <Text style={styles.screenTitle}>Edit Equipment</Text>

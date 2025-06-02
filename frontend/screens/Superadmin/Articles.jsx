@@ -6,6 +6,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getArticles } from '../../redux/actions/articleActions';
 import ArticleList from '../../components/Superadmin/Articles/ArticleList';
+import { resetError } from '../../redux/slices/articleSlice';
 
 const Articles = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -15,27 +16,17 @@ const Articles = ({ navigation }) => {
     useEffect(() => {
         dispatch(getArticles());
     }, [dispatch])
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
 
     const handleRefresh = () => {
         setRefreshing(true);
+        dispatch(resetError());
         dispatch(getArticles())
             .then(() => setRefreshing(false))
             .catch(() => setRefreshing(false));
     };
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <Text style={styles.screenTitle}>Articles</Text>
             <View style={styles.buttonRow}>
 

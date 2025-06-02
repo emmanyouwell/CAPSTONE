@@ -5,17 +5,11 @@ import { SuperAdmin } from '../../../styles/Styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import Header from '../Header';
-import { registerUser, logoutUser } from '../../../redux/actions/userActions';
+import { registerUser } from '../../../redux/actions/userActions';
 import { resetRegister } from '../../../redux/slices/userSlice';
 const CreateStaff = ({navigation}) => {
     const dispatch = useDispatch();
     const {isRegistered, loading, error} = useSelector((state) => state.users);
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    }
-    const onLogoutPress = () => {
-        dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
-    }
     // Validation schema using Yup
     const validationSchema = Yup.object().shape({
         first: Yup.string()
@@ -53,7 +47,7 @@ const CreateStaff = ({navigation}) => {
     }, [isRegistered]);
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <Text style={SuperAdmin.headerText}>Create Staff</Text>
             <Formik
                 initialValues={{

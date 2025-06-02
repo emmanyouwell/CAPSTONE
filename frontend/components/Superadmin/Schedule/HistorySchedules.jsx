@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../Header";
-import { logoutUser } from "../../../redux/actions/userActions";
 import { getAllSchedules } from "../../../redux/actions/scheduleActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import Schedules from "./Schedules";
@@ -26,18 +25,6 @@ const HistorySchedules = ({ navigation }) => {
       .catch(() => setRefreshing(false));
   };
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   const filteredSchedules = schedules.filter(
     (sched) => sched.status && sched.status === "Completed"
   );
@@ -45,7 +32,7 @@ const HistorySchedules = ({ navigation }) => {
   return (
     <View style={SuperAdmin.container}>
       {/* Header Component */}
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
 
       <Text style={styles.screenTitle}>Schedule History</Text>
 

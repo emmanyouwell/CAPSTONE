@@ -3,24 +3,18 @@ import { View, Text, Image, ImageBackground, TextInput, RefreshControl, ScrollVi
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Superadmin/Header'
 import DonorRecordsTable from '../../components/Superadmin/DonorRecordTable'
-import { SuperAdmin, donorRecordsStyle, colors } from '../../styles/Styles'
+import { donorRecordsStyle, colors } from '../../styles/Styles'
 import donorImg from '../../assets/image/donors.jpg'
-import { logoutUser } from '../../redux/actions/userActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { getDonors } from '../../redux/actions/donorActions';
-import { getToken, viewAsyncStorage } from '../../utils/helper';
+
 const DonorRecords = ({ navigation }) => {
   const dispatch = useDispatch();
   const { donors, pageSize, totalDonors, totalPages, loading, error } = useSelector((state) => state.donors);
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const handleMenuClick = () => {
-    navigation.openDrawer();
-  }
-  const handleLogoutClick = () => {
-    dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
-  }
+
   // Using onChangeText to update the state when text changes
   const handleTextChange = (newText) => {
     setSearch(newText);
@@ -50,7 +44,7 @@ const DonorRecords = ({ navigation }) => {
     
   return (
     <View>
-      <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
+      <Header/>
       <View style={donorRecordsStyle.imageContainer}>
         <ImageBackground source={donorImg} style={donorRecordsStyle.image}>
           <View style={donorRecordsStyle.overlay} />
