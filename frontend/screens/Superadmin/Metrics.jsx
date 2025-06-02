@@ -19,12 +19,17 @@ import {
   getDispensedMilkPerMonth,
   getPatientsPerMonth,
   getRequestsPerMonth,
+  getAvailableMilk,
+  getExpiringMilk,
+  donationLocation,
+  donorLocation,
+  patientHospital,
 } from "../../redux/actions/metricActions";
 
 const Metrics = ({ navigation }) => {
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
-  const [localLoading, setLocalLoading] = useState(true); // local loading state
+  const [localLoading, setLocalLoading] = useState(true); 
 
   const {
     stats,
@@ -33,6 +38,8 @@ const Metrics = ({ navigation }) => {
     monthlyDonors,
     monthlyPatients,
     monthlyRequests,
+    availableMilk,
+    expiringMilk
   } = useSelector((state) => state.metrics);
 
   useEffect(() => {
@@ -44,6 +51,11 @@ const Metrics = ({ navigation }) => {
           dispatch(getDispensedMilkPerMonth()),
           dispatch(getPatientsPerMonth()),
           dispatch(getRequestsPerMonth()),
+          dispatch(getAvailableMilk()),
+          dispatch(getExpiringMilk()),
+          dispatch(donationLocation()),
+          dispatch(donorLocation()),
+          dispatch(patientHospital()),
         ]);
       } catch (err) {
         console.error("Error fetching metrics:", err);
@@ -63,8 +75,7 @@ const Metrics = ({ navigation }) => {
       dispatch(getDispensedMilkPerMonth()),
       dispatch(getPatientsPerMonth()),
       dispatch(getRequestsPerMonth()),
-    ])
-      .finally(() => setRefreshing(false));
+    ]).finally(() => setRefreshing(false));
   };
 
   const cardData = [
@@ -93,21 +104,53 @@ const Metrics = ({ navigation }) => {
       id: "4",
       title: "Total Milk Released",
       subtitle: `${((dispensedMilk?.total?.total ?? 0) / 1000).toFixed(2)} L`,
-      icon: "baby-bottle",
+      icon: "bottle-tonic",
       route: "DispensedPerMonth",
     },
     {
       id: "5",
       title: "Total Requests",
       subtitle: `${monthlyRequests?.total?.total ?? 0}`,
-      icon: "baby-bottle",
+      icon: "clipboard-text",
       route: "RequestsPerMonth",
+    },
+    {
+      id: "6",
+      title: "Donations Per Baranggay",
+      icon: "map-marker-radius",
+      route: "RequestsPerMonth",
+    },
+    {
+      id: "7",
+      title: "Donors Per Baranggay",
+      icon: "map-marker-account",
+      route: "RequestsPerMonth",
+    },
+    {
+      id: "8",
+      title: "Patients Per Hospital",
+      icon: "hospital-building",
+      route: "RequestsPerMonth",
+    },
+    {
+      id: "9",
+      title: "Pasteurized Milk Avail",
+      subtitle: `${availableMilk ?? 0}`,
+      icon: "bottle-tonic-plus",
+      disable: true,
+    },
+    {
+      id: "10",
+      title: "Pasteurize Soon",
+      subtitle: `${((expiringMilk ?? 0) / 1000).toFixed(2)} L`,
+      icon: "timer-sand",
+      disable: true,
     },
   ];
 
   const renderItem = (item) => (
     <View style={metricsStyle.cardContainer}>
-      <TouchableOpacity onPress={() => navigation.navigate(item.route)}>
+      <TouchableOpacity onPress={() => navigation.navigate(item.route)} disabled={item.disable}>
         <Cards title={item.title} subtitle={item.subtitle} icon={item.icon} />
       </TouchableOpacity>
     </View>
@@ -131,7 +174,7 @@ const Metrics = ({ navigation }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header/>
+      <Header />
       <Text style={styles.screenTitle}>Metrics</Text>
       <ScrollView
         style={{ padding: 10 }}
