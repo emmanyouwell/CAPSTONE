@@ -51,6 +51,11 @@ const Metrics = ({ navigation }) => {
           dispatch(getDispensedMilkPerMonth()),
           dispatch(getPatientsPerMonth()),
           dispatch(getRequestsPerMonth()),
+          dispatch(getAvailableMilk()),
+          dispatch(getExpiringMilk()),
+          dispatch(donationLocation()),
+          dispatch(donorLocation()),
+          dispatch(patientHospital()),
         ]);
       } catch (err) {
         console.error("Error fetching metrics:", err);
@@ -118,19 +123,19 @@ const Metrics = ({ navigation }) => {
       id: "6",
       title: "Donations Per Baranggay",
       icon: "map-marker-radius",
-      route: "RequestsPerMonth",
+      route: "DonationsPerBrgy",
     },
     {
       id: "7",
       title: "Donors Per Baranggay",
       icon: "map-marker-account",
-      route: "RequestsPerMonth",
+      route: "DonorsPerBrgy",
     },
     {
       id: "8",
       title: "Patients Per Hospital",
       icon: "hospital-building",
-      route: "RequestsPerMonth",
+      route: "PatientsPerHospital",
     },
     {
       id: "9",
