@@ -6,6 +6,7 @@ import {
   ScrollView,
   Dimensions,
   RefreshControl,
+  ActivityIndicator,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../../../components/Superadmin/Header";
@@ -13,7 +14,9 @@ import { SuperAdmin } from "../../../styles/Styles";
 import { getDispensedMilkPerMonth } from "../../../redux/actions/metricActions";
 import { BarChart } from "react-native-chart-kit";
 
-const DispensedMilkPerMonth = ({ navigation }) => {
+const screenWidth = Dimensions.get("window").width;
+
+const DispensedMilkPerMonth = () => {
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -21,9 +24,10 @@ const DispensedMilkPerMonth = ({ navigation }) => {
     (state) => state.metrics
   );
 
-  const chartLabels = Object.keys(dispensedMilk).filter(
-    (key) => key !== "total"
-  );
+  const chartLabels = Object.keys(dispensedMilk)
+    .filter((key) => key !== "total" && key !== "")
+    .sort();
+
   const inpatients = chartLabels.map(
     (month) => (dispensedMilk[month]?.inpatient || 0) / 1000
   );
@@ -35,12 +39,18 @@ const DispensedMilkPerMonth = ({ navigation }) => {
   const inpatientTotal = (dispensedMilk.total?.inpatient || 0) / 1000;
   const overallTotal = (dispensedMilk.total?.total || 0) / 1000;
 
+  const isEmpty =
+    chartLabels.length === 0 ||
+    (inpatients.every((v) => v === 0) && outpatients.every((v) => v === 0));
+
   const handleRefresh = () => {
     setRefreshing(true);
-    dispatch(getDispensedMilkPerMonth())
-      .then(() => setRefreshing(false))
-      .catch(() => setRefreshing(false));
+    dispatch(getDispensedMilkPerMonth()).finally(() => setRefreshing(false));
   };
+
+  useEffect(() => {
+    dispatch(getDispensedMilkPerMonth());
+  }, [dispatch]);
 
   return (
     <View style={SuperAdmin.container}>
@@ -49,82 +59,64 @@ const DispensedMilkPerMonth = ({ navigation }) => {
       <Text style={styles.screenTitle}>Dispensed Milk Per Month</Text>
 
       {loading ? (
-        <Text style={styles.loadingText}>Loading...</Text>
+        <ActivityIndicator size="large" color="#4682B4" style={styles.centered} />
       ) : error ? (
-        <Text style={styles.errorText}>{error}</Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>❌ {error}</Text>
+        </View>
       ) : (
         <ScrollView
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
+          contentContainerStyle={styles.scrollContainer}
         >
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Inpatients Dispenses</Text>
-            <BarChart
-              data={{
-                labels: chartLabels,
-                datasets: [{ data: inpatients.flat() }],
-              }}
-              width={Dimensions.get("window").width - 32}
-              height={300}
-              yAxisLabel=""
-              yAxisSuffix=" L"
-              chartConfig={{
-                backgroundGradientFrom: "#fff",
-                backgroundGradientTo: "#f7f7f7",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                barPercentage: 0.5,
-                fillShadowGradient: "blue",
-                fillShadowGradientOpacity: 1,
-              }}
-              style={styles.chart}
-              verticalLabelRotation={30}
-              fromZero
-              showBarTops
-              showValuesOnTopOfBars
-            />
-            <Text style={styles.totalVolume}>
-              Total: {inpatientTotal.toFixed(2)} Liters
-            </Text>
-          </View>
+          {isEmpty ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyIcon}>🥛</Text>
+              <Text style={styles.emptyText}>No milk dispensed yet.</Text>
+            </View>
+          ) : (
+            <View style={styles.card}>
+              <Text style={styles.sectionTitle}>Monthly Dispense Overview</Text>
+              <BarChart
+                data={{
+                  labels: chartLabels,
+                  datasets: [
+                    { data: inpatients, color: () => "#4682B4" },
+                    { data: outpatients, color: () => "#FF6347" },
+                  ],
+                  legend: ["Inpatients", "Outpatients"],
+                }}
+                width={screenWidth - 40}
+                height={300}
+                yAxisSuffix=" L"
+                fromZero
+                chartConfig={{
+                  backgroundGradientFrom: "#ffffff",
+                  backgroundGradientTo: "#ffffff",
+                  decimalPlaces: 2,
+                  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                  barPercentage: 0.5,
+                }}
+                style={styles.chart}
+                verticalLabelRotation={30}
+                showBarTops
+                showValuesOnTopOfBars
+              />
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Outpatient Dispenses</Text>
-            <BarChart
-              data={{
-                labels: chartLabels,
-                datasets: [{ data: outpatients.flat() }],
-              }}
-              width={Dimensions.get("window").width - 32}
-              height={300}
-              yAxisLabel=""
-              yAxisSuffix=" L"
-              chartConfig={{
-                backgroundGradientFrom: "#fff",
-                backgroundGradientTo: "#f7f7f7",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                barPercentage: 0.5,
-                fillShadowGradient: "red",
-                fillShadowGradientOpacity: 1,
-              }}
-              style={styles.chart}
-              verticalLabelRotation={30}
-              fromZero
-              showBarTops
-              showValuesOnTopOfBars
-            />
-            <Text style={styles.totalVolume}>
-              Total: {outpatientTotal.toFixed(2)} Liters
-            </Text>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Overall Total: {overallTotal.toFixed(2)} Liters
-            </Text>
-          </View>
+              <Text style={styles.summaryText}>
+                🏥 Inpatient Total: <Text style={styles.value}>{inpatientTotal.toFixed(2)} L</Text>
+              </Text>
+              <Text style={styles.summaryText}>
+                👪 Outpatient Total: <Text style={styles.value}>{outpatientTotal.toFixed(2)} L</Text>
+              </Text>
+              <Text style={styles.summaryText}>
+                🧮 Overall Total: <Text style={[styles.value, styles.overall]}>{overallTotal.toFixed(2)} L</Text>
+              </Text>
+            </View>
+          )}
         </ScrollView>
       )}
     </View>
@@ -137,40 +129,73 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: 16,
+    color: "#333",
   },
-  section: {
-    marginBottom: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    backgroundColor: "#f9f9f9",
+  scrollContainer: {
+    paddingBottom: 30,
+    paddingHorizontal: 16,
   },
-  loadingText: {
-    textAlign: "center",
-    fontSize: 18,
-    color: "#666",
-  },
-  errorText: {
-    textAlign: "center",
-    fontSize: 18,
-    color: "red",
-  },
-  chart: {
-    marginVertical: 16,
-    borderRadius: 16,
-    alignSelf: "center",
-  },
-  totalVolume: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 8,
+  card: {
+    backgroundColor: "#fefefe",
+    borderRadius: 12,
+    padding: 20,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
-    alignContent: "center",
+    marginBottom: 16,
+    color: "#222",
+  },
+  chart: {
+    borderRadius: 12,
+  },
+  summaryText: {
+    fontSize: 16,
+    marginTop: 8,
+    color: "#444",
+  },
+  value: {
+    fontWeight: "bold",
+    color: "#000",
+  },
+  overall: {
+    color: "#008000",
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 50,
+  },
+  errorContainer: {
+    padding: 20,
+    backgroundColor: "#ffe6e6",
+    borderRadius: 10,
+    margin: 20,
+  },
+  errorText: {
+    color: "#cc0000",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 50,
+  },
+  emptyIcon: {
+    fontSize: 50,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: "#666",
+    marginTop: 10,
   },
 });
 

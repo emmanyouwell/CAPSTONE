@@ -11,13 +11,17 @@ import { useDispatch, useSelector } from "react-redux";
 import Header from "../../../components/Superadmin/Header";
 import { SuperAdmin } from "../../../styles/Styles";
 import { getMilkPerMonth } from "../../../redux/actions/metricActions";
-import { BarChart } from "react-native-chart-kit";
+import { BarChart, StackedBarChart } from "react-native-chart-kit";
 
-const MilkPerMonth = ({ navigation }) => {
+const MilkPerMonth = () => {
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
 
   const { stats, loading, error } = useSelector((state) => state.metrics);
+
+  useEffect(() => {
+    dispatch(getMilkPerMonth());
+  }, []);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -32,6 +36,11 @@ const MilkPerMonth = ({ navigation }) => {
     (month) => (stats[month]?.community || 0) / 1000
   );
 
+  const stackedData = chartLabels.map((label, idx) => [
+    communityData[idx],
+    privateData[idx],
+  ]);
+
   const communityTotal = (stats.total?.community || 0) / 1000;
   const privateTotal = (stats.total?.private || 0) / 1000;
   const overallTotal = (stats.total?.total || 0) / 1000;
@@ -39,8 +48,7 @@ const MilkPerMonth = ({ navigation }) => {
   return (
     <View style={SuperAdmin.container}>
       <Header />
-
-      <Text style={styles.screenTitle}>Milk Per Month Charts</Text>
+      <Text style={styles.screenTitle}>Milk Collection Overview</Text>
 
       {loading ? (
         <Text style={styles.loadingText}>Loading...</Text>
@@ -52,7 +60,43 @@ const MilkPerMonth = ({ navigation }) => {
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         >
-          {/* Private Donors Chart */}
+          {/* Totals Summary Card */}
+          <View style={styles.summaryContainer}>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryLabel}>Community</Text>
+              <Text style={styles.summaryValue}>{communityTotal.toFixed(2)} L</Text>
+            </View>
+            <View style={styles.summaryCard}>
+              <Text style={styles.summaryLabel}>Private</Text>
+              <Text style={styles.summaryValue}>{privateTotal.toFixed(2)} L</Text>
+            </View>
+            <View style={[styles.summaryCard, styles.overallCard]}>
+              <Text style={styles.summaryLabel}>Total</Text>
+              <Text style={styles.summaryValue}>{overallTotal.toFixed(2)} L</Text>
+            </View>
+          </View>
+
+          {/* Stacked Chart */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Combined Donor Comparison</Text>
+            <StackedBarChart
+              data={{
+                labels: chartLabels,
+                legend: ["Community", "Private"],
+                data: stackedData,
+                barColors: ["#e74c3c", "#2980b9"],
+              }}
+              width={Dimensions.get("window").width - 32}
+              height={300}
+              yAxisSuffix=" L"
+              chartConfig={chartConfig}
+              style={styles.chart}
+              decimalPlaces={1}
+              fromZero
+            />
+          </View>
+
+          {/* Private Donors */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Private Donors</Text>
             <BarChart
@@ -61,29 +105,19 @@ const MilkPerMonth = ({ navigation }) => {
                 datasets: [{ data: privateData }],
               }}
               width={Dimensions.get("window").width - 32}
-              height={300}
+              height={250}
               yAxisSuffix=" L"
               chartConfig={{
-                backgroundGradientFrom: "#fff",
-                backgroundGradientTo: "#f7f7f7",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                barPercentage: 0.5,
-                fillShadowGradient: "blue",
-                fillShadowGradientOpacity: 1,
+                ...chartConfig,
+                fillShadowGradient: "#3498db",
               }}
               style={styles.chart}
-              verticalLabelRotation={30}
               fromZero
-              showBarTops
               showValuesOnTopOfBars
             />
-            <Text style={styles.totalVolume}>
-              Total: {privateTotal.toFixed(2)} Liters
-            </Text>
           </View>
 
-          {/* Community Donors Chart */}
+          {/* Community Donors */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Community Donors</Text>
             <BarChart
@@ -92,38 +126,30 @@ const MilkPerMonth = ({ navigation }) => {
                 datasets: [{ data: communityData }],
               }}
               width={Dimensions.get("window").width - 32}
-              height={300}
+              height={250}
               yAxisSuffix=" L"
               chartConfig={{
-                backgroundGradientFrom: "#fff",
-                backgroundGradientTo: "#f7f7f7",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                barPercentage: 0.5,
-                fillShadowGradient: "red",
-                fillShadowGradientOpacity: 1,
+                ...chartConfig,
+                fillShadowGradient: "#e74c3c",
               }}
               style={styles.chart}
-              verticalLabelRotation={30}
               fromZero
-              showBarTops
               showValuesOnTopOfBars
             />
-            <Text style={styles.totalVolume}>
-              Total: {communityTotal.toFixed(2)} Liters
-            </Text>
-          </View>
-
-          {/* Overall Total */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Overall Total: {overallTotal.toFixed(2)} Liters
-            </Text>
           </View>
         </ScrollView>
       )}
     </View>
   );
+};
+
+const chartConfig = {
+  backgroundGradientFrom: "#fff",
+  backgroundGradientTo: "#fff",
+  decimalPlaces: 1,
+  color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+  barPercentage: 0.5,
 };
 
 const styles = StyleSheet.create({
@@ -132,14 +158,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginVertical: 16,
-  },
-  section: {
-    marginBottom: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    backgroundColor: "#f9f9f9",
   },
   loadingText: {
     textAlign: "center",
@@ -151,25 +169,54 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "red",
   },
-  chart: {
-    marginVertical: 16,
-    borderRadius: 16,
-    alignSelf: "center",
-  },
-  totalsContainer: {
-    marginTop: 16,
-    paddingHorizontal: 16,
-  },
-  totalVolume: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 8,
+  section: {
+    marginHorizontal: 16,
+    marginBottom: 24,
+    padding: 16,
+    backgroundColor: "#fdfdfd",
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   sectionTitle: {
     fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+    color: "#333",
+    textAlign: "center",
+  },
+  chart: {
+    borderRadius: 16,
+    alignSelf: "center",
+  },
+  summaryContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginHorizontal: 16,
+    marginBottom: 20,
+  },
+  summaryCard: {
+    backgroundColor: "#ecf0f1",
+    padding: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    flex: 1,
+    marginHorizontal: 4,
+  },
+  overallCard: {
+    backgroundColor: "#dff9fb",
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: "#555",
+  },
+  summaryValue: {
+    fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 8,
-    alignContent: "center",
+    marginTop: 4,
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Header from "../../../components/Superadmin/Header";
 import { SuperAdmin } from "../../../styles/Styles";
 import { getRequestsPerMonth } from "../../../redux/actions/metricActions";
-import { BarChart } from "react-native-chart-kit";
+import { StackedBarChart } from "react-native-chart-kit";
 
 const RequestsPerMonth = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -27,24 +27,23 @@ const RequestsPerMonth = ({ navigation }) => {
   };
 
   const chartLabels = Object.keys(monthlyRequests).filter(
-    (key) => key !== "total"
-  );
-  const inpatientData = chartLabels.map(
-    (month) => monthlyRequests[month]?.inpatient || 0
-  );
-  const outpatientData = chartLabels.map(
-    (month) => monthlyRequests[month]?.outpatient || 0
+    (key) => key !== "total" && key !== "pending"
   );
 
-  const outpatientTotal = monthlyRequests.total?.outpatient || 0;
+  const chartData = chartLabels.map((month) => [
+    monthlyRequests[month]?.inpatient || 0,
+    monthlyRequests[month]?.outpatient || 0,
+  ]);
+
   const inpatientTotal = monthlyRequests.total?.inpatient || 0;
+  const outpatientTotal = monthlyRequests.total?.outpatient || 0;
   const overallTotal = monthlyRequests.total?.total || 0;
 
   return (
     <View style={SuperAdmin.container}>
       <Header />
 
-      <Text style={styles.screenTitle}>Requests Per Month Charts</Text>
+      <Text style={styles.screenTitle}>Requests Per Month</Text>
 
       {loading && !refreshing ? (
         <Text style={styles.loadingText}>Loading...</Text>
@@ -57,68 +56,40 @@ const RequestsPerMonth = ({ navigation }) => {
           }
         >
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Inpatients Requests</Text>
-            <BarChart
+            <Text style={styles.sectionTitle}>Monthly Request Comparison</Text>
+            <StackedBarChart
               data={{
                 labels: chartLabels,
-                datasets: [{ data: inpatientData }],
+                legend: ["Inpatient", "Outpatient"],
+                data: chartData,
+                barColors: ["#4e73df", "#f6c23e"],
               }}
               width={Dimensions.get("window").width - 32}
-              height={300}
-              yAxisLabel=""
+              height={320}
               chartConfig={{
-                backgroundGradientFrom: "#fff",
-                backgroundGradientTo: "#f7f7f7",
+                backgroundGradientFrom: "#ffffff",
+                backgroundGradientTo: "#f5f5f5",
+                decimalPlaces: 0,
                 color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
                 labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                barPercentage: 0.5,
-                fillShadowGradient: "blue",
-                fillShadowGradientOpacity: 1,
               }}
               style={styles.chart}
               verticalLabelRotation={30}
+              hideLegend={false}
               fromZero
-              showBarTops
-              showValuesOnTopOfBars
             />
-            <Text style={styles.totalVolume}>
-              Total: {inpatientTotal} Inpatient Requests
-            </Text>
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Outpatients Requests</Text>
-            <BarChart
-              data={{
-                labels: chartLabels,
-                datasets: [{ data: outpatientData }],
-              }}
-              width={Dimensions.get("window").width - 32}
-              height={300}
-              yAxisLabel=""
-              chartConfig={{
-                backgroundGradientFrom: "#fff",
-                backgroundGradientTo: "#f7f7f7",
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                barPercentage: 0.5,
-                fillShadowGradient: "red",
-                fillShadowGradientOpacity: 1,
-              }}
-              style={styles.chart}
-              verticalLabelRotation={30}
-              fromZero
-              showBarTops
-              showValuesOnTopOfBars
-            />
-            <Text style={styles.totalVolume}>
-              Total: {outpatientTotal} Outpatients Requests
+          <View style={styles.summaryCard}>
+            <Text style={styles.summaryTitle}>Overall Summary</Text>
+            <Text style={styles.summaryItem}>
+              🏠 Inpatients: {inpatientTotal}
             </Text>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Overall Total: {overallTotal} Requests
+            <Text style={styles.summaryItem}>
+              🌱 Outpatients: {outpatientTotal}
+            </Text>
+            <Text style={styles.summaryTotal}>
+              👥 Total Recipients: {overallTotal}
             </Text>
           </View>
         </ScrollView>
@@ -166,7 +137,32 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 8,
-    alignContent: "center",
+    textAlign: "center",
+  },
+  summaryCard: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    padding: 20,
+    backgroundColor: "#e6f0fa",
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  summaryTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "#2b3e50",
+  },
+  summaryItem: {
+    fontSize: 16,
+    marginVertical: 2,
+    color: "#2b3e50",
+  },
+  summaryTotal: {
+    fontSize: 18,
+    marginTop: 10,
+    fontWeight: "bold",
+    color: "#1a2e45",
   },
 });
 
