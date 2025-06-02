@@ -16,7 +16,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { Swipeable } from "react-native-gesture-handler";
 import Header from "../../Header";
-import { logoutUser } from "../../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../../styles/Styles";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { allCollections } from "../../../../redux/actions/collectionActions";
@@ -42,18 +41,6 @@ const StoreCollections = ({ navigation, route }) => {
     dispatch(allCollections())
       .then(() => setRefreshing(false))
       .catch(() => setRefreshing(false));
-  };
-
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
   };
 
   const handleSubmit = async (item) => {
@@ -120,11 +107,12 @@ const StoreCollections = ({ navigation, route }) => {
   const filteredCollections = collections.filter(
     (coll) => coll.status === "Collected"
   );
-  console.log("Filtered Collections: ", filteredCollections);
+
   const renderCollections = ({ item }) => {
     const { collectionType, collectionDate, pubDetails, privDetails, status } =
       item;
-
+    console.log(pubDetails);
+    console.log(privDetails);
     return (
       <Swipeable renderRightActions={() => renderRightActions(item)}>
         <View style={styles.card}>
@@ -160,7 +148,7 @@ const StoreCollections = ({ navigation, route }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
 
       <Text style={styles.screenTitle}>Collected milk to store</Text>
 

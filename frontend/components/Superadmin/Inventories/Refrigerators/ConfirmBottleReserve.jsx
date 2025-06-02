@@ -12,7 +12,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import ImageViewing from "react-native-image-viewing";
 import Header from "../../Header";
-import { logoutUser } from "../../../../redux/actions/userActions";
 import { SuperAdmin, colors } from "../../../../styles/Styles";
 import { reserveInventory } from "../../../../redux/actions/inventoryActions";
 
@@ -34,18 +33,6 @@ const ConfirmBottleReserve = ({ navigation, route }) => {
     setSelectedImages(request.images.map((img) => ({ uri: img.url })));
     setImageIndex(index);
     setIsVisible(true);
-  };
-
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
   };
 
   const handleConfirm = () => {
@@ -75,7 +62,7 @@ const ConfirmBottleReserve = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.screenTitle}>Confirm Reservation</Text>
         {request.patient.patientType === "Inpatient" && (

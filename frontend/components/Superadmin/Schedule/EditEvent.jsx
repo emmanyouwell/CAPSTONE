@@ -4,7 +4,7 @@ import { getEventDetails, editEvents, deleteEvents } from '../../../redux/action
 import { resetUpdate, resetDelete } from '../../../redux/slices/eventSlice'
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet, Alert } from 'react-native'
 import Header from '../Header'
-import { logoutUser, getUserDetails } from '../../../redux/actions/userActions'
+import { getUserDetails } from '../../../redux/actions/userActions'
 
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -39,14 +39,6 @@ const EditEvent = ({ route, navigation }) => {
     };
     const handleEndConfirm = () => {
         setEndDateOpen(false);  // Close the picker after selection
-    }
-
-
-    const handleMenuClick = () => {
-        navigation.openDrawer();
-    }
-    const handleLogoutClick = () => {
-        dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
     }
 
     const validationSchema = Yup.object({
@@ -113,7 +105,7 @@ const EditEvent = ({ route, navigation }) => {
     }
     return (
         <>
-            <Header onLogoutPress={handleLogoutClick} onMenuPress={handleMenuClick} />
+            <Header/>
             <View style={styles.container}>
                 <Text style={SuperAdmin.headerText}>Edit Event</Text>
                 <View style={{ padding: 8 }}>

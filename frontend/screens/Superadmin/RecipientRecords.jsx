@@ -6,7 +6,6 @@ import RecipientRecordTable from '../../components/Superadmin/RecipientRecordTab
 import { SuperAdmin, donorRecordsStyle, colors } from '../../styles/Styles'
 import recipientsImg from '../../assets/image/recipients.jpg'
 import { getRecipients } from '../../redux/actions/recipientActions';
-import { logoutUser } from '../../redux/actions/userActions';
 import { useDispatch, useSelector } from 'react-redux';
 
 const RecipientRecords = ({ navigation }) => {
@@ -16,12 +15,6 @@ const RecipientRecords = ({ navigation }) => {
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const handleMenuClick = () => {
-    navigation.openDrawer();
-  }
-  const handleLogoutClick = () => {
-    dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
-  }
   // Using onChangeText to update the state when text changes
   const handleTextChange = (newText) => {
     setSearch(newText);
@@ -48,7 +41,7 @@ const RecipientRecords = ({ navigation }) => {
 
   return (
     <View>
-      <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
+      <Header/>
       <View style={donorRecordsStyle.imageContainer}>
         <ImageBackground source={recipientsImg} style={donorRecordsStyle.image}>
           <View style={donorRecordsStyle.overlay} />

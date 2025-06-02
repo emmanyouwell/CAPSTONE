@@ -3,7 +3,7 @@ import { Text, View, TouchableOpacity } from 'react-native'
 import { defaultStyle, SuperAdmin } from '../../styles/Styles'
 import Header from '../../components/Superadmin/Header'
 import MenuGrid from '../../components/Superadmin/MenuGrid'
-import { logoutUser, getUserDetails } from '../../redux/actions/userActions'
+import { getUserDetails } from '../../redux/actions/userActions'
 import { useDispatch, useSelector } from 'react-redux'
 import { viewAsyncStorage, getUser } from '../../utils/helper'
 import { getDevices, addDevice } from '../../redux/actions/notifActions'
@@ -42,19 +42,9 @@ const Dashboard = ({ navigation }) => {
         }
     }, [expoPushToken, userDetails, devices, dispatch]);
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    }
-    const onLogoutPress = () => {
-        dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
-    }
-    useEffect(() => {
-        // console.log('Dashboard loaded: ', viewAsyncStorage());
-
-    }, [])
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <Text style={SuperAdmin.headerText}>Dashboard</Text>
             <MenuGrid />
         </View>

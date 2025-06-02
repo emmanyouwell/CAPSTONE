@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '../../../components/Superadmin/Header';
-import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
 import { getMilkPerMonth } from '../../../redux/actions/metricActions';
 import { BarChart } from 'react-native-chart-kit';
@@ -22,17 +21,6 @@ const MilkPerMonth = ({ navigation }) => {
         dispatch(getMilkPerMonth());
     }, [dispatch]);
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser()
-            .then(() => navigation.replace('login'))
-            .catch((err) => console.log(err))
-        );
-    };
-
     // Prepare data for the chart (convert to liters)
     const chartLabels = Object.keys(stats).filter((key) => key !== 'total'); 
     const privateData = chartLabels.map((month) => (stats[month]?.private || 0) / 1000);
@@ -44,7 +32,7 @@ const MilkPerMonth = ({ navigation }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
 
             <Text style={styles.screenTitle}>Milk Per Month Charts</Text>
 

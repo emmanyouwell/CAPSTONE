@@ -13,7 +13,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Header from '../../components/Superadmin/Header';
-import { logoutUser } from '../../redux/actions/userActions';
 import { addPatient } from '../../redux/actions/recipientActions';
 import { getUser } from '../../utils/helper';
 import { SuperAdmin } from '../../styles/Styles';
@@ -42,18 +41,6 @@ const AddPatient = ({ navigation }) => {
           fetchUserDetails();
         });
     }, []);
-
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
 
     const handleChange = (key, value) => {
         if (["street", "brgy", "city"].includes(key)) {
@@ -112,7 +99,7 @@ const AddPatient = ({ navigation }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <Text style={styles.screenTitle}>Patient Information</Text>
 
             <FlatList

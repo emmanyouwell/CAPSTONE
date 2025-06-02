@@ -21,8 +21,6 @@ import {
 import { getAllBags } from "../../../redux/actions/bagActions";
 import { useNavigation } from "@react-navigation/native";
 import Header from "../../../components/Superadmin/Header";
-import { dataTableStyle } from "../../../styles/Styles";
-import { logoutUser } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 
 const screenHeight = Dimensions.get("window").height;
@@ -104,18 +102,6 @@ const Refrigerator = ({ route }) => {
       });
   };
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   const handleRefresh = () => {
     setRefreshing(true);
     dispatch(getAllBags());
@@ -167,7 +153,7 @@ const Refrigerator = ({ route }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <Text style={styles.screenTitle}>Refrigerator Management</Text>
       <ScrollView
         refreshControl={
