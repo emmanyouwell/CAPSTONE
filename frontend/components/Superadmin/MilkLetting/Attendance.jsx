@@ -4,7 +4,7 @@ import {
   Text,
   Button,
   TextInput,
-  StyleSheet,
+  KeyboardAvoidingView,
   TouchableOpacity,
   RefreshControl,
   ScrollView,
@@ -21,6 +21,7 @@ import {
 } from "../../../redux/actions/lettingActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import DatePicker from "react-native-date-picker";
+import { BARANGAY_OPTIONS, styles, requiredFields } from "./constants";
 
 const Attendance = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -39,7 +40,7 @@ const Attendance = ({ route, navigation }) => {
     contact_number: "",
     street: "",
     brgy: "",
-    city: "",
+    city: "Taguig City",
     age: "",
     birthday: "",
     office_address: "",
@@ -62,6 +63,9 @@ const Attendance = ({ route, navigation }) => {
   const [donorItems, setDonorItems] = useState([]);
   const [bags, setBags] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [barangayOpen, setBarangayOpen] = useState(false);
+  const [showCityInput, setShowCityInput] = useState(false);
 
   useEffect(() => {
     dispatch(getDonors({ search: "", page: 1, pageSize: 100 }));
@@ -123,21 +127,6 @@ const Attendance = ({ route, navigation }) => {
   };
 
   const handleSubmitNewDonor = () => {
-    // List of required fields (exclude optional ones)
-    const requiredFields = [
-      "first_name",
-      "last_name",
-      "birthday",
-      "street",
-      "brgy",
-      "city",
-      "child_name",
-      "child_bday",
-      "birth_weight",
-      "aog",
-      "contact_number",
-    ];
-
     // Check for any empty required fields
     const emptyFields = requiredFields.filter((field) => {
       return (
@@ -282,17 +271,44 @@ const Attendance = ({ route, navigation }) => {
             onChangeText={(value) => setForm({ ...form, street: value })}
           />
           <Text style={styles.requiredLabel}>* Baranggay</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter baranggay"
-            onChangeText={(value) => setForm({ ...form, brgy: value })}
-          />
-          <Text style={styles.requiredLabel}>* City</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter city"
-            onChangeText={(value) => setForm({ ...form, city: value })}
-          />
+          <View style={{ zIndex: 1000, marginBottom: barangayOpen ? 200 : 5 }}>
+            <DropDownPicker
+              open={barangayOpen}
+              value={form.brgy}
+              items={BARANGAY_OPTIONS}
+              setOpen={setBarangayOpen}
+              setValue={(val) => setForm({ ...form, brgy: val() })}
+              setItems={() => {}}
+              placeholder="Select Barangay"
+              searchable={true}
+              searchPlaceholder="Search barangay"
+              style={styles.dropdown}
+              dropDownContainerStyle={{ zIndex: 1000 }}
+            />
+          </View>
+
+          {showCityInput && (
+            <>
+              <Text style={styles.requiredLabel}>* City</Text>
+              <TextInput
+                style={styles.input}
+                value={form.city}
+                placeholder="Enter city"
+                onChangeText={(value) => setForm({ ...form, city: value })}
+              />
+            </>
+          )}
+          <View style={styles.radioContainer}>
+            <TouchableOpacity
+              style={styles.radioButton}
+              onPress={() => setShowCityInput(!showCityInput)}
+            >
+              <View style={styles.radioCircle}>
+                {showCityInput && <View style={styles.radioSelected} />}
+              </View>
+              <Text style={styles.radioLabel}>Outside Taguig</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.section}>
@@ -386,9 +402,8 @@ const Attendance = ({ route, navigation }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header/>
+      <Header />
       <Text style={styles.screenTitle}>Attendance</Text>
-
       <ScrollView
         style={styles.container}
         refreshControl={
@@ -584,113 +599,5 @@ const Attendance = ({ route, navigation }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#f5f5f5",
-  },
-  screenTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  section: {
-    marginBottom: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    backgroundColor: "#f9f9f9",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  input: {
-    height: 40,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 4,
-    marginBottom: 16,
-    paddingHorizontal: 8,
-  },
-  navButtons: {
-    flex: 1,
-    justifyContent: "center", // Center buttons vertically
-    alignItems: "center", // Align buttons horizontally
-    paddingHorizontal: 16,
-  },
-  button: {
-    backgroundColor: "#E53777",
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    marginVertical: 8,
-    width: "80%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  datePickerButton: {
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#e0e0e0",
-    borderRadius: 4,
-    marginBottom: 16,
-  },
-  datePickerText: {
-    color: "#000",
-  },
-  itemContainer: {
-    marginBottom: 8,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    backgroundColor: "#ffffff",
-  },
-  bagsList: {
-    marginTop: 20,
-  },
-  subTitle: {
-    fontSize: 18,
-    // fontWeight: "bold",
-  },
-  deleteButton: {
-    position: "absolute",
-    top: 4,
-    right: 4,
-    backgroundColor: "#ff4d4d",
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  deleteText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  dropdown: {
-    marginBottom: 16,
-  },
-  requiredLabel: {
-    fontSize: 14,
-    color: "#d00", // red color for emphasis
-  },
-});
 
 export default Attendance;
