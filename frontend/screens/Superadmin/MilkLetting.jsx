@@ -19,7 +19,6 @@ import { resetError, resetSuccess } from '../../redux/slices/lettingSlice';
 const InventoryScreen = ({ navigation }) => {
     const dispatch = useDispatch();
     const { lettings, error, loading }  = useSelector((state) => state.lettings);
-    console.log("Milk Lettings: ", lettings)
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
