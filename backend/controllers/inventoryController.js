@@ -421,10 +421,6 @@ exports.updateAllInventoriesStatus = catchAsyncErrors(
         "unpasteurizedDetails.collectionId": { $exists: true },
       }).populate("unpasteurizedDetails.collectionId");
 
-      if (!inventories.length) {
-        return next(new ErrorHandler("No Inventories", 400));
-      }
-
       let updatedCount = 0;
       for (const inventory of inventories) {
         const collection = inventory.unpasteurizedDetails.collectionId;

@@ -122,12 +122,10 @@ const Schedules = ({ data }) => {
 
   const renderSchedules = ({ item }) => {
     const { dates, address, donorDetails, totalVolume, status } = item;
-    const isCompleted = status === "Completed"
+    const isCompleted = status === "Completed";
     return (
       <Swipeable
-        renderRightActions={() => {
-          status !== "Completed" ? renderRightActions(item) : null;
-        }}
+        renderRightActions={() => renderRightActions(item)}
       >
         <TouchableOpacity
           style={styles.card}
@@ -139,7 +137,10 @@ const Schedules = ({ data }) => {
           <View style={styles.info}>
             <Text style={styles.title}>
               Donor:{" "}
-              {`${donorDetails.donorId.user.name.last}, ${donorDetails.donorId.user.name.first}`}
+              {`${donorDetails?.donorId?.user?.name?.last}, ${donorDetails?.donorId?.user?.name?.first}`}
+            </Text>
+            <Text style={styles.title}>
+              Phone: {donorDetails?.donorId?.user?.phone}
             </Text>
             <Text style={styles.details}>Venue: {address}</Text>
             <Text style={styles.details}>Status: {status}</Text>
