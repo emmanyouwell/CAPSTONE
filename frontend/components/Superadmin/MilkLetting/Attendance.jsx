@@ -4,7 +4,6 @@ import {
   Text,
   Button,
   TextInput,
-  KeyboardAvoidingView,
   TouchableOpacity,
   RefreshControl,
   ScrollView,
@@ -18,6 +17,7 @@ import { getDonors } from "../../../redux/actions/donorActions";
 import {
   newPublicDonor,
   markAttendance,
+  updateAttendance,
 } from "../../../redux/actions/lettingActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import DatePicker from "react-native-date-picker";
@@ -57,15 +57,24 @@ const Attendance = ({ route, navigation }) => {
     quantity: "",
   }));
   const { donors } = useSelector((state) => state.donors);
+  const { loading } = useSelector((state) => state.lettings);
 
   const [open, setOpen] = useState(false);
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [donorItems, setDonorItems] = useState([]);
   const [bags, setBags] = useState([]);
+  const [additionalBags, setAdditionalBags] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const [barangayOpen, setBarangayOpen] = useState(false);
   const [showCityInput, setShowCityInput] = useState(false);
+
+  const [showAddDetails, setShowAddDetails] = useState(false);
+  const [expressedDateOpen, setExpressedDateOpen] = useState(false);
+  const [expressedDate, setExpressedDate] = useState(null);
+  const [additionalDetails, setAdditionalDetails] = useState(() => ({
+    volume: "",
+  }));
 
   useEffect(() => {
     dispatch(getDonors({ search: "", page: 1, pageSize: 100 }));
@@ -109,6 +118,27 @@ const Attendance = ({ route, navigation }) => {
     });
   };
 
+  const addExtraBags = () => {
+    const { volume } = additionalDetails;
+
+    if (!volume || !expressedDate) {
+      Alert.alert("Error", "Error here");
+      return;
+    }
+
+    const newBags = {
+      volume: Number(volume),
+      expressDate: expressedDate,
+    };
+
+    setAdditionalBags([...additionalBags, newBags]);
+    setAdditionalDetails({
+      ...additionalDetails,
+      volume: "",
+    });
+    setExpressedDate(null)
+  };
+
   const handleEligibility = (eligible) => (eligible ? setStep(4) : setStep(1));
 
   const handleNewRecord = () => {
@@ -117,6 +147,8 @@ const Attendance = ({ route, navigation }) => {
     });
     setBags([]);
     setBagDetails({});
+    setAdditionalBags([]);
+    setAdditionalDetails({});
     setSelectedDonor(null);
     setStep(1);
   };
@@ -124,6 +156,13 @@ const Attendance = ({ route, navigation }) => {
   const removeBag = (indexToRemove) => {
     const updatedBags = bags.filter((_, index) => index !== indexToRemove);
     setBags(updatedBags);
+  };
+
+  const removeAddBag = (indexToRemove) => {
+    const updatedBags = additionalBags.filter(
+      (_, index) => index !== indexToRemove
+    );
+    setAdditionalBags(updatedBags);
   };
 
   const handleSubmitNewDonor = () => {
@@ -173,10 +212,26 @@ const Attendance = ({ route, navigation }) => {
       bags: bags,
     };
 
+    const additionalData = {
+      id: item._id,
+      donorId: selectedDonor,
+      bags: additionalBags,
+    };
+
     await dispatch(markAttendance(newData))
-      .then((res) => {
-        Alert.alert("Success", "Attendance recorded.");
-        setStep(5);
+      .then(() => {
+        if (additionalBags.length > 0) {
+          dispatch(updateAttendance(additionalData)).then(() => {
+            Alert.alert(
+              "Success",
+              "Attendance recorded and additional bags added."
+            );
+            setStep(5);
+          });
+        } else {
+          Alert.alert("Success", "Attendance recorded.");
+          setStep(5);
+        }
       })
       .catch((error) => {
         console.error("Error adding inventory:", error);
@@ -513,7 +568,7 @@ const Attendance = ({ route, navigation }) => {
                           month: "long",
                           day: "numeric",
                         })
-                      : "Select Express Date"}
+                      : "Select last donation date"}
                   </Text>
                 </TouchableOpacity>
 
@@ -524,7 +579,7 @@ const Attendance = ({ route, navigation }) => {
                   date={selectedDate ? selectedDate : new Date()}
                   mode="date"
                   onConfirm={(date) => {
-                    setOpen(false);
+                    setLastDonationOpen(false);
                     setSelectedDate(date);
                   }}
                   onCancel={() => setLastDonationOpen(false)}
@@ -532,30 +587,92 @@ const Attendance = ({ route, navigation }) => {
               </>
             )}
             <Text style={styles.subTitle}>Bag Details:</Text>
+            <Text style={styles.requiredLabel}>* Volume (ml)</Text>
             <TextInput
               style={styles.input}
               placeholder="Volume (ml)"
               keyboardType="numeric"
-              value={bagDetails.volume}
-              onChangeText={(value) =>
-                setBagDetails({ ...bagDetails, volume: value })
+              value={
+                showAddDetails ? additionalDetails.volume : bagDetails.volume
               }
+              onChangeText={(value) => {
+                showAddDetails
+                  ? setAdditionalDetails({
+                      ...additionalDetails,
+                      volume: value,
+                    })
+                  : setBagDetails({ ...bagDetails, volume: value });
+              }}
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Quantity"
-              keyboardType="numeric"
-              value={bagDetails.quantity}
-              onChangeText={(value) =>
-                setBagDetails({ ...bagDetails, quantity: value })
-              }
+            {showAddDetails ? (
+              <>
+                <Text style={styles.requiredLabel}>* Expressed Date:</Text>
+                <TouchableOpacity
+                  onPress={() => setExpressedDateOpen(true)}
+                  style={{ ...styles.input, flex: 1, justifyContent: "center" }}
+                >
+                  <Text>
+                    {expressedDate
+                      ? expressedDate.toLocaleString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : "Select Express Date"}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Modal Date Picker */}
+                <DatePicker
+                  modal
+                  open={expressedDateOpen}
+                  date={expressedDate ? expressedDate : new Date()}
+                  mode="date"
+                  onConfirm={(date) => {
+                    setExpressedDateOpen(false);
+                    setExpressedDate(date);
+                  }}
+                  onCancel={() => setExpressedDateOpen(false)}
+                />
+              </>
+            ) : (
+              <>
+                <Text style={styles.requiredLabel}>* Quantity</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Quantity"
+                  keyboardType="numeric"
+                  value={bagDetails.quantity}
+                  onChangeText={(value) =>
+                    setBagDetails({ ...bagDetails, quantity: value })
+                  }
+                />
+              </>
+            )}
+            <View style={styles.radioContainer}>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => setShowAddDetails(!showAddDetails)}
+                disabled={loading}
+              >
+                <View style={styles.radioCircle}>
+                  {showAddDetails && <View style={styles.radioSelected} />}
+                </View>
+                <Text style={styles.radioLabel}>Additional Bags</Text>
+              </TouchableOpacity>
+            </View>
+            <Button
+              title="Add Bag Details"
+              disabled={loading}
+              onPress={() => {
+                showAddDetails ? addExtraBags() : addBags();
+              }}
             />
-            <Button title="Add Bag Details" onPress={addBags} />
             {bags.length > 0 && (
               <View style={styles.section}>
                 <View style={styles.bagsList}>
                   <Text style={styles.subTitle}>Bags:</Text>
-                  {bags.map((bag, index) => (
+                  {bags?.map((bag, index) => (
                     <View key={index} style={styles.itemContainer}>
                       <Text>Volume: {bag.volume} mL</Text>
                       <Text>Quantity: {bag.quantity}</Text>
@@ -567,8 +684,28 @@ const Attendance = ({ route, navigation }) => {
                       </TouchableOpacity>
                     </View>
                   ))}
+                  <Text style={styles.subTitle}>Additional Bags:</Text>
+                  {additionalBags?.map((bag, index) => (
+                    <View key={index} style={styles.itemContainer}>
+                      <Text>Volume: {bag.volume} mL</Text>
+                      <Text>
+                        Expressed Date: {bag.expressDate.toLocaleDateString()}
+                      </Text>
+                      <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => removeAddBag(index)}
+                        disabled={loading}
+                      >
+                        <Text style={styles.deleteText}>X</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ))}
                 </View>
-                <Button title="Submit" onPress={handleSubmit} />
+                <Button
+                  title={loading ? "Submitting..." : "Submit"}
+                  onPress={handleSubmit}
+                  disabled={loading}
+                />
               </View>
             )}
           </>

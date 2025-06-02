@@ -1,4 +1,9 @@
-import React, { useEffect, useState, startTransition, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  startTransition,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
@@ -37,7 +42,7 @@ const MilkLettingDetails = ({ route, navigation }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header/>
+      <Header />
 
       <Text style={styles.screenTitle}>Milk Letting Details</Text>
 
@@ -87,6 +92,26 @@ const MilkLettingDetails = ({ route, navigation }) => {
                     <Text>
                       Total Volume Collected:{" "}
                       {donor.bags.reduce((total, bag) => total + bag.volume, 0)}{" "}
+                      mL
+                    </Text>
+                    <Text>
+                      Add bags volume:{" "}
+                      {donor.additionalBags?.reduce(
+                        (total, bag) => total + bag.volume,
+                        0
+                      )}{" "}
+                      mL
+                    </Text>
+                    <Text style={styles.donorName}>
+                      Total donation volume:{" "}
+                      {(donor.bags?.reduce(
+                        (total, bag) => total + bag.volume,
+                        0
+                      ) || 0) +
+                        (donor.additionalBags?.reduce(
+                          (total, bag) => total + bag.volume,
+                          0
+                        ) || 0)}{" "}
                       mL
                     </Text>
                   </View>
