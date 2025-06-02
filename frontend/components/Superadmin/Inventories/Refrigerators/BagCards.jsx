@@ -20,9 +20,10 @@ import { resetScheduleDetails } from "../../../../redux/slices/scheduleSlice";
 import { getScheduleDetails } from "../../../../redux/actions/scheduleActions";
 import { SuperAdmin } from "../../../../styles/Styles";
 import { dataTableStyle } from "../../../../styles/Styles";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const BagCards = ({ route }) => {
-  const { item, fridge } = route.params;
+  const { item, fridge, stored } = route.params;
   const items = route.params.selectedItems ? route.params.selectedItems : [];
   const volLimit = route.params ? route.params.volLimit : 0;
   const dispatch = useDispatch();
@@ -69,7 +70,7 @@ const BagCards = ({ route }) => {
   const alertBelowLimit = (volume) => {
     Alert.alert(
       "Milk volume not met!",
-      `The total milk volume needed to pasteurize is not yet reached. Please select more milk bags!`,
+      `The total milk volume needed to pasteurize is not yet reached. Please select more milk bags!`
     );
   };
 
@@ -119,10 +120,10 @@ const BagCards = ({ route }) => {
   };
 
   const handleNavigate = () => {
-    if(totalVolume < limit){
-      alertBelowLimit(totalVolume)
-      return
-    };
+    if (totalVolume < limit) {
+      alertBelowLimit(totalVolume);
+      return;
+    }
     const selectedBags = allBags.filter((bag) =>
       selectedItems.includes(bag._id)
     );
@@ -160,7 +161,7 @@ const BagCards = ({ route }) => {
   const renderSchedCard = (bags, donor, id) => {
     return (
       <View key={id}>
-        {bags.map((bag) => {
+        {bags?.map((bag) => {
           const isSelected = selectedItems.includes(bag._id);
           const isPasteurized = bag.status === "Pasteurized";
 
@@ -172,20 +173,32 @@ const BagCards = ({ route }) => {
                 isSelected && styles.selectedCard,
                 isPasteurized && styles.disabledCard,
               ]}
-              onLongPress={() => {
-                if (!isPasteurized) showToggleSelectionOption();
-              }}
               onPress={() => {
                 if (!isPasteurized && selectionMode) {
                   toggleSelectItem(bag._id);
                 }
               }}
-              disabled={isPasteurized || totalVolume === limit}
+              disabled={isPasteurized}
             >
-              <Text style={styles.cardTitle}>Status: {bag.status}</Text>
-              <Text>Date: {formatDate(bag.expressDate)}</Text>
-              <Text>Volume: {bag.volume} mL</Text>
-              <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
+              <View style={styles.cardContent}>
+                <View>
+                  <Text style={styles.cardTitle}>Status: {bag.status}</Text>
+                  <Text>Express Date: {formatDate(bag.expressDate)}</Text>
+                  <Text>Volume: {bag.volume} mL</Text>
+                  <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
+                </View>
+
+                {!stored && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate("bagDetails", { id: bag._id, collectionId: id })
+                    }
+                    style={styles.editIcon}
+                  >
+                    <MaterialIcons name="edit" size={24} color="#007AFF" />
+                  </TouchableOpacity>
+                )}
+              </View>
             </TouchableOpacity>
           );
         })}
@@ -194,9 +207,10 @@ const BagCards = ({ route }) => {
   };
 
   const renderLettingCard = (addBags, bags, donor, id) => {
+    const collectionBags = [...bags, ...addBags];
     return (
       <View key={id}>
-        {bags.map((bag) => {
+        {collectionBags?.map((bag) => {
           const isSelected = selectedItems.includes(bag._id);
           const isPasteurized = bag.status === "Pasteurized";
 
@@ -208,9 +222,6 @@ const BagCards = ({ route }) => {
                 isSelected && styles.selectedCard,
                 isPasteurized && styles.disabledCard,
               ]}
-              onLongPress={() => {
-                if (!isPasteurized) showToggleSelectionOption();
-              }}
               onPress={() => {
                 if (!isPasteurized && selectionMode) {
                   toggleSelectItem(bag._id);
@@ -219,36 +230,7 @@ const BagCards = ({ route }) => {
               disabled={isPasteurized}
             >
               <Text style={styles.cardTitle}>Status: {bag.status}</Text>
-              <Text>Date: {formatDate(bag.expressDate)}</Text>
-              <Text>Volume: {bag.volume} mL</Text>
-              <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
-            </TouchableOpacity>
-          );
-        })}
-        {addBags?.map((bag) => {
-          const isSelected = selectedItems.includes(bag._id);
-          const isPasteurized = bag.status === "Pasteurized";
-
-          return (
-            <TouchableOpacity
-              key={bag._id}
-              style={[
-                styles.card,
-                isSelected && styles.selectedCard,
-                isPasteurized && styles.disabledCard,
-              ]}
-              onLongPress={() => {
-                if (!isPasteurized) showToggleSelectionOption();
-              }}
-              onPress={() => {
-                if (!isPasteurized && selectionMode) {
-                  toggleSelectItem(bag._id);
-                }
-              }}
-              disabled={isPasteurized}
-            >
-              <Text style={styles.cardTitle}>Status: {bag.status}</Text>
-              <Text>Date: {formatDate(bag.expressDate)}</Text>
+              <Text>Express Date: {formatDate(bag.expressDate)}</Text>
               <Text>Volume: {bag.volume} mL</Text>
               <Text>Donor: {donor?.user?.name?.last || "Unknown"}</Text>
             </TouchableOpacity>
@@ -260,8 +242,21 @@ const BagCards = ({ route }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header/>
+      <Header />
       <Text style={styles.screenTitle}>Bags in the collection</Text>
+      {stored && (
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => showToggleSelectionOption()}
+          >
+            <Text style={styles.buttonText}>
+              <MaterialIcons name="add" size={16} color="white" /> Pasteurize
+              milk bags
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <View style={dataTableStyle.tableContainer}>
         <ScrollView
           style={styles.cardContainer}
@@ -280,7 +275,8 @@ const BagCards = ({ route }) => {
           {scheduleDetails?.donorDetails?.bags &&
             renderSchedCard(
               scheduleDetails.donorDetails.bags,
-              scheduleDetails.donorDetails.donorId
+              scheduleDetails.donorDetails.donorId,
+              scheduleDetails._id
             )}
         </ScrollView>
       </View>
@@ -389,6 +385,38 @@ const styles = StyleSheet.create({
   footerButtons: {
     flexDirection: "row",
     justifyContent: "space-around",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2196F3",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 5,
+    flex: 1,
+    marginLeft: 5,
+    marginRight: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  cardContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  editIcon: {
+    padding: 6,
   },
 });
 

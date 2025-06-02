@@ -537,6 +537,9 @@ exports.newPublicDonor = catchAsyncErrors(async (req, res, next) => {
       contact_number: formData.contact_number_2,
       donorType: formData.donor_type,
       occupation: formData.occupation,
+      verified: true,
+      lastSubmissionDate: new Date(),
+      eligibility: "Eligible"
     });
 
     res.status(200).json({

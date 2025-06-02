@@ -9,13 +9,12 @@ const Schedule = require('../models/schedule')
 exports.createBag = catchAsyncErrors(async (req, res, next) => {
     const { userID, volume, expressDate, type } = req.body;
     console.log("body: ", req.body)
-    const donor = await Donor.find({ user: userID });
+    const donor = await Donor.findOne({ user: userID });
     if (!donor) {
         return next(new ErrorHandler('Donor not found', 404));
     }
-
-    console.log('donor: ', donor[0]._id);
-    const bags = await Bag.create({ donor: donor[0]._id, volume, expressDate, collectionType: type });
+    
+    const bags = await Bag.create({ donor: donor._id, volume, expressDate, collectionType: type });
     res.status(201).json({
         success: true,
         bags,

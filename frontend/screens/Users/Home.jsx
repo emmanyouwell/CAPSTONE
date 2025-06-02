@@ -170,6 +170,7 @@ const Home = ({ navigation }) => {
                               onPress={() => {
                                 closeMenu(item._id);
                                 navigation.navigate("bagDetails", {
+                                  collectionId: null,
                                   id: item._id,
                                 });
                               }}

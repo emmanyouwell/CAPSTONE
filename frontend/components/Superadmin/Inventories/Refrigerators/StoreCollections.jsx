@@ -23,9 +23,8 @@ import { addInventory } from "../../../../redux/actions/inventoryActions";
 
 const StoreCollections = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const fridge = route.params.selectedBags
-    ? { fridgeType: "Pasteurized" }
-    : route.params;
+  const fridge = route.params;
+
   const { collections, loading, error } = useSelector(
     (state) => state.collections
   );
@@ -63,30 +62,36 @@ const StoreCollections = ({ navigation, route }) => {
       const { _id } = item;
 
       if (!_id) {
-        Alert.alert(
-          "Error",
-          "Not Found"
-        );
+        Alert.alert("Error", "Not Found");
         return;
       }
 
       newData.unpasteurizedDetails = {
-        collectionId: _id
+        collectionId: _id,
       };
 
-      try {
-        dispatch(addInventory(newData));
-        console.log(newData);
-        Alert.alert("Success", "Collection has been stored.");
+      Alert.alert("Confirmation", "Store the collected milks in this fridge?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Confirm",
+          style: "destructive",
+          onPress: () => {
+            try {
+              dispatch(addInventory(newData));
+              console.log(newData);
+              Alert.alert("Success", "Collection has been stored.");
 
-        // navigation.goBack();
-      } catch (error) {
-        Alert.alert(
-          "Error",
-          "Failed to add Inventory or update item status. Please try again."
-        );
-        console.error(error);
-      }
+              navigation.goBack();
+            } catch (error) {
+              Alert.alert(
+                "Error",
+                "Failed to add Inventory or update item status. Please try again."
+              );
+              console.error(error);
+            }
+          },
+        },
+      ]);
     } else {
       console.log("Wrong fridge type");
       Alert.alert("Error", "Unknown fridge type. Please contact support.");
@@ -95,6 +100,18 @@ const StoreCollections = ({ navigation, route }) => {
 
   const renderRightActions = (item) => (
     <View style={styles.actionsContainer}>
+      <TouchableOpacity
+        style={[styles.actionButton, styles.seeButton]}
+        onPress={() =>
+          navigation.navigate("BagCards", {
+            item,
+            fridge: fridge,
+            stored: false
+          })
+        }
+      >
+        <MaterialIcons name="remove-red-eye" size={30} color="white" />
+      </TouchableOpacity>
       <TouchableOpacity
         style={[styles.actionButton, styles.addButton]}
         onPress={() => handleSubmit(item)}
@@ -111,8 +128,6 @@ const StoreCollections = ({ navigation, route }) => {
   const renderCollections = ({ item }) => {
     const { collectionType, collectionDate, pubDetails, privDetails, status } =
       item;
-    console.log(pubDetails);
-    console.log(privDetails);
     return (
       <Swipeable renderRightActions={() => renderRightActions(item)}>
         <View style={styles.card}>
@@ -132,8 +147,8 @@ const StoreCollections = ({ navigation, route }) => {
             ) : (
               <>
                 <Text style={styles.details}>
-                  Donor: {privDetails?.donorDetails?.donorId.user.name.last},{" "}
-                  {privDetails?.donorDetails?.donorId.user.name.first}
+                  Donor: {privDetails?.donorDetails?.donor?.user?.name?.last},{" "}
+                  {privDetails?.donorDetails?.donor?.user?.name?.first}
                 </Text>
                 <Text style={styles.details}>
                   Volume Collected: {privDetails.totalVolume} ml
@@ -148,7 +163,7 @@ const StoreCollections = ({ navigation, route }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header/>
+      <Header />
 
       <Text style={styles.screenTitle}>Collected milk to store</Text>
 
@@ -262,11 +277,11 @@ const styles = StyleSheet.create({
     width: 80,
     height: "100%",
   },
-  addButton: {
+  seeButton: {
     backgroundColor: "#E53777",
   },
-  deleteButton: {
-    backgroundColor: "#F44336",
+  addButton: {
+    backgroundColor: "#4CAF50",
   },
   actionText: {
     color: "#fff",

@@ -221,11 +221,21 @@ exports.allCollections = catchAsyncErrors(async (req, res, next) => {
     })
     .populate({
       path: "privDetails",
-      select: "totalVolume donorDetails.bags",
-      populate: {
-        path: "donorDetails.bags",
-        select: "expressDate volume",
-      },
+      select: "totalVolume donorDetails.donorId donorDetails.bags",
+      populate: [
+        {
+          path: "donorDetails.donorId",
+          select: "user home_address age birthday",
+          populate: {
+            path: "user",
+            select: "name email",
+          },
+        },
+        {
+          path: "donorDetails.bags",
+          select: "expressDate volume",
+        },
+      ],
     });
 
   const count = await Collection.countDocuments();
@@ -236,3 +246,4 @@ exports.allCollections = catchAsyncErrors(async (req, res, next) => {
     collections,
   });
 });
+

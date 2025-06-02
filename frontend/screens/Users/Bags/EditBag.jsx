@@ -17,12 +17,10 @@ import { colors } from "../../../styles/Styles";
 import { updateBag } from "../../../redux/actions/bagActions";
 import { getUserDetails } from "../../../redux/actions/userActions";
 import { getSingleBag } from "../../../redux/actions/bagActions";
-import { useRoute } from "@react-navigation/native";
 
-const EditBag = ({ navigation }) => {
-  const route = useRoute();
+const EditBag = ({ navigation, route }) => {
   const formikRef = useRef(null);
-  const { id } = route.params;
+  const { id, collectionId } = route.params;
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [volume, setVolume] = useState(0);
@@ -61,12 +59,13 @@ const EditBag = ({ navigation }) => {
             enableReinitialize={true} // 👈 Ensures Formik updates with bagDetails
             onSubmit={(values) => {
               const data = {
+                collectionId,
                 volume: values.volume,
                 expressDate: values.expressDate,
                 id: id,
               };
               dispatch(updateBag(data)).then(() => {
-                navigation.navigate("userHome");
+                navigation.goBack();
               });
             }}
           >

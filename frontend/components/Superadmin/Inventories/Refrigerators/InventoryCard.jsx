@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
-
 import Header from "../../Header";
 import { checkInventories, getInventories } from "../../../../redux/actions/inventoryActions";
 import { SuperAdmin } from "../../../../styles/Styles";
@@ -87,7 +86,8 @@ const Inventory = ({ route }) => {
             item: inv.unpasteurizedDetails.collectionId,
             fridge: fridge,
             selectedItems: selectedItems,
-            volLimit: limit
+            volLimit: limit,
+            stored: true
           })
         }
       >
