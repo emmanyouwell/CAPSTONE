@@ -15,7 +15,6 @@ import { RadioButton } from "react-native-paper";
 import { useDispatch, useSelector } from "react-redux";
 import DropDownPicker from "react-native-dropdown-picker";
 import Header from "../../../../components/Superadmin/Header";
-import { logoutUser } from "../../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../../styles/Styles";
 import { getFridges } from "../../../../redux/actions/fridgeActions";
 import { addInventory } from "../../../../redux/actions/inventoryActions";
@@ -70,10 +69,6 @@ const AddMilkInventory = ({ route, navigation }) => {
     }
   }, [fridges, items]);
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
   const handleDateChange = (event, selectedDate, field) => {
     const date = selectedDate || formData[field];
     setFormData({ ...formData, [field]: date.toISOString().split("T")[0] });
@@ -95,14 +90,6 @@ const AddMilkInventory = ({ route, navigation }) => {
       </View>
     );
   }
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
 
   const handleSubmit = async () => {
     if (!formData || !selectedFridge || !items || !bottleType) {
@@ -251,7 +238,7 @@ const AddMilkInventory = ({ route, navigation }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <ScrollView>
         <View style={styles.section}>
           <Text style={styles.title}>Add Pastuerized Milk</Text>

@@ -18,7 +18,6 @@ import { Swipeable } from "react-native-gesture-handler";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import DropDownPicker from "react-native-dropdown-picker";
 import Header from "../Header";
-import { logoutUser } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import {
   getRequests,
@@ -65,18 +64,6 @@ const Outpatients = ({ navigation }) => {
     setRefreshing(true);
     dispatch(getRequests()).finally(() => setRefreshing(false));
     dispatch(resetMessage());
-  };
-
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
   };
 
   const handleConfirm = () => {
@@ -195,7 +182,7 @@ const Outpatients = ({ navigation }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <Text style={styles.screenTitle}>Outpatient Requests</Text>
       <View style={styles.buttonRow}>
         <TouchableOpacity

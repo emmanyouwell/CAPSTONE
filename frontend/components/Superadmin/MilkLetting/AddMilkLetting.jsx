@@ -12,7 +12,6 @@ import {
   Alert,
 } from "react-native";
 import Header from "../Header";
-import { logoutUser, getUserDetails } from "../../../redux/actions/userActions";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import moment from "moment";
@@ -30,16 +29,6 @@ const AddMilkLetting = ({ navigation }) => {
   const dispatch = useDispatch();
   const { success, loading, error } = useSelector((state) => state.events);
   const { userDetails } = useSelector((state) => state.users);
-  const handleMenuClick = () => {
-    navigation.openDrawer();
-  };
-  const handleLogoutClick = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.replace("login");
-      })
-      .catch((err) => console.log(err));
-  };
 
   const validationSchema = Yup.object({
     activity: Yup.string().required("Activity is required"),
@@ -59,7 +48,7 @@ const AddMilkLetting = ({ navigation }) => {
   }, [dispatch, success]);
   return (
     <>
-      <Header onLogoutPress={handleLogoutClick} onMenuPress={handleMenuClick} />
+      <Header/>
       <View style={styles.container}>
         <Text style={SuperAdmin.headerText}>Add Milk Letting Event</Text>
         <View style={{ padding: 8 }}>

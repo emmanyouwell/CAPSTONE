@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 
 import Header from "../../Header";
-import { logoutUser } from "../../../../redux/actions/userActions";
 import { getInventories } from "../../../../redux/actions/inventoryActions";
 import { SuperAdmin } from "../../../../styles/Styles";
 import { dataTableStyle } from "../../../../styles/Styles";
@@ -221,20 +220,9 @@ const PasteurCards = ({ route }) => {
     );
   }
 
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   return (
     <View style={SuperAdmin.container}>
-      <Header
-        onLogoutPress={() => onLogoutPress()}
-        onMenuPress={() => navigation.openDrawer()}
-      />
+      <Header/>
 
       <Text style={styles.screenTitle}>{fridge.name} Batches</Text>
       <ScrollView>

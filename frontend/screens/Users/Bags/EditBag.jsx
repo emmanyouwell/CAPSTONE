@@ -18,7 +18,6 @@ import { updateBag } from "../../../redux/actions/bagActions";
 import { getUserDetails } from "../../../redux/actions/userActions";
 import { getSingleBag } from "../../../redux/actions/bagActions";
 import { useRoute } from "@react-navigation/native";
-import { logoutUser } from "../../../redux/actions/userActions";
 
 const EditBag = ({ navigation }) => {
   const route = useRoute();
@@ -30,16 +29,6 @@ const EditBag = ({ navigation }) => {
   const dispatch = useDispatch();
   const { bagDetails, loading } = useSelector((state) => state.bags);
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.replace("login");
-      })
-      .catch((err) => console.log(err));
-  };
   // Validation Schema using Yup
   const validationSchema = Yup.object().shape({
     volume: Yup.number()
@@ -58,7 +47,7 @@ const EditBag = ({ navigation }) => {
   }, [bagDetails]);
   return (
     <>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <View style={styles.container}>
         {bagDetails && (
           <Formik

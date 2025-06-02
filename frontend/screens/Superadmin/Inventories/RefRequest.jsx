@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getFridges } from "../../../redux/actions/fridgeActions";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Header from "../../../components/Superadmin/Header";
-import { logoutUser } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 
 const screenHeight = Dimensions.get("window").height;
@@ -53,18 +52,6 @@ const RefRequest = ({ route }) => {
       request: request,
       prevEbm: ebm,
     });
-  };
-
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
   };
 
   const handleRefresh = () => {
@@ -106,7 +93,7 @@ const RefRequest = ({ route }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />

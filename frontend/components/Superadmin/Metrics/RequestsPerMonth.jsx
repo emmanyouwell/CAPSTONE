@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '../../../components/Superadmin/Header';
-import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
 import { getRequestsPerMonth } from '../../../redux/actions/metricActions';
 import { BarChart } from 'react-native-chart-kit';
@@ -22,17 +21,6 @@ const RequestsPerMonth = ({ navigation }) => {
         dispatch(getRequestsPerMonth());
     }, [dispatch]);
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser()
-            .then(() => navigation.replace('login'))
-            .catch((err) => console.log(err))
-        );
-    };
-
     const chartLabels = Object.keys(monthlyRequests).filter((key) => key !== 'total'); 
     const inpatientData = chartLabels.map((month) => (monthlyRequests[month]?.inpatient || 0) );
     const outpatientData = chartLabels.map((month) => (monthlyRequests[month]?.outpatient || 0) );
@@ -43,7 +31,7 @@ const RequestsPerMonth = ({ navigation }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
 
             <Text style={styles.screenTitle}>Requests Per Month Charts</Text>
 

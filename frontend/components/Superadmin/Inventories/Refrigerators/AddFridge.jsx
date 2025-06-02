@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux';
 import { addFridges } from '../../../../redux/actions/fridgeActions'; 
 
 import Header from '../../../../components/Superadmin/Header';
-import { logoutUser } from '../../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../../styles/Styles';
 
 const AddFridge = () => {
@@ -17,18 +16,6 @@ const AddFridge = () => {
         { label: 'Pasteurized', value: 'Pasteurized' },
         { label: 'Unpasteurized', value: 'Unpasteurized' },
     ]);
-
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
 
     const handleSubmit = () => {
         if (!name || !fridgeType ) {
@@ -55,7 +42,7 @@ const AddFridge = () => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <View style={styles.container}>
                 <Text style={styles.title}>Add New Fridge</Text>
 

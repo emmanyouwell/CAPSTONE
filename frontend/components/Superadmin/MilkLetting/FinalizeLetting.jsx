@@ -12,7 +12,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import Header from "../../../components/Superadmin/Header";
-import { logoutUser, getUserDetails } from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import {
   finalizeSession,
@@ -74,21 +73,9 @@ const FinalizeLetting = ({ route, navigation }) => {
     ]);
   };
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   return (
     <View style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
 
       <Text style={styles.screenTitle}>Finalize Milk Letting</Text>
 
@@ -129,21 +116,21 @@ const FinalizeLetting = ({ route, navigation }) => {
                       {donor.donor.user.name.middle}{" "}
                       {donor.donor.user.name.last}
                     </Text>
-                    {donor.donorType === "Old Donor" && <Text>Last Breast Milk Donation: {new Date(donor.lastDonation).toLocaleString("en-US", {
+                    {donor.donorType === "Old Donor" && <Text>Last donation: {new Date(donor.lastDonation).toLocaleString("en-US", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
 
                     })}</Text>}
 
-                    <Text>Donor Type: {donor.donorType}</Text>
+                    <Text>Donor type: {donor.donorType}</Text>
                     <Text>
                       Address: {donor.donor.home_address.street},{" "}
                       {donor.donor.home_address.brgy},{" "}
                       {donor.donor.home_address.city}
                     </Text>
                     <Text>
-                      Total Volume Collected:{" "}
+                      Total volume:{" "}
                       {donor.bags.reduce((total, bag) => total + bag.volume, 0)}{" "}
                       mL
                     </Text>

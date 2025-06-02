@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateLetting } from '../../../redux/actions/lettingActions';
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet } from 'react-native';
 import Header from '../Header';
-import { logoutUser } from '../../../redux/actions/userActions';
 import { Formik } from "formik";
 import * as Yup from "yup";
 import moment from 'moment';
@@ -37,7 +36,7 @@ const EditMilkLetting = ({ route, navigation }) => {
 
     return (
         <>
-            <Header onLogoutPress={() => dispatch(logoutUser())} onMenuPress={() => navigation.openDrawer()} />
+            <Header/>
             <View style={styles.container}>
                 <Text style={SuperAdmin.headerText}>Edit Milk Letting Event</Text>
                 <Formik

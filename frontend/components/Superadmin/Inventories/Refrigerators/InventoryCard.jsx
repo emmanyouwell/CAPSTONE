@@ -13,7 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 
 import Header from "../../Header";
-import { logoutUser } from "../../../../redux/actions/userActions";
 import { checkInventories, getInventories } from "../../../../redux/actions/inventoryActions";
 import { SuperAdmin } from "../../../../styles/Styles";
 import { dataTableStyle } from "../../../../styles/Styles";
@@ -134,14 +133,6 @@ const Inventory = ({ route }) => {
     );
   }
 
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   const handleNavigate = () => {
     const selectedBags = allBags.filter((bag) =>
       selectedItems.includes(bag._id)
@@ -151,10 +142,7 @@ const Inventory = ({ route }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header
-        onLogoutPress={() => onLogoutPress()}
-        onMenuPress={() => navigation.openDrawer()}
-      />
+      <Header/>
       <Text style={styles.screenTitle}>{fridge.name} Stored Milk</Text>
       {selectedItems.length === 0 && (
         <View style={styles.buttonRow}>
