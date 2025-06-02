@@ -40,6 +40,10 @@ const requestSchema = new mongoose.Schema({
     enum: ["Pending", "Reserved", "Done", "Canceled"],
     default: "Pending",
   },
+  comment: {
+    type: String,
+    default: "",
+  },
   volumeRequested: {
     volume: {
       type: Number,
@@ -87,7 +91,12 @@ const requestSchema = new mongoose.Schema({
       type: ObjectId,
       ref: "User",
     },
+    disapprovedBy: {
+      type: ObjectId,
+      ref: "User",
+    }
   },
+
   images: [
     {
       public_id: {

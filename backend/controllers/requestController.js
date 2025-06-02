@@ -4,7 +4,7 @@ const Inventory = require("../models/inventory");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 const cloudinary = require("cloudinary");
-
+const User = require("../models/user");
 // Get All requests => /api/v1/requests
 exports.allRequests = catchAsyncErrors(async (req, res, next) => {
   const requests = await Request.find()
@@ -68,7 +68,7 @@ exports.createRequest = catchAsyncErrors(async (req, res, next) => {
     }
     const request = await Request.create(newData);
 
-    patient.patientType = req.body.patientType;
+    
     patient.requested.push(request._id);
     patient.save();
 
@@ -223,7 +223,7 @@ exports.deleteRequest = catchAsyncErrors(async (req, res, next) => {
 
 // Update Request Status
 exports.updateRequestStatus = catchAsyncErrors(async (req, res, next) => {
-  const { status } = req.body;
+  const { status, comment, userID } = req.body;
 
   try {
     const request = await Request.findById(req.params.id);
@@ -232,8 +232,13 @@ exports.updateRequestStatus = catchAsyncErrors(async (req, res, next) => {
         new ErrorHandler(`Request is not found with this id: ${req.params.id}`)
       );
     }
-
+    const user = await User.findById(userID);
+    if (!user) {
+      return next(new ErrorHandler(`User not found with this id: ${user}`));
+    }
     request.status = status;
+    request.comment = comment;
+    request.tchmb.disapprovedBy = user;
     await request.save();
 
     res.status(200).json({
