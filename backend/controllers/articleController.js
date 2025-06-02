@@ -4,7 +4,14 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const cloudinary = require('cloudinary');
 
 exports.allArticles = catchAsyncErrors(async (req, res, next) => {
-    const articles = await Article.find().sort({ createdAt: -1 });
+    const { search } = req.query;
+    let query = {};
+    if (search) {
+        query.$or = [
+            { 'title': { $regex: search, $options: 'i' } },
+        ];
+    }
+    const articles = await Article.find(query).sort({ createdAt: -1 });
 
     const count = await Article.countDocuments();
 
