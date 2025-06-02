@@ -287,3 +287,33 @@ export const updateLetting = createAsyncThunk(
         }
     }
 )
+
+// Update Milk Letting
+export const updateAttendance = createAsyncThunk(
+    'letting/updateAttendance',
+    async (req, thunkAPI) => {
+
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+            const response = await api.put(`/api/v1//additional-bags/${req.id}`, req, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)

@@ -1,4 +1,9 @@
-import React, { useEffect, useState, startTransition, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  startTransition,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
@@ -34,7 +39,6 @@ const FinalizeLetting = ({ route, navigation }) => {
       dispatch(getLettingDetails(item._id));
     }
   }, [dispatch]);
-
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -75,7 +79,7 @@ const FinalizeLetting = ({ route, navigation }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header/>
+      <Header />
 
       <Text style={styles.screenTitle}>Finalize Milk Letting</Text>
 
@@ -116,12 +120,16 @@ const FinalizeLetting = ({ route, navigation }) => {
                       {donor.donor.user.name.middle}{" "}
                       {donor.donor.user.name.last}
                     </Text>
-                    {donor.donorType === "Old Donor" && <Text>Last donation: {new Date(donor.lastDonation).toLocaleString("en-US", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-
-                    })}</Text>}
+                    {donor.donorType === "Old Donor" && (
+                      <Text>
+                        Last donation:{" "}
+                        {new Date(donor.lastDonation).toLocaleString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </Text>
+                    )}
 
                     <Text>Donor type: {donor.donorType}</Text>
                     <Text>
@@ -130,8 +138,31 @@ const FinalizeLetting = ({ route, navigation }) => {
                       {donor.donor.home_address.city}
                     </Text>
                     <Text>
-                      Total volume:{" "}
-                      {donor.bags.reduce((total, bag) => total + bag.volume, 0)}{" "}
+                      Bags volume:{" "}
+                      {donor.bags?.reduce(
+                        (total, bag) => total + bag.volume,
+                        0
+                      )}{" "}
+                      mL
+                    </Text>
+                    <Text>
+                      Add bags volume:{" "}
+                      {donor.additionalBags?.reduce(
+                        (total, bag) => total + bag.volume,
+                        0
+                      )}{" "}
+                      mL
+                    </Text>
+                    <Text style={styles.donorName}>
+                      Total donation volume:{" "}
+                      {(donor.bags?.reduce(
+                        (total, bag) => total + bag.volume,
+                        0
+                      ) || 0) +
+                        (donor.additionalBags?.reduce(
+                          (total, bag) => total + bag.volume,
+                          0
+                        ) || 0)}{" "}
                       mL
                     </Text>
                   </View>
