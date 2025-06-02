@@ -11,7 +11,6 @@ import {
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "../../components/Superadmin/Header";
-import { logoutUser } from "../../redux/actions/userActions";
 import { getAllSchedules } from "../../redux/actions/scheduleActions";
 import { SuperAdmin } from "../../styles/Styles";
 import Schedules from "../../components/Superadmin/Schedule/Schedules";
@@ -38,28 +37,14 @@ const Schedule = ({ navigation }) => {
       .catch(() => setRefreshing(false));
   };
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   const filteredSchedules = schedules.filter(
     (sched) => sched.status && sched.status !== "Completed"
   );
-  useEffect(()=>{
-    console.log("Filtered Schedules: ", filteredSchedules);
-  },[schedules])  
+
   return (
     <View style={SuperAdmin.container}>
       {/* Header Component */}
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
 
       <Text style={styles.screenTitle}>Schedules Management</Text>
 

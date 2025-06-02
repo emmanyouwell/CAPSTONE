@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert,
 import { useDispatch } from 'react-redux';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Header from '../Header';
-import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
 import { updateRequest } from '../../../redux/actions/requestActions';
 import { updateInventory } from '../../../redux/actions/inventoryActions';
@@ -106,7 +105,7 @@ const ConfirmRequest = ({ route, navigation }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={() => dispatch(logoutUser())} onMenuPress={() => navigation.openDrawer()} />
+            <Header/>
             <Text style={styles.screenTitle}>Complete Request</Text>
             <ScrollView >
                 {/* Request Details */}

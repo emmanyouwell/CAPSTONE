@@ -16,7 +16,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { getDonors } from '../../../../redux/actions/donorActions';
 
 import Header from '../../../../components/Superadmin/Header';
-import { logoutUser } from '../../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../../styles/Styles';
 import { updateInventory } from '../../../../redux/actions/inventoryActions';
 import { getUser } from '../../../../utils/helper';
@@ -80,10 +79,6 @@ const EditMilkInventory = ({ route, navigation }) => {
         return user;
     };
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
     if (loading) {
         return (
             <View style={styles.center}>
@@ -99,14 +94,6 @@ const EditMilkInventory = ({ route, navigation }) => {
             </View>
         );
     }
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
 
     const handleDateChange = (event, selectedDate, field) => {
         const date = selectedDate
@@ -326,7 +313,7 @@ const EditMilkInventory = ({ route, navigation }) => {
 
     return (
         <ScrollView>
-            <Header title="Edit Milk Inventory" onMenuPress={onMenuPress} onLogoutPress={onLogoutPress} />
+            <Header/>
             <Text style={styles.screenTitle}>Update Inventory</Text>
             <View style={styles.container}>
                 {renderFormFields()}

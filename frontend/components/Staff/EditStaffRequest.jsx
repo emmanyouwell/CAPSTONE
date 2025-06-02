@@ -17,7 +17,6 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 import DropDownPicker from "react-native-dropdown-picker";
 import Header from "../../components/Superadmin/Header";
-import { logoutUser } from "../../redux/actions/userActions";
 import { getRecipients } from "../../redux/actions/recipientActions";
 import { updateRequest } from "../../redux/actions/requestActions";
 import { SuperAdmin } from "../../styles/Styles";
@@ -73,16 +72,6 @@ const EditStaffRequest = ({ navigation, route }) => {
       days: request?.volumeRequested?.days?.toString() || "",
     }));
   }, [request]);
-
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => navigation.navigate("login"))
-      .catch((err) => console.log(err));
-  };
 
   const handleChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
@@ -171,7 +160,7 @@ const EditStaffRequest = ({ navigation, route }) => {
       style={SuperAdmin.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <Text style={styles.screenTitle}>Request Information</Text>
       <ScrollView>
         <SafeAreaView style={styles.form} keyboardShouldPersistTaps="handled">

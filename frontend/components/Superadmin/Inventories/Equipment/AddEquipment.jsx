@@ -15,7 +15,6 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { useDispatch } from 'react-redux';
 import Header from '../../../../components/Superadmin/Header';
 import { addEquipments } from '../../../../redux/actions/equipmentActions';
-import { logoutUser } from '../../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../../styles/Styles';
 import { getUser } from '../../../../utils/helper';
 
@@ -52,17 +51,6 @@ const AddEquipment = ({ navigation }) => {
         });
     }, []);
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
 
     const handlePickImage = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -117,7 +105,7 @@ const AddEquipment = ({ navigation }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <SafeAreaView style={styles.form}>
                 <Text style={styles.screenTitle}>Add Equipment</Text>
 

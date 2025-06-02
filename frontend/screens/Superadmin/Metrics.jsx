@@ -12,7 +12,6 @@ import {
 import Header from "../../components/Superadmin/Header";
 import { SuperAdmin, metricsStyle, colors } from "../../styles/Styles";
 import Cards from "../../components/Superadmin/Metrics/Cards";
-import { logoutUser } from "../../redux/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getMilkPerMonth,
@@ -66,16 +65,6 @@ const Metrics = ({ navigation }) => {
       dispatch(getRequestsPerMonth()),
     ])
       .finally(() => setRefreshing(false));
-  };
-
-  const handleMenuClick = () => {
-    navigation.openDrawer();
-  };
-
-  const handleLogoutClick = () => {
-    dispatch(logoutUser())
-      .then(() => navigation.navigate("login"))
-      .catch((err) => console.log(err));
   };
 
   const cardData = [
@@ -142,7 +131,7 @@ const Metrics = ({ navigation }) => {
 
   return (
     <View style={SuperAdmin.container}>
-      <Header onMenuPress={handleMenuClick} onLogoutPress={handleLogoutClick} />
+      <Header/>
       <Text style={styles.screenTitle}>Metrics</Text>
       <ScrollView
         style={{ padding: 10 }}

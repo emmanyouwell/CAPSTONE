@@ -3,24 +3,17 @@ import { Text, View, TouchableOpacity, StyleSheet } from 'react-native'
 import { defaultStyle, SuperAdmin, colors } from '../../styles/Styles'
 import Header from '../../components/Superadmin/Header'
 
-import { logoutUser } from '../../redux/actions/userActions'
 import { useDispatch } from 'react-redux'
 import { viewAsyncStorage } from '../../utils/helper'
 const AccountManagement = ({ navigation }) => {
     const dispatch = useDispatch();
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    }
-    const onLogoutPress = () => {
-        dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
-    }
     useEffect(() => {
         console.log('Dashboard loaded: ', viewAsyncStorage());
 
     }, [])
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <Text style={SuperAdmin.headerText}>Account Management</Text>
             <View style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 

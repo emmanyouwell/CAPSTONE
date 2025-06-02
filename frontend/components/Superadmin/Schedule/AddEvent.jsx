@@ -4,14 +4,13 @@ import { addEvents } from '../../../redux/actions/eventActions'
 
 import { View, Text, TouchableOpacity, TextInput, Button, StyleSheet } from 'react-native'
 import Header from '../Header'
-import { logoutUser, getUserDetails} from '../../../redux/actions/userActions'
+import { getUserDetails} from '../../../redux/actions/userActions'
 import { Formik } from "formik";
 import * as Yup from "yup";
 import moment from 'moment'
 import DropDownPicker from 'react-native-dropdown-picker';
 import DatePicker from 'react-native-date-picker';
 import { SuperAdmin, buttonStyle } from '../../../styles/Styles'
-import { getUser } from '../../../utils/helper'
 import { resetSuccess } from '../../../redux/slices/eventSlice'
 
 const AddEvent = ({ navigation }) => {
@@ -39,12 +38,6 @@ const AddEvent = ({ navigation }) => {
     const dispatch = useDispatch();
     const { success, loading, error } = useSelector(state => state.events);
     const {userDetails} = useSelector(state => state.users);
-    const handleMenuClick = () => {
-        navigation.openDrawer();
-    }
-    const handleLogoutClick = () => {
-        dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
-    }
 
     const validationSchema = Yup.object({
         title: Yup.string()
@@ -77,7 +70,7 @@ const AddEvent = ({ navigation }) => {
     },[dispatch, success])
     return (
         <>
-            <Header onLogoutPress={handleLogoutClick} onMenuPress={handleMenuClick} />
+            <Header/>
             <View style={styles.container}>
                 <Text style={SuperAdmin.headerText}>Add Event</Text>
                 <View style={{ padding: 8 }}>

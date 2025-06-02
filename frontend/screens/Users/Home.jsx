@@ -12,7 +12,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import Header from "../../components/Superadmin/Header";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser, getUserDetails } from "../../redux/actions/userActions";
+import { getUserDetails } from "../../redux/actions/userActions";
 import { Button, IconButton, Menu } from "react-native-paper";
 import { colors } from "../../styles/Styles";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -39,16 +39,6 @@ const Home = ({ navigation }) => {
   const openMenu = (id) => setVisible((prev) => ({ ...prev, [id]: true }));
   const closeMenu = (id) => setVisible((prev) => ({ ...prev, [id]: false }));
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.replace("login");
-      })
-      .catch((err) => console.log(err));
-  };
   const handleDelete = (id) => {
     Alert.alert(
       "Confirm Deletion",
@@ -107,7 +97,7 @@ const Home = ({ navigation }) => {
   };
   return (
     <>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
           <Text style={styles.headerText}>

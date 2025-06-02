@@ -16,17 +16,6 @@ const Articles = ({ navigation }) => {
     useEffect(() => {
         dispatch(getArticles());
     }, [dispatch])
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
 
     const handleRefresh = () => {
         setRefreshing(true);
@@ -37,7 +26,7 @@ const Articles = ({ navigation }) => {
     };
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <Text style={styles.screenTitle}>Articles</Text>
             <View style={styles.buttonRow}>
 

@@ -18,7 +18,6 @@ import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import { getUser } from '../../../utils/helper';
 import { SuperAdmin } from '../../../styles/Styles';
-import { logoutUser } from '../../../redux/actions/userActions';
 import Header from '../../../components/Superadmin/Header';
 import { useDispatch, useSelector } from 'react-redux';
 import DocumentPicker from 'react-native-document-picker';
@@ -47,17 +46,6 @@ const EditArticles = ({ navigation, route }) => {
             fetchUserDetails();
         });
     }, []);
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
 
     const handlePickImage = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -179,7 +167,7 @@ const EditArticles = ({ navigation, route }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <SafeAreaView style={styles.form}>
                 <Text style={styles.screenTitle}>Edit Article</Text>
 

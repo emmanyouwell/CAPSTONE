@@ -2,7 +2,6 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { useRoute } from '@react-navigation/native'
 import React, { useState, useEffect } from 'react'
-import { logoutUser } from '../../../redux/actions/userActions'
 import Header from '../../../components/Superadmin/Header'
 import { SuperAdmin } from '../../../styles/Styles'
 import { Card } from 'react-native-paper'
@@ -10,12 +9,7 @@ const PickUpSchedules = ({ navigation }) => {
     const route = useRoute();
     const { schedules } = route.params || [];
     const dispatch = useDispatch();
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    }
-    const onLogoutPress = () => {
-        dispatch(logoutUser()).then(() => { navigation.replace('login') }).catch((err) => console.log(err))
-    }
+
     useEffect(() => {
         if (schedules) {
             console.log('Schedules:', schedules);
@@ -29,7 +23,7 @@ const PickUpSchedules = ({ navigation }) => {
     };
     return (
         <>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
 
             <View style={styles.container}>
                 <Text style={SuperAdmin.headerText}>Schedule</Text>

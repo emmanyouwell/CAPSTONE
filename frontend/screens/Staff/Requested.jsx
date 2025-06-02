@@ -9,9 +9,7 @@ import {
     RefreshControl, 
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Header from '../../components/Superadmin/Header';
-import { logoutUser } from '../../redux/actions/userActions';
 import { SuperAdmin } from '../../styles/Styles';
 import { getStaffRequests } from '../../redux/actions/requestActions';
 import Requests from '../../components/Staff/Requests';
@@ -35,18 +33,6 @@ const Requested = ({ navigation }) => {
             .catch(() => setRefreshing(false));
     };
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
-
     if (error) {
         return (
           <View style={styles.center}>
@@ -57,7 +43,7 @@ const Requested = ({ navigation }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
 
             <Text style={styles.screenTitle}>My requests</Text>
 

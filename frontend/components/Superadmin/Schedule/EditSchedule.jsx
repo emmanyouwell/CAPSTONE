@@ -26,18 +26,6 @@ const EditSchedule = ({ route }) => {
   const [date, setDate] = useState(new Date(item.dates));
   const [open, setOpen] = useState(false);
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   const handleSave = () => {
     const updatedData = {
       scheduleId: item._id,
@@ -71,7 +59,7 @@ const EditSchedule = ({ route }) => {
 
   return (
     <View contentContainerStyle={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
 
       <Text style={styles.screenTitle}>Edit Schedule</Text>
       <ScrollView style={styles.section}>

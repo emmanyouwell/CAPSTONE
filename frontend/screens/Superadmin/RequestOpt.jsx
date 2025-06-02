@@ -7,27 +7,14 @@ import {
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 import Header from '../../components/Superadmin/Header'; // Import Header
-import { logoutUser } from '../../redux/actions/userActions';
 import { SuperAdmin } from '../../styles/Styles';
 
 const RequestOpt = ({ navigation }) => {
     const dispatch = useDispatch();
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
-
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
 
             <Text style={styles.screenTitle}>Pending Request</Text>
 

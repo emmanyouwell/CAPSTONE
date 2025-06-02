@@ -11,7 +11,6 @@ import {
 import ImageViewing from "react-native-image-viewing";
 import Header from "../../components/Superadmin/Header";
 import { useDispatch } from "react-redux";
-import { logoutUser } from "../../redux/actions/userActions";
 import { SuperAdmin, colors } from "../../styles/Styles";
 
 const RequestDetails = ({ navigation, route }) => {
@@ -35,21 +34,9 @@ const RequestDetails = ({ navigation, route }) => {
     setIsVisible(true);
   };
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   return (
     <SafeAreaView style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.screenTitle}>Request Details</Text>
         {request.patient.patientType === "Inpatient" && (

@@ -10,7 +10,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import Header from "../../../components/Superadmin/Header";
-import { logoutUser} from "../../../redux/actions/userActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import { getLettingDetails } from "../../../redux/actions/lettingActions";
 
@@ -36,21 +35,9 @@ const MilkLettingDetails = ({ route, navigation }) => {
       .catch(() => setRefreshing(false));
   };
 
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.navigate("login");
-      })
-      .catch((err) => console.log(err));
-  };
-
   return (
     <View style={SuperAdmin.container}>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
 
       <Text style={styles.screenTitle}>Milk Letting Details</Text>
 

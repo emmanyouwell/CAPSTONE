@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from "@react-navigation/native";
 
 import Header from '../../Header';
-import { logoutUser } from '../../../../redux/actions/userActions';
 import { deleteInventory, getInventories } from '../../../../redux/actions/inventoryActions';
 import { SuperAdmin } from '../../../../styles/Styles';
 import { dataTableStyle } from '../../../../styles/Styles'
@@ -26,10 +25,6 @@ const FridgeDetails = ({ route }) => {
         dispatch(getInventories());
     }, [dispatch]);
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
     const handleEdit = (row) => {
         navigation.navigate('EditMilkInventory', row)
     };
@@ -43,14 +38,6 @@ const FridgeDetails = ({ route }) => {
             .catch((err) => {
                 Alert.alert('Error', 'Failed to delete the fridge.');
             });
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
     };
 
     if (loading) {
@@ -234,7 +221,7 @@ const FridgeDetails = ({ route }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
             <Text style={styles.screenTitle}>{fridge.name} Inventory</Text>
             <View style={dataTableStyle.container}>
                 <View style={dataTableStyle.tableContainer}>

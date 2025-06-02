@@ -15,24 +15,13 @@ import { useDispatch, useSelector } from "react-redux";
 import Header from "../../../components/Superadmin/Header";
 import { colors } from "../../../styles/Styles";
 import { createBag } from "../../../redux/actions/bagActions";
-import { getUserDetails } from "../../../redux/actions/userActions";
-import { logoutUser } from "../../../redux/actions/userActions";
 const CreateBag = ({ navigation }) => {
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const dispatch = useDispatch();
   const { loading } = useSelector((state) => state.bags);
   const { userDetails } = useSelector((state) => state.users);
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => {
-        navigation.replace("login");
-      })
-      .catch((err) => console.log(err));
-  };
+
   // Validation Schema using Yup
   const validationSchema = Yup.object().shape({
     volume: Yup.number()
@@ -44,7 +33,7 @@ const CreateBag = ({ navigation }) => {
 
   return (
     <>
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
       <View style={styles.container}>
         <Formik
           initialValues={{ volume: "", expressDate: "" }}

@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '../../../components/Superadmin/Header';
-import { logoutUser } from '../../../redux/actions/userActions';
 import { SuperAdmin } from '../../../styles/Styles';
 import { getDonorsPerMonth } from '../../../redux/actions/metricActions';
 import { BarChart } from 'react-native-chart-kit';
@@ -22,17 +21,6 @@ const DonorsPerMonth = ({ navigation }) => {
         dispatch(getDonorsPerMonth());
     }, [dispatch]);
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser()
-            .then(() => navigation.replace('login'))
-            .catch((err) => console.log(err))
-        );
-    };
-
     const chartLabels = Object.keys(monthlyDonors).filter((key) => key !== 'total'); 
     const privateData = chartLabels.map((month) => (monthlyDonors[month]?.private || 0) );
     const communityData = chartLabels.map((month) => (monthlyDonors[month]?.community || 0) );
@@ -43,7 +31,7 @@ const DonorsPerMonth = ({ navigation }) => {
 
     return (
         <View style={SuperAdmin.container}>
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
 
             <Text style={styles.screenTitle}>Donors Per Month Charts</Text>
 

@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import Header from '../Header';
-import { logoutUser } from '../../../redux/actions/userActions';
 import { getLettings } from '../../../redux/actions/lettingActions';
 import { SuperAdmin } from '../../../styles/Styles';
 import MilkLettings from './MilkLettings';
@@ -32,18 +31,6 @@ const HistoryLetting = ({ navigation }) => {
             .catch(() => setRefreshing(false));
     };
 
-    const onMenuPress = () => {
-        navigation.openDrawer();
-    };
-
-    const onLogoutPress = () => {
-        dispatch(logoutUser())
-            .then(() => {
-                navigation.replace('login');
-            })
-            .catch((err) => console.log(err));
-    };
-
     const filteredLettings = lettings.filter(
         (lets) => lets.status && lets.status === 'Done'
     );
@@ -51,7 +38,7 @@ const HistoryLetting = ({ navigation }) => {
     return (
         <View style={SuperAdmin.container}>
             {/* Header Component */}
-            <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+            <Header/>
 
             <Text style={styles.screenTitle}>Milk Letting History</Text>
 

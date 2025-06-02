@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { useDispatch } from "react-redux";
 import Header from "../Header";
-import { logoutUser } from "../../../redux/actions/userActions";
 import { updateVolumeRequested } from "../../../redux/actions/requestActions";
 import { SuperAdmin } from "../../../styles/Styles";
 import { ScrollView } from "react-native-gesture-handler";
@@ -25,16 +24,6 @@ const EditRequest = ({ navigation, route }) => {
     volume: request?.volumeRequested?.volume?.toString() || "",
     days: request?.volumeRequested?.days?.toString() || "",
   });
-
-  const onMenuPress = () => {
-    navigation.openDrawer();
-  };
-
-  const onLogoutPress = () => {
-    dispatch(logoutUser())
-      .then(() => navigation.navigate("login"))
-      .catch((err) => console.log(err));
-  };
 
   const handleChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
@@ -70,7 +59,7 @@ const EditRequest = ({ navigation, route }) => {
       style={SuperAdmin.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Header onLogoutPress={onLogoutPress} onMenuPress={onMenuPress} />
+      <Header/>
 
       <Text style={styles.screenTitle}>Confirm Request Amount</Text>
       <ScrollView>
