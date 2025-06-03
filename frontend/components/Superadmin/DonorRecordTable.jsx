@@ -1,133 +1,148 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { ScrollView, View, TouchableOpacity, Text, Animated } from 'react-native'
-import { Checkbox, DataTable } from 'react-native-paper'
-import { dataTableStyle, buttonStyle } from '../../styles/Styles'
-import { formatDate } from '../../utils/helper'
-import { getDonors } from '../../redux/actions/donorActions'
-import { useDispatch } from 'react-redux'
-const DonorRecordsTable = ({ donors, totalDonors, totalPages, currentPage, setCurrentPage, pageSize }) => {
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+  StyleSheet,
+} from "react-native";
+import { Card } from "react-native-paper";
+import { formatDate } from "../../utils/helper";
 
+const DonorRecordTable = ({ donors }) => {
+  const [selectedDonor, setSelectedDonor] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const [selectedRows, setSelectedRows] = useState([]);
+  const openModal = (donor) => {
+    setSelectedDonor(donor);
+    setModalVisible(true);
+  };
 
-
-  const checkboxColumnWidth = useRef(new Animated.Value(0)).current;
-  const checkboxColumnOpacity = useRef(new Animated.Value(0)).current;
-
-  const handleLongPress = (id) => {
-    setSelectedRows((prevSelectedRows) => {
-      if (prevSelectedRows.includes(id)) {
-        return prevSelectedRows.filter(rowId => rowId !== id);
-      } else {
-        return [...prevSelectedRows, id];
-      }
-    })
-  }
-
-  useEffect(() => {
-    if (selectedRows.length > 0) {
-      Animated.parallel([
-        Animated.timing(checkboxColumnWidth, {
-          toValue: selectedRows.length > 0 ? 80 : 0,
-          duration: 150,
-          useNativeDriver: false,
-        }),
-        Animated.timing(checkboxColumnOpacity, {
-          toValue: selectedRows.length > 0 ? 1 : 0,
-          duration: 150,
-          useNativeDriver: false,
-        })
-      ]).start()
-    }
-    else {
-      Animated.sequence([
-        Animated.timing(checkboxColumnOpacity, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: false,
-        }),
-        Animated.timing(checkboxColumnWidth, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: false,
-        })
-      ]).start();
-    }
-
-  }, [selectedRows])
+  const closeModal = () => {
+    setSelectedDonor(null);
+    setModalVisible(false);
+  };
 
   return (
-    <View style={dataTableStyle.container}>
-      <View style={dataTableStyle.btnContainer}>
+    <ScrollView contentContainerStyle={styles.container}>
+      {donors.map((donor, index) => (
+        <TouchableOpacity key={index} onPress={() => openModal(donor)}>
+          <Card style={styles.card}>
+            <Card.Content>
+              <Text style={styles.name}>
+                {donor.user?.name?.first} {donor.user?.name?.last}
+              </Text>
+              <Text style={styles.label}>
+                Donor Type: <Text style={styles.value}>{donor.donorType}</Text>
+              </Text>
+              <Text style={styles.label}>
+                City:{" "}
+                <Text style={styles.value}>{donor.home_address?.city}</Text>
+              </Text>
+              <Text style={styles.label}>
+                Age:{" "}
+                <Text style={styles.value}>
+                  {donor.age?.value} {donor.age?.unit}
+                </Text>
+              </Text>
+            </Card.Content>
+          </Card>
+        </TouchableOpacity>
+      ))}
 
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Donor Details</Text>
+            {selectedDonor && (
+              <>
+                <Text>
+                  Name: {selectedDonor.user?.name?.first}{" "}
+                  {selectedDonor.user?.name?.middle}{" "}
+                  {selectedDonor.user?.name?.last}
+                </Text>
+                <Text>Phone: {selectedDonor.user?.phone}</Text>
+                <Text>
+                  Address: {selectedDonor.home_address?.street},{" "}
+                  {selectedDonor.home_address?.brgy},{" "}
+                  {selectedDonor.home_address?.city}
+                </Text>
+                <Text>
+                  Age: {selectedDonor.age?.value} {selectedDonor.age?.unit}
+                </Text>
+                <Text>Birthday: {formatDate(selectedDonor.birthday)}</Text>
+                <Text>Type: {selectedDonor.donorType}</Text>
+                <Text>Eligibility: {selectedDonor.eligibility}</Text>
+                <Text>Occupation: {selectedDonor.occupation || "N/A"}</Text>
+                <Text>
+                  Office Address: {selectedDonor.office_address || "N/A"}
+                </Text>
+              </>
+            )}
+            <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </ScrollView>
+  );
+};
 
+export default DonorRecordTable;
 
-        <DataTable.Pagination
-          page={currentPage}
-          numberOfPages={totalPages}
-          onPageChange={(page) => {
-            setCurrentPage(page)
-          }}
-          label={`${currentPage+1} of ${totalPages}`}
-        />
-
-      </View>
-
-      <View style={dataTableStyle.tableContainer}>
-        <ScrollView horizontal>
-          <ScrollView style={{ height: '100%' }} contentContainerStyle={dataTableStyle.verticalContainer}>
-            <DataTable>
-              <DataTable.Header>
-                <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
-                  <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.checkboxColumn}>Select</DataTable.Title>
-                </Animated.View>
-
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>First Name</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Last Name</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Middle Name</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Street</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Brgy</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>City</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Phone</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Age</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Birthday</DataTable.Title>
-                <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.columnWidth}>Donor Type</DataTable.Title>
-                {/* <DataTable.Title textStyle={dataTableStyle.tableHeaderStyle} style={dataTableStyle.locationColumn}>Children</DataTable.Title> */}
-
-              </DataTable.Header>
-
-              {donors && donors.map((row, index) => (
-                <DataTable.Row key={index} onLongPress={() => { handleLongPress(index) }}>
-                  <Animated.View style={{ width: checkboxColumnWidth, opacity: checkboxColumnOpacity }}>
-                    <DataTable.Cell style={dataTableStyle.checkboxColumn}>
-                      <Checkbox
-                        status={selectedRows.includes(index) ? 'checked' : 'unchecked'}
-                        onPress={() => handleLongPress(index)} />
-                    </DataTable.Cell>
-
-                  </Animated.View>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.user.name.first}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.user.name.last}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.user.name.middle}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.home_address.street}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.home_address.brgy}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.home_address.city}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.user.phone}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.age.value} {row.age.unit}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{formatDate(row.birthday)}</DataTable.Cell>
-                  <DataTable.Cell textStyle={dataTableStyle.tableBodyTextStyle} style={dataTableStyle.columnWidth}>{row.donorType}</DataTable.Cell>
-                </DataTable.Row>
-              ))}
-
-
-            </DataTable>
-          </ScrollView>
-        </ScrollView>
-
-      </View>
-
-    </View>
-  )
-}
-
-export default DonorRecordsTable
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+  },
+  card: {
+    marginBottom: 10,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    elevation: 3,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  label: {
+    fontWeight: "600",
+  },
+  value: {
+    fontWeight: "400",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  closeButton: {
+    marginTop: 20,
+    alignSelf: "flex-end",
+    backgroundColor: "#007AFF",
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+});
