@@ -162,7 +162,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             },
 
         };
-        const prediction = await axios.post("https://python-server-production-13c2.up.railway.app/predict/", json, config);
+        const prediction = await axios.post("https://python-server-sfkh.onrender.com/predict/", json, config);
 
         if (!prediction) {
             return res.status(500).json({
