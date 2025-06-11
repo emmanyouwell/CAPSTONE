@@ -153,7 +153,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
 
 
         const json = {
-            data: values
+            submissionID: req.body.data.submissionID
         }
         const config = {
             headers: {
@@ -162,7 +162,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             },
 
         };
-        const prediction = await axios.post("https://python-server-sfkh.onrender.com/predict/", json, config);
+        const prediction = await axios.post("https://python-predictive-analysis.onrender.com/predict/", json, config);
 
         if (!prediction) {
             return res.status(500).json({
@@ -171,7 +171,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             });
         }
 
-        const result = prediction.data.predictions.includes(1) ? "Eligible" : "Ineligible";
+        const result = prediction
         let new_data = {};
 
         fields.forEach(field => {
@@ -252,7 +252,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                 contact_number: new_data.contact_number_2,
                 donorType: new_data.donor_type[0],
                 occupation: new_data.occupation,
-                eligibility: result,
+                eligibility: result.prediction,
                 submissionID: req.body.data.submissionId,
                 lastSubmissionDate: req.body.createdAt
             });
