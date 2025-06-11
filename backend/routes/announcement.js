@@ -7,7 +7,7 @@ const { allAnnouncements, createArticle, updateArticle, deleteArticle, getArticl
 
 //Super Admin Routes
 router.route('/announcements')
-    .get(isAuthenticatedUser, allAnnouncements)
+    .get(allAnnouncements)
     .post(isAuthenticatedUser, authorizeRoles('SuperAdmin', 'Admin'), upload.single('file'), createArticle)
 
 router.route('/html-announcement')
