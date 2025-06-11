@@ -126,7 +126,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             "Have you received any organ or tissue transplant within the last 12 months? (Ikaw ba ay nakatanggap ng parte ng katawan mula sa ibang tao nitong nakaraang 12 buwan?)",
             "Within the last 24 hours, have you had intake of any hard liquor or alcohol? (Nakainom ka ba ng alak nitong nakaraang 24 oras?)",
             "Do you regularly use over-the-counter medications or systemic preparations such as replacement hormones and some birth control hormones? (Regular ka bang gumagamit ng mga gamot gaya ng mga hormones o pills?)",
-            "Do you use megadose vitamins or pharmacologically active herbal preparations? (Gumagamit ka ba ng mga “megadose vitamins” o mga “herbal drugs”?)",
+            "Do you use megadose vitamins or pharmacologically active herbal preparations? (Gumagamit ka ba ng mga \"megadose vitamins\" o mga \"herbal drugs\"?)",
             "Are you a total vegetarian/vegan? (Ikaw ba ay hindi kumakain ng karne o isang vegetarian?)",
             "Have you had breast augmentation surgery, using silicone breast implants? (Ikaw ba ay naoperahan na sa suso at nalagyan ng “silicone” o artipisyal na breast implants?)",
             "Do you use illicit drugs? (Gumagamit ka ba ng ipinagbabawal na gamot?)",
@@ -134,12 +134,12 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             "Have you had syphilis, HIV, herpes, or any sexually-transmitted disease? (Nagkakaroon ka ba ng sakit na nakukuha sa pakikipagtalik /sex?)",
             "Do you have multiple sex partners? (Nagkaroon ka ba ng karanasang makipagtalik sa hindi lang iisang lalaki?)",
             "Have you had a sexual partner from any of the following? (Nagkaroon ka ba ng partner mula sa mga sumusunod?)",
-            "Have you had a tattoo applied or have had accidental needlestick or contact with someone else’s blood? (Nagpalagay ka na ba ng tattoo, naturukan ng karayom nang hindi sinasadya o nadikit sa dugo ng ibang tao?)",
+            "Have you had a tattoo applied or have had accidental needlestick or contact with someone else's blood? (Nagpalagay ka na ba ng tattoo, naturukan ng karayom nang hindi sinasadya o nadikit sa dugo ng ibang tao?)",
             "Is your child healthy? (Malusog ba ang iyong anak?)",
             "Was your child delivered full term? (Ipinanganak ba ang anak mo na husto sa buwan?)",
             "Are you exclusively breastfeeding your child? (Purong gatas mo ba ang binibigay mo sa anak mo at walang halong ibang formula / gatas?)",
             "Is/Was your youngest child jaundiced? (Madilaw/nanilaw ba ang bunso mong anak?)",
-            "Has your child ever received milk from another mother? (Nakatanggap na ba ang iyong anak ng gatas / breast milk mula sa ibang ina?"
+            "Has your child ever received milk from another mother? (Nakatanggap na ba ang iyong anak ng gatas/ breast milk mula sa ibang ina?)"
         ];
         const values = [relevantQuestions.map((key) => {
             // Find the question in the response object that matches the label
@@ -483,7 +483,7 @@ exports.getDonorDetails = catchAsyncErrors(async (req, res, next) => {
         // Add totalVolume directly to the donation object
         donation.totalVolume = totalVolume;
     }
-    console.log("donor: ", donor);  
+    console.log("donor: ", donor);
     res.status(200).json({
         success: true,
         donor,
