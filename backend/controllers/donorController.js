@@ -153,7 +153,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
 
 
         const json = {
-            submissionID: req.body.data.submissionID
+            submissionID: req.body.data.submissionId
         }
         const config = {
             headers: {
