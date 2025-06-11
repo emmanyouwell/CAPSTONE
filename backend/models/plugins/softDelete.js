@@ -53,4 +53,7 @@ module.exports = function softDeletePlugin(schema, options = {}) {
   schema.statics.findIncludingDeleted = function (filter = {}) {
     return this.find({ ...filter, includeDeleted: true });
   };
+  schema.statics.findOnlyDeleted = function (filter = {}) {
+    return this.find({ ...filter, isDeleted: true });
+  };
 };
