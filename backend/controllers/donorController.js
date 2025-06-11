@@ -252,7 +252,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
                 contact_number: new_data.contact_number_2,
                 donorType: new_data.donor_type[0],
                 occupation: new_data.occupation,
-                eligibility: result.prediction,
+                eligibility: result.data.prediction,
                 submissionID: req.body.data.submissionId,
                 lastSubmissionDate: req.body.createdAt
             });
