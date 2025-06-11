@@ -171,7 +171,7 @@ exports.predictEligibility = catchAsyncErrors(async (req, res, next) => {
             });
         }
 
-        const result = prediction.data.predictions.includes(1) ? "Eligible" : "Not Eligible";
+        const result = prediction.data.predictions.includes(1) ? "Eligible" : "Ineligible";
         let new_data = {};
 
         fields.forEach(field => {
