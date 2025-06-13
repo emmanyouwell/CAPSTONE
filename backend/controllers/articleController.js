@@ -27,40 +27,32 @@ exports.createHTMLArticle = catchAsyncErrors(async (req, res, next) => {
     try {
         let { content, title, description } = req.body;
         let images = [];
-        // Ensure content is a valid string before processing
-        content = String(content)
-        if (typeof content !== "string") {
-            console.error("Error: content is not a string or is undefined.");
-            return;
+        if (typeof req.body.images === "string") {
+            images.push(req.body.images);
+        } else {
+            images = req.body.images;
         }
-        // Extract base64 images from content
-        const base64Images = content.match(/<img[^>]+src="data:image\/[^">]+"/g);
 
-        if (base64Images) {
-            for (let imgTag of base64Images) {
-                const base64Data = imgTag.match(/src="(data:image\/[^"]+)"/)[1];
+        let imagesLinks = [];
 
-                // Upload image to Cloudinary
-                const result = await cloudinary.uploader.upload(base64Data, {
-                    folder: "articles",
-                });
-
-                images.push({
-                    public_id: result.public_id,
-                    url: result.secure_url
-                });
-
-                // Replace base64 image with Cloudinary URL in the content
-                content = content.replace(base64Data, result.secure_url);
-            }
+        for (let i = 0; i < images.length; i++) {
+            const result = await cloudinary.v2.uploader.upload(images[i], {
+                folder: "articlesImages",
+            });
+            imagesLinks.push({
+                public_id: result.public_id,
+                url: result.secure_url,
+            });
         }
+
+        req.body.images = imagesLinks;
 
         // Save article with updated content
         const article = await Article.create({
             title,
             description,
             content,
-            // images,
+            images: req.body.images,
         });
 
         res.status(201).json({
@@ -125,22 +117,62 @@ exports.getArticleDetails = catchAsyncErrors(async (req, res, next) => {
 })
 
 exports.updateHTMLArticle = catchAsyncErrors(async (req, res, next) => {
-
+    const data = req.body;
     try {
         let article = await Article.findById(req.params.id);
         if (!article) {
             return next(new ErrorHandler('Article not found', 404));
         }
-        if (req.body.title === '') {
-            req.body.title = article.title;
+        if (data.title === '') {
+            data.title = article.title;
         }
 
-        if (req.body.description === '') {
-            req.body.description = article.description;
+        if (data.description === '') {
+            data.description = article.description;
         }
 
+        let newImages = [];
+        let existingImages = [];
 
-        article = await Article.findByIdAndUpdate(req.params.id, req.body, {
+        if (Array.isArray(data.images)) {
+            data.images.forEach((image) => {
+                if (image.public_id) {
+                    existingImages.push(image); // Existing image
+                } else if (image.local) {
+                    newImages.push(image.url); // New base64 image
+                }
+            });
+        }
+
+        // Remove deleted images
+        for (let oldImage of article.images) {
+            if (!existingImages.some((img) => img.public_id === oldImage.public_id)) {
+                await cloudinary.v2.uploader.destroy(oldImage.public_id);
+            }
+        }
+
+        // Upload new base64 images
+        let uploadedImages = [];
+        for (let imageUri of newImages) {
+            if (!imageUri.startsWith("data:image")) {
+                console.log("Skipping invalid image format:", imageUri);
+                continue;
+            }
+
+            const result = await cloudinary.v2.uploader.upload(imageUri, {
+                folder: "articlesImages",
+            });
+
+            uploadedImages.push({
+                public_id: result.public_id,
+                url: result.secure_url,
+            });
+        }
+
+        // Merge and update
+        data.images = [...existingImages, ...uploadedImages];
+
+        const updatedArticle = await Article.findByIdAndUpdate(req.params.id, data, {
             new: true,
             runValidators: true,
             useFindAndModify: false,
@@ -148,7 +180,7 @@ exports.updateHTMLArticle = catchAsyncErrors(async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            article
+            article: updatedArticle
         })
     } catch (error) {
         console.log('Error: ', error.message);
