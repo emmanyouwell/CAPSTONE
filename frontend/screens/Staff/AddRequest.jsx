@@ -19,7 +19,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import Header from "../../components/Superadmin/Header";
 import { getRecipients } from "../../redux/actions/recipientActions";
 import { addRequest } from "../../redux/actions/requestActions";
-import { getDevices, sendNotification } from "../../redux/actions/notifActions";
+import { sendNotifications } from "../../redux/actions/notifActions";
 import { SuperAdmin } from "../../styles/Styles";
 import { getUser } from "../../utils/helper";
 import moment from "moment";
@@ -40,11 +40,6 @@ const AddRequest = ({ navigation, route }) => {
   const [open, setOpen] = useState(false);
   const [patientItems, setPatientItems] = useState([]);
   const [outPatient, setOutPatient] = useState(false);
-  const { devices } = useSelector((state) => state.devices);
-
-  useEffect(() => {
-    dispatch(getDevices());
-  }, [dispatch]);
 
   useEffect(() => {
     if (!newPatient) {
@@ -75,7 +70,7 @@ const AddRequest = ({ navigation, route }) => {
   const handleChange = (key, value) => {
     setFormData({ ...formData, [key]: value });
   };
-  
+
   const handlePickImage = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== "granted") {
@@ -146,31 +141,15 @@ const AddRequest = ({ navigation, route }) => {
 
     dispatch(addRequest(requestData))
       .then((res) => {
-        if (devices) {
-          for (const device of devices) {
-            if (
-              (device.token && device.user.role === "Admin") ||
-              device.user.role === "SuperAdmin"
-            ) {
-              const notifData = {
-                token: device.token,
-                title: "New Request for Milk",
-                body: `A nurse issued a new request for milk with the volume of ${res.payload.request.volumeRequested.volume} mL per day for ${res.payload.request.volumeRequested.days} days. Open TCHMB Portal App to see more details`,
-              };
-              dispatch(sendNotification(notifData))
-                .then((response) => {
-                  console.log(
-                    "Notification Status: ",
-                    response.payload.data.status
-                  );
-                })
-                .catch((error) => {
-                  console.error("Error sending notification:", error);
-                  Alert.alert("Error", "Sending Notification");
-                });
-            }
-          }
-        }
+        const notifData = {
+          role: "Admin",
+          title: "New Request for Milk",
+          body: `A nurse issued a new request for milk with the volume of ${res.payload.request.volumeRequested.volume} mL per day for ${res.payload.request.volumeRequested.days} days. Open TCHMB Portal App to see more details`,
+        };
+        dispatch(sendNotifications(notifData)).catch((error) => {
+          console.error("Error sending notification:", error);
+          Alert.alert("Error", "Sending Notification");
+        });
         Alert.alert("Success", "Request added successfully!");
         navigation.navigate("superadmin_dashboard");
       })
@@ -185,7 +164,7 @@ const AddRequest = ({ navigation, route }) => {
       style={SuperAdmin.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Header/>
+      <Header />
       <Text style={styles.screenTitle}>Request Information</Text>
       <ScrollView>
         <SafeAreaView style={styles.form} keyboardShouldPersistTaps="handled">

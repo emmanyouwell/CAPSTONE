@@ -1,21 +1,28 @@
 const mongoose = require('mongoose');
-const {ObjectId} = mongoose.Schema.Types;
-const softDeletePlugin = require('./plugins/softDelete')
+const { ObjectId } = mongoose.Schema.Types;
+
 const notificationSchema = new mongoose.Schema({
-    token: { 
-        type: String, 
-        required: true, 
-        unique: true 
-    },
-    user: {
-        type: ObjectId,
-        ref: 'User',
+    user: { 
+        type: ObjectId, 
+        ref: 'User', 
         required: true,
+        unique: true
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-notificationSchema.plugin(softDeletePlugin)
+    expoTokens: [
+        {
+            type: String,
+            required: true
+        }
+    ],
+    notifications: [
+        {
+            title: { type: String, required: true },
+            body: { type: String, required: true },
+            seen: { type: Boolean, default: false },
+            notifiedAt: { type: Date, default: Date.now },
+        }
+    ],
+    createdAt: { type: Date, default: Date.now }
+}, { timestamps: true });
+
 module.exports = mongoose.model('Notification', notificationSchema);
