@@ -28,7 +28,7 @@ export const store = configureStore({
     requests: requestReducer,
     equipments: equipmentReducer,
     articles: articleReducer,
-    devices: notifReducer,
+    notifications: notifReducer,
     bags: bagReducer,
     lettings: lettingReducer,
     schedules: scheduleReducer,

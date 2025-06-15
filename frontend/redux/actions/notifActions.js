@@ -1,12 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
 import {getToken} from '../../utils/helper';
-import { REACT_APP_API_URL } from '@env';
 import api from '../../api/axiosInstance';
-// Get Devices with Token
-export const getDevices = createAsyncThunk(
-    'devices/getDevices',
-    async (query, thunkAPI) => {
+
+// Get notifications with Token
+export const notifChecker = createAsyncThunk(
+    'notifications/notifChecker',
+    async (data, thunkAPI) => {
         
         const token = await getToken();
 
@@ -22,9 +21,8 @@ export const getDevices = createAsyncThunk(
             withCredentials: true
         }
         try {
-            let urlString = `/api/v1/notifications`
 
-            const response = await api.get(urlString, config);
+            const response = await api.post(`/api/v1/notifications/check`, data, config);
 
             return response.data;
 
@@ -34,10 +32,9 @@ export const getDevices = createAsyncThunk(
     }
 )
 
-// Add Device for Notification 
-export const addDevice = createAsyncThunk(
-    'device/addDevice',
-    async (req, thunkAPI) => {
+export const getUserNotifications = createAsyncThunk(
+    'notifications/getUserNotifications',
+    async (_, thunkAPI) => {
 
         const token = await getToken();
 
@@ -54,7 +51,7 @@ export const addDevice = createAsyncThunk(
         }
         try {
 
-            const response = await api.post(`/api/v1/notifications/save-token`, req, config)
+            const response = await api.get(`/api/v1/notifications`, config)
 
             return response.data;
 
@@ -66,9 +63,9 @@ export const addDevice = createAsyncThunk(
 )
 
 // Send Notification
-export const sendNotification = createAsyncThunk(
-    'notification/sendNotification',
-    async (req, thunkAPI) => {
+export const sendNotifications = createAsyncThunk(
+    'notifications/sendNotifications',
+    async (data, thunkAPI) => {
         
         const token = await getToken();
 
@@ -85,7 +82,69 @@ export const sendNotification = createAsyncThunk(
         }
         try {
 
-            const response = await api.post(`/api/v1/send-notification`, req, config)
+            const response = await api.post(`/api/v1/notifications/send`, data, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Seen Notification
+export const markAsSeen = createAsyncThunk(
+    'notifications/markAsSeen',
+    async (id, thunkAPI) => {
+        
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+        
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await api.put(`/api/v1/notifications/${id}`, config)
+            
+            return response.data;
+
+        } catch (error) {
+
+            return thunkAPI.rejectWithValue(error.message);
+        }
+    }
+)
+
+// Delete Notification
+export const deleteNotif = createAsyncThunk(
+    'notifications/deleteNotif',
+    async (id, thunkAPI) => {
+        
+        const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+        
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+        try {
+
+            const response = await api.put(`/api/v1/notifications/${id}`, config)
             
             return response.data;
 

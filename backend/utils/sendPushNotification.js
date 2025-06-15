@@ -27,7 +27,6 @@ const sendPushNotification = async (token, title, body) => {
         }
 
         const jsonResponse = await response.json();
-        console.log("Notification Response:", jsonResponse);
         return jsonResponse;
     } catch (error) {
         console.error("Error Sending Push Notification:", error);

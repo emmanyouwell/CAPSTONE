@@ -1,55 +1,93 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { addDevice, getDevices, sendNotification } from '../actions/notifActions';
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  deleteNotif,
+  getUserNotifications,
+  markAsSeen,
+  notifChecker,
+  sendNotifications,
+} from "../actions/notifActions";
 
-export const notifSlice = createSlice({
-  name: 'notifications',
+const notifSlice = createSlice({
+  name: "notifications",
   initialState: {
-    devices: [],
-    loading: false, 
+    notifDetails: null,
+    notifications: [],
+    unseen: 0,
+    count: 0,
+    message: null,
+    loading: false,
     error: null,
-    status: "not ok" 
   },
   reducers: {
   },
   extraReducers: (builder) => {
     builder
-      
-      .addCase(getDevices.pending, (state, action) => {
+      .addCase(notifChecker.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(getDevices.fulfilled, (state, action) => {
+      .addCase(notifChecker.fulfilled, (state, action) => {
         state.loading = false;
-        state.devices = action.payload.userNotifs;
+        state.notifDetails = action.payload.notification;
       })
-      .addCase(getDevices.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload; 
-      })
-
-      .addCase(addDevice.pending, (state, action) => {
-        state.loading = true;
-      })
-      .addCase(addDevice.fulfilled, (state, action) => {
-        state.loading = false;
-        state.success = action.payload.success;
-      })
-      .addCase(addDevice.rejected, (state, action) => {
+      .addCase(notifChecker.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      .addCase(sendNotification.pending, (state, action) => {
+      .addCase(getUserNotifications.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(sendNotification.fulfilled, (state, action) => {
+      .addCase(getUserNotifications.fulfilled, (state, action) => {
         state.loading = false;
-        state.status = action.payload.data.status;
+        state.notifications = action.payload.notifications;
+        state.count = action.payload.count;
+        state.unseen = action.payload.unseen;
       })
-      .addCase(sendNotification.rejected, (state, action) => {
+      .addCase(getUserNotifications.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+
+      .addCase(sendNotifications.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(sendNotifications.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(sendNotifications.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(markAsSeen.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(markAsSeen.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(markAsSeen.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(deleteNotif.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteNotif.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload.message;
+      })
+      .addCase(deleteNotif.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
-
 export default notifSlice.reducer;
