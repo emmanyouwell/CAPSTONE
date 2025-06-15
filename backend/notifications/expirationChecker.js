@@ -51,16 +51,24 @@ const checkExpiringMilk = async () => {
       for (const user of users) {
         const notifDoc = notificationsMap.get(user._id.toString());
         if (notifDoc && notifDoc.expoTokens.length > 0) {
-          for (const token of notifDoc.expoTokens) {
-            pushTasks.push(sendPushNotification(token, title, body));
-          }
+          if (notifDoc && notifDoc.expoTokens.length > 0) {
+            const alreadyNotified = notifDoc.notifications.some(
+              (n) => n.body === body
+            );
 
-          notifDoc.notifications.push({
-            title,
-            body,
-            seen: false,
-            notifiedAt: new Date(),
-          });
+            if (!alreadyNotified) {
+              for (const token of notifDoc.expoTokens) {
+                pushTasks.push(sendPushNotification(token, title, body));
+              }
+
+              notifDoc.notifications.push({
+                title,
+                body,
+                seen: false,
+                notifiedAt: new Date(),
+              });
+            }
+          }
         }
       }
     }
