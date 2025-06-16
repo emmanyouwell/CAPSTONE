@@ -20,41 +20,31 @@ exports.createHTMLArticle = catchAsyncErrors(async (req, res, next) => {
     try {
         let { content, title, description } = req.body;
         let images = [];
-        // Ensure content is a valid string before processing
-        content = String(content)
-        if (typeof content !== "string") {
-            console.error("Error: content is not a string or is undefined.");
-            return;
+        if (typeof req.body.images === 'string') {
+            images.push(req.body.images)
         }
-        // Extract base64 images from content
-        const base64Images = content.match(/<img[^>]+src="data:image\/[^">]+"/g);
-
-        if (base64Images) {
-            for (let imgTag of base64Images) {
-                const base64Data = imgTag.match(/src="(data:image\/[^"]+)"/)[1];
-
-                // Upload image to Cloudinary
-                const result = await cloudinary.uploader.upload(base64Data, {
-                    folder: "articles",
-                });
-
-                images.push({
-                    public_id: result.public_id,
-                    url: result.secure_url
-                });
-
-                // Replace base64 image with Cloudinary URL in the content
-                content = content.replace(base64Data, result.secure_url);
-            }
+        else {
+            images = req.body.images
         }
+
+        let imagesLinks = [];
+
+        for (let i = 0; i < images.length; i++) {
+            const result = await cloudinary.v2.uploader.upload(images[i], {
+                folder: 'articles'
+            });
+
+            imagesLinks.push({
+                public_id: result.public_id,
+                url: result.secure_url
+            });
+        }
+        req.body.images = imagesLinks;
 
         // Save article with updated content
-        const article = await Announcement.create({
-            title,
-            description,
-            content,
-            // images,
-        });
+        const article = await Announcement.create(
+            req.body
+        );
 
         res.status(201).json({
             success: true,

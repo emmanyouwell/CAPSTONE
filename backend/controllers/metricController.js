@@ -249,6 +249,7 @@ exports.getRequestsPerMonth = catchAsyncErrors(async (req, res, next) => {
   try {
     const requests = await Request.find();
     const incomingRequests = requests.filter((req) => req.status === "Pending");
+    const completedRequests = requests.filter((req) => req.status === "Done");
     console.log(requests)
 
     const monthlyData = {};
@@ -285,6 +286,7 @@ exports.getRequestsPerMonth = catchAsyncErrors(async (req, res, next) => {
 
     monthlyData["total"] = yearlyTotals;
     monthlyData["pending"] = incomingRequests.length;
+    monthlyData["completed"] = completedRequests.length;
     const result = monthlyData;
 
     res.status(200).json({
