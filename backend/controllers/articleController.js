@@ -22,7 +22,20 @@ exports.allArticles = catchAsyncErrors(async (req, res, next) => {
     })
 
 })
-
+exports.archivedArticles = catchAsyncErrors(async (req, res, next) => {
+    const { search } = req.query;
+    let query = {};
+    if (search) {
+        query.$or = [
+            { 'title': { $regex: search, $options: 'i' } },
+        ];
+    }
+    const articles = await Article.findOnlyDeleted(query).sort({ deletedAt: -1 });
+    res.status(200).json({
+        success: true,
+        articles
+    });
+});
 exports.createHTMLArticle = catchAsyncErrors(async (req, res, next) => {
     try {
         let { content, title, description } = req.body;
@@ -272,3 +285,32 @@ exports.deleteArticle = catchAsyncErrors(async (req, res, next) => {
         message: 'Article is deleted'
     })
 })
+
+exports.softDeleteArticle = catchAsyncErrors(async (req, res, next) => {
+    const article = await Article.softDeleteById(req.params.id);
+
+    if (!article) {
+        return next(new ErrorHandler(`Article is not found with this id: ${req.params.id}`))
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Article is soft deleted'
+    })
+})
+
+exports.restoreArticle = catchAsyncErrors(async (req, res, next) => {
+    const article = await Article.restoreById(req.params.id);
+
+    if (!article) {
+        return res.status(404).json({
+            success: false,
+            message: `Article with id ${req.params.id} not found`
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: 'Article is restored'
+    });
+});

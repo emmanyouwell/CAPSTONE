@@ -4,8 +4,14 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const cloudinary = require('cloudinary');
 
 exports.allAnnouncements = catchAsyncErrors(async (req, res, next) => {
-    const articles = await Announcement.find().sort({ createdAt: -1 });
-
+    const { search } = req.query;
+    let query = {};
+    if (search) {
+        query.$or = [
+            { 'title': { $regex: search, $options: 'i' } },
+        ];
+    }
+    const articles = await Announcement.find(query).sort({ createdAt: -1 });
     const count = await Announcement.countDocuments();
 
     res.status(200).json({
@@ -223,3 +229,48 @@ exports.deleteArticle = catchAsyncErrors(async (req, res, next) => {
         message: 'Article is deleted'
     })
 })
+
+exports.softDeleteArticle = catchAsyncErrors(async (req, res, next) => {
+    const article = await Announcement.softDeleteById(req.params.id.trim());
+
+    if (!article) {
+        return next(new ErrorHandler(`Article is not found with this id: ${req.params.id}`))
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Article is soft deleted'
+    })
+})
+
+exports.restoreArticle = catchAsyncErrors(async (req, res, next) => {
+    const cleanId = req.params.id.replace(/\s+/g, '');
+
+    const article = await Announcement.restoreById(cleanId);
+
+    if (!article) {
+        return res.status(404).json({
+            success: false,
+            message: `Article with id ${cleanId} not found`
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: 'Article is restored'
+    });
+});
+exports.archivedArticles = catchAsyncErrors(async (req, res, next) => {
+    const { search } = req.query;
+    let query = {};
+    if (search) {
+        query.$or = [
+            { 'title': { $regex: search, $options: 'i' } },
+        ];
+    }
+    const articles = await Announcement.findOnlyDeleted(query).sort({ deletedAt: -1 });
+    res.status(200).json({
+        success: true,
+        articles
+    });
+});

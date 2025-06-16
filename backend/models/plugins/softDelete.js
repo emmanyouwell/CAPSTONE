@@ -5,15 +5,20 @@ module.exports = function softDeletePlugin(schema, options = {}) {
     deletedAt: { type: Date, default: null },
   });
 
-  // Auto-filter deleted documents unless explicitly included
   schema.pre(/^find/, function (next) {
+    if (this.getOptions().skipDeletedFilter) {
+      return next(); // Don't apply any filter
+    }
+
     if (!this.getFilter().includeDeleted) {
       this.where({ isDeleted: false });
     } else {
       this.setQuery({ ...this.getFilter(), includeDeleted: undefined });
     }
+
     next();
   });
+
 
   // --- Static Methods ---
 
@@ -25,13 +30,14 @@ module.exports = function softDeletePlugin(schema, options = {}) {
     });
   };
 
-  // Restore a single soft-deleted document
   schema.statics.restoreById = async function (id) {
-    return this.findByIdAndUpdate(id, {
-      isDeleted: false,
-      deletedAt: null,
-    });
+    return this.findOneAndUpdate(
+      { _id: id, isDeleted: true }, // Find only soft-deleted
+      { isDeleted: false, deletedAt: null },
+      { new: true } // Return the updated document
+    ).setOptions({ skipDeletedFilter: true }); // ✅ Bypass soft-delete filter
   };
+
 
   // Soft delete multiple documents
   schema.statics.softDeleteMany = async function (filter = {}) {
@@ -54,6 +60,6 @@ module.exports = function softDeletePlugin(schema, options = {}) {
     return this.find({ ...filter, includeDeleted: true });
   };
   schema.statics.findOnlyDeleted = function (filter = {}) {
-    return this.find({ ...filter, isDeleted: true });
+    return this.find({ ...filter, isDeleted: true }).setOptions({ skipDeletedFilter: true });
   };
 };
