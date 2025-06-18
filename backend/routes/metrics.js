@@ -14,6 +14,7 @@ const {
   getDonationLocations,
   getDonorLocations,
   getPatientHospitals,
+  getPasteurizedMilkPerMonth,
 } = require("../controllers/metricController");
 
 router.route("/metrics")
@@ -37,6 +38,12 @@ router.route("/dispensePerMonth")
     authorizeRoles("SuperAdmin", "Admin"),
     getDispensedMilk
   );
+router.route("/pasteurizedMilkPerMonth")
+  .get(
+    isAuthenticatedUser,
+    authorizeRoles("SuperAdmin", "Admin"),
+    getPasteurizedMilkPerMonth
+  );
 router.route("/patientsPerMonth")
   .get(
     isAuthenticatedUser,
@@ -51,37 +58,37 @@ router.route("/requestsPerMonth")
   );
 
 router.route("/availableMilk")
-.get(
-  isAuthenticatedUser,
-  authorizeRoles("SuperAdmin", "Admin"),
-  getAvailableMilk
-);
+  .get(
+    isAuthenticatedUser,
+    authorizeRoles("SuperAdmin", "Admin"),
+    getAvailableMilk
+  );
 
 router.route("/expiringMilk")
-.get(
-  isAuthenticatedUser,
-  authorizeRoles("SuperAdmin", "Admin"),
-  pasteurizeSoon
-);
+  .get(
+    isAuthenticatedUser,
+    authorizeRoles("SuperAdmin", "Admin"),
+    pasteurizeSoon
+  );
 
 router.route("/donationLocation")
-.get(
-  isAuthenticatedUser,
-  authorizeRoles("SuperAdmin", "Admin"),
-  getDonationLocations
-);
+  .get(
+    isAuthenticatedUser,
+    authorizeRoles("SuperAdmin", "Admin"),
+    getDonationLocations
+  );
 
 router.route("/donorLocation")
-.get(
-  isAuthenticatedUser,
-  authorizeRoles("SuperAdmin", "Admin"),
-  getDonorLocations
-);
+  .get(
+    isAuthenticatedUser,
+    authorizeRoles("SuperAdmin", "Admin"),
+    getDonorLocations
+  );
 
 router.route("/patientHospital")
-.get(
-  isAuthenticatedUser,
-  authorizeRoles("SuperAdmin", "Admin"),
-  getPatientHospitals
-);
+  .get(
+    isAuthenticatedUser,
+    authorizeRoles("SuperAdmin", "Admin"),
+    getPatientHospitals
+  );
 module.exports = router;

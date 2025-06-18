@@ -138,7 +138,14 @@ exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
 
 exports.getDispensedMilk = catchAsyncErrors(async (req, res, next) => {
   try {
-    const requests = await Request.find();
+    const year = parseInt(req.query.year) || new Date().getFullYear(); // Get the year from query parameters
+    // Start and end of the year
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(year + 1, 0, 1);
+
+    console.log("Start Date:", startDate.toISOString());
+    console.log("End Date:", endDate.toISOString());
+    const requests = await Request.find({ status: "Done", "tchmb.dispenseAt": { $gte: startDate, $lt: endDate } });
 
     const stats = {};
 
@@ -606,5 +613,84 @@ exports.getPatientHospitals = catchAsyncErrors(async (req, res, next) => {
       success: false,
       message: error.message
     })
+  }
+})
+
+exports.getPasteurizedMilkPerMonth = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const fridges = await Fridge.find();
+    const past = fridges.filter((f) => f.fridgeType === 'Pasteurized') || [];
+
+    let pastFridge = [];
+
+    if (past.length > 0) {
+      pastFridge = await Promise.all(past.map(async (fridge) => {
+        const inventories = await Inventory.find({ fridge: fridge._id, status: "Available" })
+          .populate({
+            path: "pasteurizedDetails.donors",
+            populate: {
+              path: "user",
+              select: "name"
+            }
+          })
+          .sort({ 'pasteurizedDetails.pasteurizationDate': 1 });
+
+        return { inventories };
+      }));
+    }
+
+    // Initialize monthly volume tracker
+    const totalVolumeByMonth = {};
+
+    for (const fridge of pastFridge) {
+      for (const inventory of fridge.inventories) {
+        const details = inventory.pasteurizedDetails;
+        const bottleVolume = details.bottleType; // mL per bottle
+
+        const pasteurizationDate = details.pasteurizationDate;
+        if (!pasteurizationDate) continue;
+
+
+        const parsedDate = new Date(pasteurizationDate);
+        let month = "";
+        if (!isNaN(parsedDate)) {
+          month = parsedDate.toLocaleString("default", { month: "long" });
+          // proceed to use `month` in your grouping logic
+        } else {
+          console.warn("Invalid date encountered:", pasteurizationDate);
+          // optionally skip this entry or put it in a separate error log
+        }
+
+
+        const availableBottles = details.bottles.filter(
+          (b) => b.status === "Available"
+        );
+
+        const volume = availableBottles.length * bottleVolume;
+
+        if (!totalVolumeByMonth[month]) {
+          totalVolumeByMonth[month] = 0;
+        }
+
+        totalVolumeByMonth[month] += volume;
+      }
+    }
+    const yearlyTotals = { total: 0 };
+    Object.values(totalVolumeByMonth).forEach((monthStats) => {
+      yearlyTotals.total += monthStats;
+    });
+
+    totalVolumeByMonth["total"] = yearlyTotals;
+    res.status(200).json({
+      success: true,
+      monthlyVolumes: totalVolumeByMonth
+    });
+
+  } catch (error) {
+    console.error('Error fetching fridges:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 })
