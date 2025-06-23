@@ -114,16 +114,26 @@ const donorSchema = new mongoose.Schema({
 donorSchema.plugin(softDeletePlugin)
 
 donorSchema.virtual('age').get(function () {
-  const today = new Date();
-  const birthDate = new Date(this.birthday);
+  const now = new Date();
+  const birth = new Date(this.birthday);
 
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const m = today.getMonth() - birthDate.getMonth();
+  const diffMs = now - birth;
+  const ageDate = new Date(diffMs);
 
-  if (m < 0 || (m===0 && today.getDate() < birthDate.getDate())){
-    age--;
+  const years = now.getFullYear() - birth.getFullYear();
+  const months = now.getMonth() - birth.getMonth() + (years * 12);
+  const weeks = Math.floor(diffMs / (1000 * 60 * 60 * 24 * 7));
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (years >= 1) {
+    return `${years} year${years > 1 ? 's' : ''} old`;
+  } else if (months >= 1) {
+    return `${months} month${months > 1 ? 's' : ''} old`;
+  } else if (weeks >= 1) {
+    return `${weeks} week${weeks > 1 ? 's' : ''} old`;
+  } else {
+    return `${days} day${days > 1 ? 's' : ''} old`;
   }
-  return age;
 })
 donorSchema.set('toObject', {virtuals: true});
 donorSchema.set('toJSON', {virtuals: true});
