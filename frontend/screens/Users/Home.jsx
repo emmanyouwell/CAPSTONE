@@ -42,7 +42,7 @@ const Home = ({ navigation }) => {
   const handleDelete = (id) => {
     Alert.alert(
       "Confirm Deletion",
-      "Are you sure you want to delete this bag?",
+      "Do you want to delete this bag?",
       [
         { text: "Cancel", style: "cancel" },
         { text: "", style: "cancel" },

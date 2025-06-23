@@ -18,7 +18,7 @@ const Equipments = ({ data }) => {
     const handleDelete = (id) => {
         Alert.alert(
             "Confirm Deletion",
-            "Are you sure you want to delete this equipment?",
+            "Do you want to delete this equipment?",
             [
                 { text: "Cancel", style: "cancel" },
                 {
@@ -26,7 +26,7 @@ const Equipments = ({ data }) => {
                     style: "destructive",
                     onPress: () => {
                         dispatch(deleteEquipments(id))
-                            .then(Alert.alert("Deleted", "Equipment deleted successfully."))
+                            .then(Alert.alert("Deleted", "The equipment is deleted!"))
                             .catch((err) => Alert.alert('Error', err.message));;
                     },
                 },

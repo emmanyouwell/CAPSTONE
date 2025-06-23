@@ -44,7 +44,7 @@ const EditRequest = ({ navigation, route }) => {
     };
 
     dispatch(updateVolumeRequested(updatedRequest)).then((res) => {
-      Alert.alert("Success", "Request Confirmed Successfully");
+      Alert.alert("Success", "The request has been confirmed!");
       navigation.navigate("RefRequest", {
         request: res.payload.request,
       });

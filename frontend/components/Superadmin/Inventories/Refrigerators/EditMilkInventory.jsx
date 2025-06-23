@@ -149,7 +149,7 @@ const EditMilkInventory = ({ route, navigation }) => {
         console.log('Update Data',updatedData)
         dispatch(updateInventory(updatedData))
             .then(() => {
-                Alert.alert('Success', 'Inventory has been updated successfully.');
+                Alert.alert('Success', 'Inventory has been updated!');
                 navigation.goBack();
             })
             .catch((error) => {

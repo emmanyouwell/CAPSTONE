@@ -97,7 +97,7 @@ const AddEquipment = ({ navigation }) => {
 
         dispatch(addEquipments(data))
             .then(() => {
-                Alert.alert('Success', 'Equipment added successfully!');
+                Alert.alert('Success', 'The equipment is added!');
                 navigation.goBack();
             })
             .catch((err) => Alert.alert('Error', err.message));

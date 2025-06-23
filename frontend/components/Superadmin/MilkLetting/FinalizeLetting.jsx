@@ -67,11 +67,11 @@ const FinalizeLetting = ({ route, navigation }) => {
           });
         })
         .catch((error) => {
-          Alert.alert("Error", "Failed to add fridge. Please try again.");
+          Alert.alert("Error", "Failed to finalize event. Please try again.");
           console.error(error);
         });
     };
-    Alert.alert("Finalize", "Are you sure you want to finalize this event?", [
+    Alert.alert("Finalize", "Do you want to finalize this event?", [
       { text: "Cancel", style: "cancel" },
       { text: "Yes", onPress: () => submit() },
     ]);

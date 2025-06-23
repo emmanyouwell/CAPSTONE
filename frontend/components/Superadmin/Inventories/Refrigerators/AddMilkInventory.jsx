@@ -142,13 +142,13 @@ const AddMilkInventory = ({ route, navigation }) => {
       console.log(newData);
       try {
         dispatch(addInventory(newData));
-        Alert.alert("Success", "Inventory has been added successfully.");
+        Alert.alert("Success", "Inventory has been added!.");
 
         navigation.goBack();
       } catch (error) {
         Alert.alert(
-          "Error",
-          "Failed to add Inventory or update item status. Please try again."
+          "Server Error",
+          "Please try again."
         );
         console.error(error);
       }

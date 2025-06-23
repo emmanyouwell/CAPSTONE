@@ -85,7 +85,7 @@ const EditStaffRequest = ({ navigation, route }) => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
-        "Permission Denied",
+        "Permission denied",
         "You need to grant camera roll permissions."
       );
       return;
@@ -146,7 +146,7 @@ const EditStaffRequest = ({ navigation, route }) => {
 
     dispatch(updateRequest(requestData))
       .then((res) => {
-        Alert.alert("Success", "Request Updated");
+        Alert.alert("Success", "The request is updated!");
         navigation.goBack();
       })
       .catch((error) => {
