@@ -92,7 +92,7 @@ const EditEvent = ({ route, navigation }) => {
     const showEditDeleteOptions = () => {
         Alert.alert(
             "Delete Event",
-            `Are you sure you want to delete this event?`,
+            `Do you want to delete this event?`,
             [
                 
                 { text: "Delete", onPress: () => handleDelete() },

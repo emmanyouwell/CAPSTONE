@@ -93,7 +93,7 @@ const ConfirmRequest = ({ route, navigation }) => {
                 }
             }
 
-            Alert.alert("Success", "Request Completed");
+            Alert.alert("Success", "The request is completed");
             navigation.navigate('RequestOpt');
         } catch (err) {
             Alert.alert("Error", "Failed to complete the operation.");

@@ -120,7 +120,7 @@ const EditEquipments = ({ navigation, route }) => {
 
         dispatch(updateEquipment(data))
             .then(() => {
-                Alert.alert('Success', 'Equipment Updated!');
+                Alert.alert('Success', 'The equipment is updated!');
                 navigation.goBack();
             })
             .catch((err) => Alert.alert('Error', err.message));
