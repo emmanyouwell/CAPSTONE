@@ -9,10 +9,6 @@ const announcementSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    content: {
-        type: String,
-        required: true
-    },
     images: [
         {
             public_id: {
