@@ -77,7 +77,7 @@ const Refrigerator = ({ route }) => {
 
   const showEditDeleteOptions = (item) => {
     Alert.alert(
-      "Edit or Delete Fridge",
+      "Fridge Actions",
       `What would you like to do with ${item.name}?`,
       [
         { text: "Edit", onPress: () => handleEdit(item) },
@@ -94,7 +94,7 @@ const Refrigerator = ({ route }) => {
   const handleDelete = (fridgeId) => {
     dispatch(deleteFridges(fridgeId))
       .then(() => {
-        Alert.alert("Success", "Fridge deleted successfully.");
+        Alert.alert("Success", "The fridge has been deleted.");
         dispatch(getFridges());
       })
       .catch((err) => {

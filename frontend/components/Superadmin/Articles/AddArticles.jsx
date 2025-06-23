@@ -117,7 +117,7 @@ const AddArticles = ({ navigation }) => {
 
         dispatch(addArticles(data))
             .then(() => {
-                Alert.alert('Success', 'Article published successfully!');
+                Alert.alert('Success', 'The article is published!');
                 navigation.goBack();
             })
             .catch((err) => Alert.alert('Error', err.message));

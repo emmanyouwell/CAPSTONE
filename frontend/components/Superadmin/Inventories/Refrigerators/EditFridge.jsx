@@ -37,7 +37,7 @@ const EditFridge = ({ route, navigation }) => {
 
         dispatch(updateFridge(updatedFridge))
             .then(() => {
-                Alert.alert('Success', `Fridge "${name}" has been updated successfully.`);
+                Alert.alert('Success', `Fridge "${name}" has been updated!`);
                 navigation.goBack();
             })
             .catch((error) => {

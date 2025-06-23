@@ -50,7 +50,7 @@ const ConfirmBottleReserve = ({ navigation, route }) => {
     };
     dispatch(reserveInventory(data))
       .then(() => {
-        Alert.alert("Success", "Bottles Reserved");
+        Alert.alert("Success", "The bottles are reserved");
         if(request.patient.patientType === 'Inpatient'){
           navigation.navigate('Inpatients')
         } else {

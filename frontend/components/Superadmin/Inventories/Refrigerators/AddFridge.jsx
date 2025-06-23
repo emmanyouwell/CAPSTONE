@@ -30,7 +30,7 @@ const AddFridge = () => {
 
         dispatch(addFridges(newFridge))
             .then(() => {
-                Alert.alert('Success', `Fridge "${name}" has been added successfully.`);
+                Alert.alert('Success', `Fridge "${name}" has been added!.`);
                 setName(''); 
                 setFridgeType(null);
             })

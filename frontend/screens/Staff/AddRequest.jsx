@@ -148,9 +148,9 @@ const AddRequest = ({ navigation, route }) => {
         };
         dispatch(sendNotifications(notifData)).catch((error) => {
           console.error("Error sending notification:", error);
-          Alert.alert("Error", "Sending Notification");
+          Alert.alert("Error", "Error in sending notification");
         });
-        Alert.alert("Success", "Request added successfully!");
+        Alert.alert("Success", "The request has been added!");
         navigation.navigate("superadmin_dashboard");
       })
       .catch((error) => {
