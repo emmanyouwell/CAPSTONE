@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import Header from "../Header";
 import { SuperAdmin } from "../../../styles/Styles";
 import { approveSchedule } from "../../../redux/actions/scheduleActions";
+import { sendSingleUserNotif } from "../../../redux/actions/notifActions";
 
 const EditSchedule = ({ route }) => {
   const navigation = useNavigation();
@@ -34,8 +35,19 @@ const EditSchedule = ({ route }) => {
       adminId: userDetails._id,
     };
 
+    const { user } = item.donorDetails?.donorId;
+
+    const notifData = {
+      userId: user._id,
+      title: "Scheduled request update",
+      body: `Your new scheduled request (${moment(date).format(
+        "MMMM Do YYYY, h:mm A"
+      )}) is approved`,
+    };
+
     dispatch(approveSchedule(updatedData))
       .then(() => {
+        dispatch(sendSingleUserNotif(notifData));
         Alert.alert("Success", "The schedule has been updated!");
         navigation.goBack();
       })
@@ -43,23 +55,23 @@ const EditSchedule = ({ route }) => {
   };
 
   const handlePress = () => {
-      Alert.alert(
-        "Confirm Edit and Approve",
-        "Do you want to update and approve this Schedule?",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Approve",
-            style: "destructive",
-            onPress: () => handleSave(),
-          },
-        ]
-      );
-    };
+    Alert.alert(
+      "Confirm Edit and Approve",
+      "Do you want to update and approve this Schedule?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Approve",
+          style: "destructive",
+          onPress: () => handleSave(),
+        },
+      ]
+    );
+  };
 
   return (
     <View contentContainerStyle={SuperAdmin.container}>
-      <Header/>
+      <Header />
 
       <Text style={styles.screenTitle}>Edit Schedule</Text>
       <ScrollView style={styles.section}>

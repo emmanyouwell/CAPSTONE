@@ -17,6 +17,7 @@ import {
   approveSchedule,
   updateSchedule,
 } from "../../../redux/actions/scheduleActions";
+import { sendSingleUserNotif } from "../../../redux/actions/notifActions";
 
 const Schedules = ({ data }) => {
   const navigation = useNavigation();
@@ -76,9 +77,18 @@ const Schedules = ({ data }) => {
       adminId: userDetails._id,
     };
 
+    const { user } = item.donorDetails?.donorId;
+
+    const notifData = {
+      userId: user._id,
+      title: "Scheduled request update",
+      body: `Your scheduled request is approved`
+    }
+
     dispatch(approveSchedule(updatedData))
       .then(() => {
-        Alert.alert("Success", "The schedule has been updated!");
+        dispatch(sendSingleUserNotif(notifData));
+        Alert.alert("Success", "The schedule has been approved!");
         navigation.goBack();
       })
       .catch((err) => Alert.alert("Error", err.message));

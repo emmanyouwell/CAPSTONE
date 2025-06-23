@@ -137,3 +137,26 @@ exports.sendNotifications = catchAsyncErrors(async (req, res, next) => {
     message: "Notifications sent and saved",
   });
 });
+
+
+// Send a single user notification
+exports.sendSingleUserNotif = catchAsyncErrors(async (req, res, next) => {
+  const { userId, title, body } = req.body;
+console.log(req.body)
+  if (!userId || !title || !body) {
+    return next(new ErrorHandler("userId, title, and body are required", 400));
+  }
+
+  const notifDoc = await Notification.findOne({ user: userId });
+  console.log(notifDoc)
+  for (let token of notifDoc.expoTokens) {
+    const response = await sendPushNotification(token, title, body);
+  }
+  notifDoc.notifications.push({ title, body });
+  await notifDoc.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Notification sent",
+  });
+});

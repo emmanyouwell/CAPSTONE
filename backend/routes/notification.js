@@ -6,7 +6,8 @@ const {
     getUserNotifications, 
     markAsSeen, 
     deleteNotification,
-    sendNotifications, 
+    sendNotifications,
+    sendSingleUserNotif
 } = require('../controllers/notifController');
 
 const { isAuthenticatedUser } = require('../middlewares/auth');
@@ -19,11 +20,14 @@ router.route('/notifications')
     .get(isAuthenticatedUser, getUserNotifications);
 
 router.route('/notifications/:id')
-    .put(isAuthenticatedUser, markAsSeen)
-    .delete(isAuthenticatedUser, deleteNotification);
+    .put(markAsSeen)
+    .delete(deleteNotification);
 
 router.route('/notifications/send')
     .post(isAuthenticatedUser, sendNotifications);
+
+router.route('/notifications/send/single')
+    .post(isAuthenticatedUser, sendSingleUserNotif);
     
 
 
