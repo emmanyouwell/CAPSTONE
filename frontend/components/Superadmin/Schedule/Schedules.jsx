@@ -30,7 +30,7 @@ const Schedules = ({ data }) => {
   const handleDelete = (id) => {
     Alert.alert(
       "Confirm Deletion",
-      "Are you sure you want to delete this Schedule?",
+      "Do you want to delete this Schedule?",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -78,7 +78,7 @@ const Schedules = ({ data }) => {
 
     dispatch(approveSchedule(updatedData))
       .then(() => {
-        Alert.alert("Success", "Schedule updated.");
+        Alert.alert("Success", "The schedule has been updated!");
         navigation.goBack();
       })
       .catch((err) => Alert.alert("Error", err.message));
@@ -87,7 +87,7 @@ const Schedules = ({ data }) => {
   const handleApprove = (item) => {
     Alert.alert(
       "Confirm Approval",
-      "Are you sure you want to approve this Schedule?",
+      "Do you want to approve this schedule?",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -104,7 +104,7 @@ const Schedules = ({ data }) => {
       schedId: item._id,
       status: "Completed",
     };
-    Alert.alert("Confirm Collection", "Is the express breastmilk collected?", [
+    Alert.alert("Confirm Collection", "Is the expressed breast milk collected?", [
       { text: "Cancel", style: "cancel" },
       {
         text: "Yes",
@@ -112,7 +112,7 @@ const Schedules = ({ data }) => {
         onPress: () => {
           dispatch(updateSchedule(data))
             .then(
-              Alert.alert("Collectd", "Express breastmilk has been collected.")
+              Alert.alert("Collected", "Expressed breast milk has been collected!")
             )
             .catch((err) => Alert.alert("Error", err.message));
         },

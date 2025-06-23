@@ -17,7 +17,7 @@ const ArticleList = ({ data }) => {
     const handleDelete = (id) => {
         Alert.alert(
             "Confirm Deletion",
-            "Are you sure you want to delete this article?",
+            "Do you want to delete this article?",
             [
                 { text: "Cancel", style: "cancel" },
                 {
@@ -25,7 +25,7 @@ const ArticleList = ({ data }) => {
                     style: "destructive",
                     onPress: () => {
                         dispatch(deleteArticle(id))
-                            .then(Alert.alert("Deleted", "Article deleted successfully."))
+                            .then(Alert.alert("Deleted", "The article is deleted!"))
                             .catch((err) => Alert.alert('Error', err.message));;
                     },
                 },

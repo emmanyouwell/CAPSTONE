@@ -27,7 +27,7 @@ const MilkLettings = ({ data }) => {
   const handleDelete = (id) => {
     Alert.alert(
       "Confirm Deletion",
-      "Are you sure you want to delete this Milk Letting event?",
+      "Do you want to delete this Milk Letting event?",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -36,7 +36,7 @@ const MilkLettings = ({ data }) => {
           onPress: () => {
             dispatch(deleteLetting(id))
               .then(
-                Alert.alert("Deleted", "Milk Letting deleted successfully.")
+                Alert.alert("Deleted", "The milk letting event is deleted!")
               )
               .catch((err) => Alert.alert("Error", err.message));
           },

@@ -135,7 +135,7 @@ const EditArticles = ({ navigation, route }) => {
         console.log("ID: ", item._id);
         dispatch(updateArticle(data))
             .then(() => {
-                Alert.alert('Success', 'Article updated successfully!');
+                Alert.alert('Success', 'The article is updated!');
                 navigation.goBack();
             })
             .catch((err) => Alert.alert('Error', err.message));

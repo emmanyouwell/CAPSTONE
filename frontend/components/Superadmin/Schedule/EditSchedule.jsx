@@ -36,7 +36,7 @@ const EditSchedule = ({ route }) => {
 
     dispatch(approveSchedule(updatedData))
       .then(() => {
-        Alert.alert("Success", "Schedule updated.");
+        Alert.alert("Success", "The schedule has been updated!");
         navigation.goBack();
       })
       .catch((err) => Alert.alert("Error", err.message));
@@ -45,7 +45,7 @@ const EditSchedule = ({ route }) => {
   const handlePress = () => {
       Alert.alert(
         "Confirm Edit and Approve",
-        "Are you sure you want to update and approve this Schedule?",
+        "Do you want to update and approve this Schedule?",
         [
           { text: "Cancel", style: "cancel" },
           {

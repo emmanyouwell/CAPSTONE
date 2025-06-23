@@ -90,7 +90,7 @@ const Outpatients = ({ navigation }) => {
   };
 
   const addRequest = () => {
-    Alert.alert("Add Request", "Is the outpatient has a record in TCHMB?", [
+    Alert.alert("Add Request", "Does the outpatient have a record in TCHMB?", [
       { text: "Cancel", style: "cancel" },
       { 
         text: "No",
