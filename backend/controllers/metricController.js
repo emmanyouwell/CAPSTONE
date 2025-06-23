@@ -38,7 +38,7 @@ exports.getDonorsPerMonth = catchAsyncErrors(async (req, res, next) => {
     // Start and end of the year
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year + 1, 0, 1);
-    const donors = await Donor.find({createdAt: {$gte: startDate, $lte: endDate}});
+    const donors = await Donor.find({ createdAt: { $gte: startDate, $lte: endDate } });
     const monthlyData = {};
 
     donors.forEach((donor) => {
@@ -97,7 +97,7 @@ exports.getDonationStats = catchAsyncErrors(async (req, res, next) => {
     // Start and end of the year
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year + 1, 0, 1);
-    const bags = await Bags.find({ status: ["Collected", "Pasteurized"], createdAt: {$gte: startDate, $lte: endDate} });
+    const bags = await Bags.find({ status: ["Collected", "Pasteurized"], createdAt: { $gte: startDate, $lte: endDate } });
 
     const stats = {};
 
@@ -215,7 +215,7 @@ exports.getPatientsPerMonth = catchAsyncErrors(async (req, res, next) => {
     // Start and end of the year
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year + 1, 0, 1);
-    const patients = await Patient.find({createdAt: {$gte: startDate, $lte:endDate}});
+    const patients = await Patient.find({ createdAt: { $gte: startDate, $lte: endDate } });
     const monthlyData = {};
 
     patients.forEach((patient) => {
@@ -335,7 +335,7 @@ exports.getAvailableMilk = catchAsyncErrors(async (req, res, next) => {
 
     if (past.length > 0) {
       pastFridge = await Promise.all(past.map(async (fridge) => {
-        const inventories = await Inventory.find({ fridge: fridge._id, status: "Available", "pasteurizedDetails.pasteurizationDate":{$gte: startDate, $lte: endDate} })
+        const inventories = await Inventory.find({ fridge: fridge._id, status: "Available", "pasteurizedDetails.pasteurizationDate": { $gte: startDate, $lte: endDate } })
           .populate({
             path: "pasteurizedDetails.donors",
             populate: {
@@ -645,7 +645,7 @@ exports.getPasteurizedMilkPerMonth = catchAsyncErrors(async (req, res, next) => 
 
     if (past.length > 0) {
       pastFridge = await Promise.all(past.map(async (fridge) => {
-        const inventories = await Inventory.find({ fridge: fridge._id, status: "Available", "pasteurizedDetails.pasteurizationDate": {$gte: startDate, $lte: endDate}})
+        const inventories = await Inventory.find({ fridge: fridge._id, status: "Available", "pasteurizedDetails.pasteurizationDate": { $gte: startDate, $lte: endDate } })
           .populate({
             path: "pasteurizedDetails.donors",
             populate: {
@@ -713,4 +713,47 @@ exports.getPasteurizedMilkPerMonth = catchAsyncErrors(async (req, res, next) => 
       message: error.message
     });
   }
+})
+
+exports.getDonorAge = catchAsyncErrors(async (req, res, next) => {
+  const today = new Date();
+
+  const donorAgeDemographics = await Donor.aggregate([
+    {
+      $addFields: {
+        age: {
+          $dateDiff: {
+            startDate: "$birthday",
+            endDate: today,
+            unit: "year"
+          }
+        }
+      }
+    },
+    {
+      $group: {
+        _id: "$age",
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { _id: 1 } // optional: sort by age
+    }
+  ]);
+
+  const ageMap = {};
+  let total = 0;
+
+  donorAgeDemographics.forEach(item => {
+    ageMap[item._id] = item.count;
+    total += item.count;
+  });
+
+  ageMap.total = total;
+
+  res.status(200).json({
+    success: true,
+    donorAge: ageMap
+  });
+
 })
