@@ -20,17 +20,6 @@ const donorSchema = new mongoose.Schema({
       required: [true, "Enter City"],
     },
   },
-  age: {
-    value: {
-      type: Number,
-      required: [true, "Please enter age of the donor"]
-    },
-    unit: {
-      enum: ["years", "months", "weeks", "days"],
-      type: String,
-      required: true
-    }
-  },
   birthday: {
     type: Date,
     required: [true, "Please enter birthday of the donor"],
@@ -123,4 +112,19 @@ const donorSchema = new mongoose.Schema({
   },
 });
 donorSchema.plugin(softDeletePlugin)
+
+donorSchema.virtual('age').get(function () {
+  const today = new Date();
+  const birthDate = new Date(this.birthday);
+
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m===0 && today.getDate() < birthDate.getDate())){
+    age--;
+  }
+  return age;
+})
+donorSchema.set('toObject', {virtuals: true});
+donorSchema.set('toJSON', {virtuals: true});
 module.exports = mongoose.model("Donor", donorSchema);
