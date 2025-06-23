@@ -24,7 +24,7 @@ exports.allAnnouncements = catchAsyncErrors(async (req, res, next) => {
 
 exports.createHTMLArticle = catchAsyncErrors(async (req, res, next) => {
     try {
-        let { content, title, description } = req.body;
+        let {title, description } = req.body;
         let images = [];
         if (typeof req.body.images === 'string') {
             images.push(req.body.images)
