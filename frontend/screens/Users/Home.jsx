@@ -6,7 +6,7 @@ import {
   ScrollView,
   RefreshControl,
   Alert,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
@@ -24,6 +24,7 @@ import {
   getDonorSchedules,
 } from "../../redux/actions/scheduleActions";
 import { resetSuccess } from "../../redux/slices/scheduleSlice";
+import { sendNotifications } from "../../redux/actions/notifActions";
 
 const Home = ({ navigation }) => {
   const [visible, setVisible] = useState({});
@@ -40,25 +41,21 @@ const Home = ({ navigation }) => {
   const closeMenu = (id) => setVisible((prev) => ({ ...prev, [id]: false }));
 
   const handleDelete = (id) => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Do you want to delete this bag?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => {
-            dispatch(deleteBag(id))
-              .then(() => {
-                dispatch(getBags(userDetails._id));
-              })
-              .catch((err) => console.log(err));
-          },
+    Alert.alert("Confirm Deletion", "Do you want to delete this bag?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: () => {
+          dispatch(deleteBag(id))
+            .then(() => {
+              dispatch(getBags(userDetails._id));
+            })
+            .catch((err) => console.log(err));
         },
-      ]
-    );
+      },
+    ]);
   };
 
   // 1️⃣ Fetch user details once when screen gains focus
@@ -97,7 +94,7 @@ const Home = ({ navigation }) => {
   };
   return (
     <>
-      <Header/>
+      <Header />
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
           <Text style={styles.headerText}>
@@ -261,7 +258,17 @@ const Home = ({ navigation }) => {
                   date,
                   userId: userDetails._id,
                 };
-                dispatch(requestSchedule(data));
+                dispatch(requestSchedule(data)).then(() => {
+                  const notifData = {
+                    role: "Admin",
+                    title: "Scheduled Request",
+                    body: `Private donor (${userDetails.name?.last}, ${userDetails.name?.first}) has requested for pickup expressed breast milk!`,
+                  };
+                  dispatch(sendNotifications(notifData)).catch((error) => {
+                    console.error("Error sending notification:", error);
+                    Alert.alert("Error", "Error in sending notification");
+                  });
+                });
               }}
               onCancel={() => setOpen(false)}
             />

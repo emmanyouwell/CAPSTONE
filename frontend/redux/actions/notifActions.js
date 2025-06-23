@@ -93,6 +93,33 @@ export const sendNotifications = createAsyncThunk(
     }
 )
 
+// Send push notification
+export const sendSingleUserNotif = createAsyncThunk('notifications/sendSingleUserNotif', async (data, thunkAPI) => {
+    const token = await getToken();
+
+        if (!token) {
+            throw new Error('No token available');
+        }
+        
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            },
+            withCredentials: true
+        }
+
+    try {
+
+        const response = await api.post(`/api/v1/notifications/send/single`, data, config)
+            
+        return response.data;
+    } catch (error) {
+        
+        return thunkAPI.rejectWithValue(error.response?.data?.errMessage || 'Failed to send notification');
+    }
+});
+
 // Seen Notification
 export const markAsSeen = createAsyncThunk(
     'notifications/markAsSeen',
