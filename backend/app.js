@@ -97,6 +97,6 @@ app.use(errorMiddleware);
 // Notifications
 checkExpiringMilk();
 newDonor();
-checkEvents();
+// checkEvents();
 
 module.exports = app;
