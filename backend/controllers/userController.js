@@ -112,7 +112,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
         await sendEmail({
             email: user.email,
-            subject: 'TCHMB Password Recovery',
+            subject: 'Reset Password',
             message
         });
 
