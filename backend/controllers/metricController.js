@@ -741,19 +741,42 @@ exports.getDonorAge = catchAsyncErrors(async (req, res, next) => {
     }
   ]);
 
-  const ageMap = {};
+  // Initialize age range counters
+  const ageRanges = {
+    "Below 16": 0,
+    "17-20": 0,
+    "21-35": 0,
+    "36-50": 0,
+    "Above 50": 0
+  };
+
   let total = 0;
 
+  // Categorize ages into ranges
   donorAgeDemographics.forEach(item => {
-    ageMap[item._id] = item.count;
-    total += item.count;
+    const age = item._id;
+    const count = item.count;
+
+    if (age < 16) {
+      ageRanges["Below 16"] += count;
+    } else if (age >= 17 && age <= 20) {
+      ageRanges["17-20"] += count;
+    } else if (age >= 21 && age <= 35) {
+      ageRanges["21-35"] += count;
+    } else if (age >= 36 && age <= 50) {
+      ageRanges["36-50"] += count;
+    } else if (age > 50) {
+      ageRanges["Above 50"] += count;
+    }
+
+    total += count;
   });
 
-  ageMap.total = total;
+  // Add total to the response
+  ageRanges.total = total;
 
   res.status(200).json({
     success: true,
-    donorAge: ageMap
+    donorAge: ageRanges
   });
-
-})
+});
